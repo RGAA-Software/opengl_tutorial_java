@@ -4,6 +4,7 @@ import com.sk.tutorial.shader.ShaderProgram;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.*;
 
 import java.io.FileOutputStream;
@@ -14,6 +15,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
+
+import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class Main {
 
@@ -90,16 +94,19 @@ public class Main {
         glfwShowWindow(window);
     }
 
+    private int texture;
+    private int texture2;
+
     private void prepare() {
 
         program = new ShaderProgram();
         program.initWithShaderPath("shader/base/vs.glsl", "shader/base/fs.glsl");
 
         float vertices[] = {
-                -0.5f, -0.5f, 0.0f, 1.0f, 0, 0,
-                0.5f, -0.5f, 0.0f, 0, 1.0f, 0,
-                0.5f,  0.5f, 0.0f, 0, 0, 1.0f,
-                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0,
+                -0.5f, -0.5f, 0.0f, 1.0f, 0, 0,  0, 0,
+                0.5f, -0.5f, 0.0f, 0, 1.0f, 0,  1, 0,
+                0.5f,  0.5f, 0.0f, 0, 0, 1.0f,  1, 1,
+                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0, 0, 1
         };
 
 
@@ -113,21 +120,72 @@ public class Main {
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
 
         int posLoc = glGetAttribLocation(program.getProgram(), "aPos");
-        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 6*4, 0);
+        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 8*4, 0);
         glEnableVertexAttribArray(posLoc);
 
         int colorLoc = glGetAttribLocation(program.getProgram(), "aColor");
-        glVertexAttribPointer(colorLoc, 3, GL_FLOAT, false, 6*4, 3*4);
+        glVertexAttribPointer(colorLoc, 3, GL_FLOAT, false, 8*4, 3*4);
         glEnableVertexAttribArray(colorLoc);
+
+        int texLoc = glGetAttribLocation(program.getProgram(), "aTex");
+        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 8*4, 6*4);
+        glEnableVertexAttribArray(texLoc);
 
         int ibo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+        texture = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        int[] x = new int[1];
+        int[] y = new int[1];
+        int[] c = new int[1];
+        STBImage.stbi_set_flip_vertically_on_load(true);
+        ByteBuffer imageData = STBImage.stbi_load("resources/images/image1.jpg", x, y, c, 3);
+        if (imageData != null) {
+            System.out.println("x : " + x[0] + " y : " + y[0] + " c : " + c[0]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            STBImage.stbi_image_free(imageData);
+        }
+
+
+        texture2 = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        x = new int[1];
+        y = new int[1];
+        c = new int[1];
+        STBImage.stbi_set_flip_vertically_on_load(true);
+        imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
+        if (imageData != null) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            STBImage.stbi_image_free(imageData);
+        }
     }
+
 
     private void render() {
         program.use();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
+        glUniform1i(glGetUniformLocation(program.getProgram(), "image1"), 0);
+        glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
+
         // Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
