@@ -96,10 +96,10 @@ public class Main {
         program.initWithShaderPath("shader/base/vs.glsl", "shader/base/fs.glsl");
 
         float vertices[] = {
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f,
-                -0.5f, 0.5f, 0.0f
+                -0.5f, -0.5f, 0.0f, 1.0f, 0, 0,
+                0.5f, -0.5f, 0.0f, 0, 1.0f, 0,
+                0.5f,  0.5f, 0.0f, 0, 0, 1.0f,
+                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0,
         };
 
 
@@ -111,9 +111,14 @@ public class Main {
         int vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+
         int posLoc = glGetAttribLocation(program.getProgram(), "aPos");
-        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 3*4, 0);
+        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 6*4, 0);
         glEnableVertexAttribArray(posLoc);
+
+        int colorLoc = glGetAttribLocation(program.getProgram(), "aColor");
+        glVertexAttribPointer(colorLoc, 3, GL_FLOAT, false, 6*4, 3*4);
+        glEnableVertexAttribArray(colorLoc);
 
         int ibo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
