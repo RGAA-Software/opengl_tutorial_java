@@ -126,7 +126,19 @@ public class Main {
     private Matrix4f view;
     private Matrix4f proj;
 
+    private Vector3f cameraPos;
+    private Vector3f cameraFront;
+    private Vector3f cameraUp;
+
+    private double lastTime = 0;
+    private double deltaTime = 0;
+    private double cameraSpeed = 3;
+
     private void prepare() {
+
+        cameraPos = new Vector3f(0, 0, 3);
+        cameraFront = new Vector3f(0, 0, -1);
+        cameraUp = new Vector3f(0, 1, 0);
 
         model = new Matrix4f();
         view = new Matrix4f();
@@ -242,6 +254,11 @@ public class Main {
     private Random random = new Random();
 
     private void render() {
+        if (lastTime <= 0) {
+            lastTime = glfwGetTime();
+        }
+        deltaTime = glfwGetTime() - lastTime;
+
         program.use();
 
         glActiveTexture(GL_TEXTURE0);
@@ -268,10 +285,14 @@ public class Main {
 
                 float x = (float) (12 * Math.sin(glfwGetTime()/5));
                 float z = (float) (12 * Math.cos(glfwGetTime()/5));
+
+                Vector3f currentPos = new Vector3f(cameraPos);
+
                 view = view.identity();
-                view = view.lookAt(new Vector3f(x, 0, z),
-                        new Vector3f(0, 0, 0),
-                        new Vector3f(0, 1, 0));
+                view = view.lookAt(cameraPos,
+                        currentPos.add(cameraFront),
+//                        new Vector3f(0, 0, 0),
+                        cameraUp);
 
                 int modelLoc = glGetUniformLocation(program.getProgram(), "model");
                 int viewLoc = glGetUniformLocation(program.getProgram(), "view");
@@ -285,6 +306,8 @@ public class Main {
 
             i++;
         }
+
+        lastTime = glfwGetTime();
     }
 
     private void loop() {
@@ -306,12 +329,49 @@ public class Main {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
             render();
+            processKey(window);
 
             glfwSwapBuffers(window); // swap the color buffers
 
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
+        }
+    }
+
+    private void processKey(long window) {
+        // very simple version, could move left right forward back
+//        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+//            cameraPos.z = (float)(cameraPos.z - cameraSpeed * deltaTime);
+//        } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+//            cameraPos.z = (float)(cameraPos.z + cameraSpeed * deltaTime);
+//        } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+//            cameraPos.x = (float)(cameraPos.x - cameraSpeed * deltaTime);
+//        } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+//            cameraPos.x = (float)(cameraPos.x + cameraSpeed * deltaTime);
+//        }
+
+        float scaledSpeed = (float) (cameraSpeed * deltaTime);
+        Vector3f tmpFront = new Vector3f(cameraFront);
+        Vector3f tmpUp = new Vector3f(cameraUp);
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            cameraPos = cameraPos.add(tmpFront.mul(scaledSpeed));
+
+        } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            cameraPos = cameraPos.sub(tmpFront.mul(scaledSpeed));
+
+        } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            cameraPos = cameraPos.sub(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
+
+        } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            cameraPos = cameraPos.add(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
+
+        } else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+            cameraPos = cameraPos.add(tmpUp.mul(scaledSpeed));
+
+        } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+            cameraPos = cameraPos.sub(tmpUp.mul(scaledSpeed));
         }
     }
 
