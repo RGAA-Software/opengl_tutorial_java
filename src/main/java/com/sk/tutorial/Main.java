@@ -109,7 +109,7 @@ public class Main {
                     (vidmode.height() - pHeight.get(0)) / 2
             );
         } // the stack frame is popped automatically
-
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
         // Enable v-sync
@@ -117,6 +117,41 @@ public class Main {
 
         // Make the window visible
         glfwShowWindow(window);
+        glfwSetCursorPos(window, lastX, lastY);
+        glfwSetCursorPosCallback(window, new GLFWCursorPosCallbackI() {
+            @Override
+            public void invoke(long window, double xpos, double ypos) {
+                System.out.println("x : " + xpos + " y: " + ypos);
+                if (firstEnter) {
+                    lastX =  xpos;
+                    lastY =  ypos;
+                    firstEnter = false;
+                    return;
+                }
+
+                double deltaX = xpos - lastX;
+                double deltaY = ypos - lastY;
+
+                lastX = xpos;
+                lastY = ypos;
+
+                pitch -= deltaY * 0.05f;
+                yaw += deltaX * 0.05f;
+
+                if (pitch >= 89) {
+                    pitch = 89;
+                }
+                if (pitch <= -89) {
+                    pitch = -89;
+                }
+
+                cameraFront.x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
+                cameraFront.y = (float) Math.sin( Math.toRadians(pitch) );
+                cameraFront.z = (float) (Math.cos( Math.toRadians(pitch) ) * Math.sin( Math.toRadians(yaw) ));
+                cameraFront = cameraFront.normalize();
+            }
+        });
+
     }
 
     private int texture;
@@ -133,6 +168,10 @@ public class Main {
     private double lastTime = 0;
     private double deltaTime = 0;
     private double cameraSpeed = 3;
+
+    private boolean firstEnter = true;
+    private double lastX = width/2, lastY = height/2;
+    private double pitch = 0 , yaw = 270;
 
     private void prepare() {
 
@@ -340,6 +379,9 @@ public class Main {
     }
 
     private void processKey(long window) {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
         // very simple version, could move left right forward back
 //        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 //            cameraPos.z = (float)(cameraPos.z - cameraSpeed * deltaTime);
