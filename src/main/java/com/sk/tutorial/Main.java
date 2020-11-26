@@ -2,6 +2,7 @@ package com.sk.tutorial;
 
 import com.sk.tutorial.shader.ShaderProgram;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -9,7 +10,9 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.*;
 
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.nio.*;
+import java.util.Random;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -27,6 +30,9 @@ public class Main {
 
     private ShaderProgram program;
 
+    private float width = 800;
+    private float height = 600;
+
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
@@ -42,6 +48,21 @@ public class Main {
         glfwSetErrorCallback(null).free();
     }
 
+    private Vector3f[] boxPositions = new Vector3f[] {
+        new Vector3f( 0.0f,  0.0f,  0.0f),
+        new Vector3f( 2.0f,  5.0f, -15.0f),
+        new Vector3f(-1.5f, -2.2f, -2.5f),
+        new Vector3f(-3.8f, -2.0f, -12.3f),
+        new Vector3f( 2.4f, -0.4f, -3.5f),
+        new Vector3f(-1.7f,  3.0f, -7.5f),
+        new Vector3f( 1.3f, -2.0f, -2.5f),
+        new Vector3f( 1.5f,  2.0f, -2.5f),
+        new Vector3f( 1.5f,  0.2f, -1.5f),
+        new Vector3f(-1.3f,  1.0f, -1.5f)
+    };
+
+    private int[] rotateFactor = new int[10];
+
     private void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
@@ -54,12 +75,13 @@ public class Main {
         // Configure GLFW
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
 
         glfwWindowHint(GLFW_SAMPLES, 4);
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 
         // Create the window
-        window = glfwCreateWindow(600, 600, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow((int)width, (int)height, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -107,47 +129,71 @@ public class Main {
     private void prepare() {
 
         model = new Matrix4f();
-        model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
         view = new Matrix4f();
-        view = view.translate(0, 0, -3);
-        proj = new Matrix4f().perspective((float)Math.toRadians(45), 1.0f, 0.1f, 100.0f);
+        view = view.translate(0, 0, -5);
+        proj = new Matrix4f().perspective((float)Math.toRadians(45), width/height, 0.1f, 100.0f);
 
         program = new ShaderProgram();
         program.initWithShaderPath("shader/base/vs.glsl", "shader/base/fs.glsl");
 
         float vertices[] = {
-                -0.5f, -0.5f, 0.0f, 1.0f, 0, 0,  0, 0,
-                0.5f, -0.5f, 0.0f, 0, 1.0f, 0,  1, 0,
-                0.5f,  0.5f, 0.0f, 0, 0, 1.0f,  1, 1,
-                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0, 0, 1
+                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+                0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
 
 
-        int[] indices = {
-            0, 1, 2,
-            2, 3, 0
-        };
 
         int vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
 
         int posLoc = glGetAttribLocation(program.getProgram(), "aPos");
-        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 8*4, 0);
+        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 5*4, 0);
         glEnableVertexAttribArray(posLoc);
 
-        int colorLoc = glGetAttribLocation(program.getProgram(), "aColor");
-        glVertexAttribPointer(colorLoc, 3, GL_FLOAT, false, 8*4, 3*4);
-        glEnableVertexAttribArray(colorLoc);
-
         int texLoc = glGetAttribLocation(program.getProgram(), "aTex");
-        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 8*4, 6*4);
+        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 5*4, 3*4);
         glEnableVertexAttribArray(texLoc);
 
-        int ibo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
         texture = glGenTextures();
@@ -187,7 +233,10 @@ public class Main {
         }
 
         glEnable(GL_MULTISAMPLE);
+        glEnable(GL_DEPTH_TEST);
     }
+
+    private Random random = new Random();
 
     private void render() {
         program.use();
@@ -200,21 +249,31 @@ public class Main {
         glUniform1i(glGetUniformLocation(program.getProgram(), "image1"), 0);
         glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
 
-        try (MemoryStack stack = MemoryStack.stackPush()){
-            model = model.identity();
-            model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
-            model = model.rotate((float)Math.toRadians(glfwGetTime() * 5), 0, 0, 1);
-            int modelLoc = glGetUniformLocation(program.getProgram(), "model");
-            int viewLoc = glGetUniformLocation(program.getProgram(), "view");
-            int projLoc = glGetUniformLocation(program.getProgram(), "proj");
+        int i = 0;
+        for (Vector3f point : boxPositions) {
 
-            glUniformMatrix4fv(modelLoc, false, model.get(stack.mallocFloat(16)));
-            glUniformMatrix4fv(viewLoc, false, view.get(stack.mallocFloat(16)));
-            glUniformMatrix4fv(projLoc, false, proj.get(stack.mallocFloat(16)));
+            if (rotateFactor[i] == 0) {
+                rotateFactor[i] = random.nextInt(8) + 1;
+            }
+
+
+            try (MemoryStack stack = MemoryStack.stackPush()){
+                model = model.identity();
+                //model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
+                model = model.translate(point);
+                model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
+                int modelLoc = glGetUniformLocation(program.getProgram(), "model");
+                int viewLoc = glGetUniformLocation(program.getProgram(), "view");
+                int projLoc = glGetUniformLocation(program.getProgram(), "proj");
+
+                glUniformMatrix4fv(modelLoc, false, model.get(stack.mallocFloat(16)));
+                glUniformMatrix4fv(viewLoc, false, view.get(stack.mallocFloat(16)));
+                glUniformMatrix4fv(projLoc, false, proj.get(stack.mallocFloat(16)));
+            }
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            i++;
         }
-
-        // Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
     private void loop() {
