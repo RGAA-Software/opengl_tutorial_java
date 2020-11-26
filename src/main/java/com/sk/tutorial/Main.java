@@ -98,11 +98,14 @@ public class Main {
         float vertices[] = {
                 -0.5f, -0.5f, 0.0f,
                 0.5f, -0.5f, 0.0f,
-                0.0f,  0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f,
+                -0.5f, 0.5f, 0.0f
+        };
 
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.0f,  -1.0f, 0.0f
+
+        int[] indices = {
+            0, 1, 2,
+            2, 3, 0
         };
 
         int vbo = glGenBuffers();
@@ -111,12 +114,17 @@ public class Main {
         int posLoc = glGetAttribLocation(program.getProgram(), "aPos");
         glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 3*4, 0);
         glEnableVertexAttribArray(posLoc);
-    }
 
+        int ibo = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
 
     private void render() {
         program.use();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
     private void loop() {
@@ -148,13 +156,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        try {
-            FileOutputStream fos = new FileOutputStream("shader/a.txt");
-            fos.write("xxxx".getBytes());
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         new Main().run();
     }
 
