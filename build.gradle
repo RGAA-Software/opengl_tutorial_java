@@ -5,11 +5,34 @@ plugins {
 group 'sk'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.9
+sourceCompatibility = 1.8
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.9.25"
-project.ext.lwjglNatives = "natives-linux"
+//project.ext.lwjglNatives = "natives-linux"
+project.ext.lwjglNatives = "natives-windows"
+
+//static def isWindows() {
+//    return System.properties['os.name'].contains('windows');
+//}
+//
+//if(isWindows()) {
+//    project.ext.lwjglNatives = "natives-windows"
+//} else {
+//    project.ext.lwjglNatives = "natives-linux"
+//}
+
+//switch (OperatingSystem.current()) {
+//    case OperatingSystem.LINUX:
+//        project.ext.lwjglNatives = "natives-linux"
+//        break
+//    case OperatingSystem.MAC_OS:
+//        project.ext.lwjglNatives = "natives-macos"
+//        break
+//    case OperatingSystem.WINDOWS:
+//        project.ext.lwjglNatives = "natives-windows"
+//        break
+//}
 
 repositories {
     mavenCentral()

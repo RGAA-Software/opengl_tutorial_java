@@ -30,8 +30,8 @@ public class Main {
 
     private ShaderProgram program;
 
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
