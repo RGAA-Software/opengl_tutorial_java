@@ -130,7 +130,10 @@ public class Main {
 
         model = new Matrix4f();
         view = new Matrix4f();
-        view = view.translate(0, 0, -5);
+        //view = view.translate(0, 0, -5);
+//        view = view.lookAt(new Vector3f(0, 0, 3),
+//                new Vector3f(0, 0, 0),
+//                new Vector3f(0, 1, 0));
         proj = new Matrix4f().perspective((float)Math.toRadians(45), width/height, 0.1f, 100.0f);
 
         program = new ShaderProgram();
@@ -253,7 +256,7 @@ public class Main {
         for (Vector3f point : boxPositions) {
 
             if (rotateFactor[i] == 0) {
-                rotateFactor[i] = random.nextInt(8) + 1;
+                rotateFactor[i] = random.nextInt(28) + 1;
             }
 
 
@@ -262,6 +265,14 @@ public class Main {
                 //model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
                 model = model.translate(point);
                 model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
+
+                float x = (float) (12 * Math.sin(glfwGetTime()/5));
+                float z = (float) (12 * Math.cos(glfwGetTime()/5));
+                view = view.identity();
+                view = view.lookAt(new Vector3f(x, 0, z),
+                        new Vector3f(0, 0, 0),
+                        new Vector3f(0, 1, 0));
+
                 int modelLoc = glGetUniformLocation(program.getProgram(), "model");
                 int viewLoc = glGetUniformLocation(program.getProgram(), "view");
                 int projLoc = glGetUniformLocation(program.getProgram(), "proj");
