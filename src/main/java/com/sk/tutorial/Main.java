@@ -109,7 +109,7 @@ public class Main {
         model = new Matrix4f();
         model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
         view = new Matrix4f();
-        view = view.translate(0, 0, -5);
+        view = view.translate(0, 0, -3);
         proj = new Matrix4f().perspective((float)Math.toRadians(45), 1.0f, 0.1f, 100.0f);
 
         program = new ShaderProgram();
