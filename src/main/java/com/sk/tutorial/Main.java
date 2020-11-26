@@ -1,6 +1,7 @@
 package com.sk.tutorial;
 
 import com.sk.tutorial.shader.ShaderProgram;
+import org.joml.Matrix4f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -55,6 +56,8 @@ public class Main {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
+        glfwWindowHint(GLFW_SAMPLES, 4);
+
         // Create the window
         window = glfwCreateWindow(600, 600, "Hello World!", NULL, NULL);
         if ( window == NULL )
@@ -97,7 +100,17 @@ public class Main {
     private int texture;
     private int texture2;
 
+    private Matrix4f model;
+    private Matrix4f view;
+    private Matrix4f proj;
+
     private void prepare() {
+
+        model = new Matrix4f();
+        model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
+        view = new Matrix4f();
+        view = view.translate(0, 0, -5);
+        proj = new Matrix4f().perspective((float)Math.toRadians(45), 1.0f, 0.1f, 100.0f);
 
         program = new ShaderProgram();
         program.initWithShaderPath("shader/base/vs.glsl", "shader/base/fs.glsl");
@@ -172,8 +185,9 @@ public class Main {
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(imageData);
         }
-    }
 
+        glEnable(GL_MULTISAMPLE);
+    }
 
     private void render() {
         program.use();
@@ -185,6 +199,19 @@ public class Main {
 
         glUniform1i(glGetUniformLocation(program.getProgram(), "image1"), 0);
         glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
+
+        try (MemoryStack stack = MemoryStack.stackPush()){
+            model = model.identity();
+            model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
+            model = model.rotate((float)Math.toRadians(glfwGetTime() * 5), 0, 0, 1);
+            int modelLoc = glGetUniformLocation(program.getProgram(), "model");
+            int viewLoc = glGetUniformLocation(program.getProgram(), "view");
+            int projLoc = glGetUniformLocation(program.getProgram(), "proj");
+
+            glUniformMatrix4fv(modelLoc, false, model.get(stack.mallocFloat(16)));
+            glUniformMatrix4fv(viewLoc, false, view.get(stack.mallocFloat(16)));
+            glUniformMatrix4fv(projLoc, false, proj.get(stack.mallocFloat(16)));
+        }
 
         // Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
