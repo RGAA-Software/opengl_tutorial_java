@@ -1,9 +1,11 @@
-attribute vec3 aPos;
-attribute vec3 aColor;
-attribute vec2 aTex;
+#version 130
 
-varying vec3 outColor;
-varying vec2 outTex;
+in vec3 aPos;
+in vec3 aColor;
+in vec2 aTex;
+
+out vec3 outColor;
+out vec2 outTex;
 
 void main()
 {
