@@ -30,8 +30,8 @@ public class Main {
 
     private ShaderProgram program;
 
-    private float width = 1920;
-    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -121,7 +121,7 @@ public class Main {
         glfwSetCursorPosCallback(window, new GLFWCursorPosCallbackI() {
             @Override
             public void invoke(long window, double xpos, double ypos) {
-                System.out.println("x : " + xpos + " y: " + ypos);
+
                 if (firstEnter) {
                     lastX =  xpos;
                     lastY =  ypos;
@@ -138,11 +138,11 @@ public class Main {
                 pitch -= deltaY * 0.05f;
                 yaw += deltaX * 0.05f;
 
-                if (pitch >= 89) {
-                    pitch = 89;
+                if (pitch >= 89.8) {
+                    pitch = 89.8;
                 }
-                if (pitch <= -89) {
-                    pitch = -89;
+                if (pitch <= -89.8) {
+                    pitch = -89.8;
                 }
 
                 cameraFront.x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
@@ -175,7 +175,7 @@ public class Main {
 
     private void prepare() {
 
-        cameraPos = new Vector3f(0, 0, 3);
+        cameraPos = new Vector3f(0, 0, 5);
         cameraFront = new Vector3f(0, 0, -1);
         cameraUp = new Vector3f(0, 1, 0);
 

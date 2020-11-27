@@ -9,30 +9,21 @@ sourceCompatibility = 1.8
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.9.25"
-//project.ext.lwjglNatives = "natives-linux"
-project.ext.lwjglNatives = "natives-windows"
 
-//static def isWindows() {
-//    return System.properties['os.name'].contains('windows');
-//}
-//
-//if(isWindows()) {
-//    project.ext.lwjglNatives = "natives-windows"
-//} else {
-//    project.ext.lwjglNatives = "natives-linux"
-//}
+static def isWindows() {
+    return System.properties['os.name'].toLowerCase().contains('windows')
+}
 
-//switch (OperatingSystem.current()) {
-//    case OperatingSystem.LINUX:
-//        project.ext.lwjglNatives = "natives-linux"
-//        break
-//    case OperatingSystem.MAC_OS:
-//        project.ext.lwjglNatives = "natives-macos"
-//        break
-//    case OperatingSystem.WINDOWS:
-//        project.ext.lwjglNatives = "natives-windows"
-//        break
-//}
+static def isLinux() {
+    String osName = System.properties.get('os.name')
+    return osName.toLowerCase().contains('linux')
+}
+
+if(isWindows()) {
+    project.ext.lwjglNatives = "natives-windows"
+} else if (isLinux()) {
+    project.ext.lwjglNatives = "natives-linux"
+}
 
 repositories {
     mavenCentral()
