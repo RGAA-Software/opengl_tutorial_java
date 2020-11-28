@@ -2,7 +2,7 @@ package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.input.InputProcessor;
-import com.sk.tutorial.scene.MultiBoxScene;
+import com.sk.tutorial.layer.MultiBoxLayer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -107,15 +107,15 @@ public class Main {
     private double mLastTime = 0;
     private double mDeltaTime = 0;
 
-    private MultiBoxScene mBoxScene;
+    private MultiBoxLayer mBoxLayer;
 
     private void prepare() {
-        Matrix4f projMatrix = new Matrix4f()
+        Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
                         width / height,
                         0.1f, 100.0f);
 
-        mBoxScene = new MultiBoxScene(mCamera, projMatrix, "shader/base/vs.glsl", "shader/base/fs.glsl");
+        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
@@ -127,7 +127,7 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
-        mBoxScene.render(deltaTime);
+        mBoxLayer.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

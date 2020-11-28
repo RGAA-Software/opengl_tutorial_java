@@ -1,16 +1,15 @@
-package com.sk.tutorial.scene;
+package com.sk.tutorial.layer;
 
 import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.renderer.BoxRenderer;
 import com.sk.tutorial.renderer.IRenderer;
-import com.sk.tutorial.shader.ShaderProgram;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-public class MultiBoxScene extends IRenderer {
+public class MultiBoxLayer extends IRenderer {
 
     private Vector3f[] boxPositions = new Vector3f[] {
             new Vector3f( 0.0f,  0.0f,  0.0f),
@@ -33,7 +32,7 @@ public class MultiBoxScene extends IRenderer {
     private Matrix4f model = new Matrix4f();
     private Matrix4f mProjection;
 
-    public MultiBoxScene(Camera camera, Matrix4f proj, String vertexPath, String fragPath) {
+    public MultiBoxLayer(Camera camera, Matrix4f proj, String vertexPath, String fragPath) {
         super(vertexPath, fragPath);
         mBoxRenderer = new BoxRenderer(mShaderProgram);
         mCamera = camera;
