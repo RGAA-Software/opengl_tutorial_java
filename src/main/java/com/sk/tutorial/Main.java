@@ -1,24 +1,20 @@
 package com.sk.tutorial;
 
+import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.renderer.BoxRenderer;
-import com.sk.tutorial.shader.ShaderProgram;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.*;
 
-import java.io.FileOutputStream;
-import java.io.RandomAccessFile;
 import java.nio.*;
 import java.util.Random;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
@@ -144,10 +140,15 @@ public class Main {
                     pitch = -89.8;
                 }
 
-                cameraFront.x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
-                cameraFront.y = (float) Math.sin( Math.toRadians(pitch) );
-                cameraFront.z = (float) (Math.cos( Math.toRadians(pitch) ) * Math.sin( Math.toRadians(yaw) ));
-                cameraFront = cameraFront.normalize();
+//                cameraFront.x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
+//                cameraFront.y = (float) Math.sin( Math.toRadians(pitch) );
+//                cameraFront.z = (float) (Math.cos( Math.toRadians(pitch) ) * Math.sin( Math.toRadians(yaw) ));
+//                cameraFront = cameraFront.normalize();
+
+                mCamera.getCameraFront().x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
+                mCamera.getCameraFront().y = (float) Math.sin( Math.toRadians(pitch) );
+                mCamera.getCameraFront().z = (float) (Math.cos( Math.toRadians(pitch) ) * Math.sin( Math.toRadians(yaw) ));
+                mCamera.getCameraFront().normalize();
             }
         });
 
@@ -157,9 +158,7 @@ public class Main {
     private Matrix4f view;
     private Matrix4f proj;
 
-    private Vector3f cameraPos;
-    private Vector3f cameraFront;
-    private Vector3f cameraUp;
+    private Camera mCamera;
 
     private double lastTime = 0;
     private double deltaTime = 0;
@@ -175,9 +174,9 @@ public class Main {
 
         mBoxRenderer = BoxRenderer.createBoxRenderer();
 
-        cameraPos = new Vector3f(0, 0, 5);
-        cameraFront = new Vector3f(0, 0, -1);
-        cameraUp = new Vector3f(0, 1, 0);
+        mCamera = new Camera(new Vector3f(0, 0, 5),
+                new Vector3f(0, 0, -1),
+                new Vector3f(0, 1, 0));
 
         model = new Matrix4f();
         view = new Matrix4f();
@@ -207,12 +206,12 @@ public class Main {
             model = model.translate(point);
             model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
 
-            Vector3f currentPos = new Vector3f(cameraPos);
+            Vector3f currentPos = new Vector3f(mCamera.getCameraPos());
 
             view = view.identity();
-            view = view.lookAt(cameraPos,
-                    currentPos.add(cameraFront),
-                    cameraUp);
+            view = view.lookAt(mCamera.getCameraPos(),
+                    currentPos.add(mCamera.getCameraFront()),
+                    mCamera.getCameraUp());
 
             mBoxRenderer.getShaderProgram().setUniformMatrix4fv("model", model);
             mBoxRenderer.getShaderProgram().setUniformMatrix4fv("view", view);
@@ -257,38 +256,32 @@ public class Main {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-        // very simple version, could move left right forward back
-//        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-//            cameraPos.z = (float)(cameraPos.z - cameraSpeed * deltaTime);
-//        } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-//            cameraPos.z = (float)(cameraPos.z + cameraSpeed * deltaTime);
-//        } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-//            cameraPos.x = (float)(cameraPos.x - cameraSpeed * deltaTime);
-//        } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-//            cameraPos.x = (float)(cameraPos.x + cameraSpeed * deltaTime);
-//        }
-
         float scaledSpeed = (float) (cameraSpeed * deltaTime);
-        Vector3f tmpFront = new Vector3f(cameraFront);
-        Vector3f tmpUp = new Vector3f(cameraUp);
+        Vector3f tmpFront = new Vector3f(mCamera.getCameraFront());
+        Vector3f tmpUp = new Vector3f(mCamera.getCameraUp());
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            cameraPos = cameraPos.add(tmpFront.mul(scaledSpeed));
+            //cameraPos = cameraPos.add(tmpFront.mul(scaledSpeed));
+            mCamera.setCameraPos(mCamera.getCameraPos().add(tmpFront.mul(scaledSpeed)));
 
         } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            cameraPos = cameraPos.sub(tmpFront.mul(scaledSpeed));
+            //cameraPos = cameraPos.sub(tmpFront.mul(scaledSpeed));
+            mCamera.setCameraPos(mCamera.getCameraPos().sub(tmpFront.mul(scaledSpeed)));
 
         } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            cameraPos = cameraPos.sub(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
+            //cameraPos = cameraPos.sub(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
+            mCamera.setCameraPos( mCamera.getCameraPos().sub( tmpFront.cross(mCamera.getCameraUp()).normalize().mul(scaledSpeed)) );
 
         } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            cameraPos = cameraPos.add(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
-
+            //cameraPos = cameraPos.add(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
+            mCamera.setCameraPos( mCamera.getCameraPos().add( tmpFront.cross(mCamera.getCameraUp()).normalize().mul(scaledSpeed)) );
         } else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-            cameraPos = cameraPos.add(tmpUp.mul(scaledSpeed));
+            //cameraPos = cameraPos.add(tmpUp.mul(scaledSpeed));
+            mCamera.setCameraPos( mCamera.getCameraPos().add(tmpUp.mul(scaledSpeed)) );
 
         } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-            cameraPos = cameraPos.sub(tmpUp.mul(scaledSpeed));
+            //cameraPos = cameraPos.sub(tmpUp.mul(scaledSpeed));
+            mCamera.setCameraPos( mCamera.getCameraPos().sub(tmpUp.mul(scaledSpeed)) );
         }
     }
 
