@@ -1,5 +1,6 @@
 package com.sk.tutorial;
 
+import com.sk.tutorial.renderer.BoxRenderer;
 import com.sk.tutorial.shader.ShaderProgram;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -27,8 +28,6 @@ public class Main {
 
     // The window handle
     private long window;
-
-    private ShaderProgram program;
 
     private float width = 800;
     private float height = 600;
@@ -154,9 +153,6 @@ public class Main {
 
     }
 
-    private int texture;
-    private int texture2;
-
     private Matrix4f model;
     private Matrix4f view;
     private Matrix4f proj;
@@ -173,7 +169,11 @@ public class Main {
     private double lastX = width/2, lastY = height/2;
     private double pitch = 0 , yaw = 270;
 
+    private BoxRenderer mBoxRenderer;
+
     private void prepare() {
+
+        mBoxRenderer = BoxRenderer.createBoxRenderer();
 
         cameraPos = new Vector3f(0, 0, 5);
         cameraFront = new Vector3f(0, 0, -1);
@@ -181,110 +181,7 @@ public class Main {
 
         model = new Matrix4f();
         view = new Matrix4f();
-        //view = view.translate(0, 0, -5);
-//        view = view.lookAt(new Vector3f(0, 0, 3),
-//                new Vector3f(0, 0, 0),
-//                new Vector3f(0, 1, 0));
         proj = new Matrix4f().perspective((float)Math.toRadians(45), width/height, 0.1f, 100.0f);
-
-        program = new ShaderProgram();
-        program.initWithShaderPath("shader/base/vs.glsl", "shader/base/fs.glsl");
-
-        float vertices[] = {
-                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-                0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-                -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-        };
-
-
-
-        int vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-
-        int posLoc = glGetAttribLocation(program.getProgram(), "aPos");
-        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 5*4, 0);
-        glEnableVertexAttribArray(posLoc);
-
-        int texLoc = glGetAttribLocation(program.getProgram(), "aTex");
-        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 5*4, 3*4);
-        glEnableVertexAttribArray(texLoc);
-
-
-
-        texture = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        int[] x = new int[1];
-        int[] y = new int[1];
-        int[] c = new int[1];
-        STBImage.stbi_set_flip_vertically_on_load(true);
-        ByteBuffer imageData = STBImage.stbi_load("resources/images/image1.jpg", x, y, c, 3);
-        if (imageData != null) {
-            System.out.println("x : " + x[0] + " y : " + y[0] + " c : " + c[0]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            STBImage.stbi_image_free(imageData);
-        }
-
-
-        texture2 = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        x = new int[1];
-        y = new int[1];
-        c = new int[1];
-        STBImage.stbi_set_flip_vertically_on_load(true);
-        imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
-        if (imageData != null) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            STBImage.stbi_image_free(imageData);
-        }
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
@@ -298,52 +195,30 @@ public class Main {
         }
         deltaTime = glfwGetTime() - lastTime;
 
-        program.use();
+        for (int i = 0; i < boxPositions.length; i++) {
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-
-        glUniform1i(glGetUniformLocation(program.getProgram(), "image1"), 0);
-        glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
-
-        int i = 0;
-        for (Vector3f point : boxPositions) {
-
+            mBoxRenderer.prepare();
+            Vector3f point = boxPositions[i];
             if (rotateFactor[i] == 0) {
                 rotateFactor[i] = random.nextInt(28) + 1;
             }
 
+            model = model.identity();
+            model = model.translate(point);
+            model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
 
-            try (MemoryStack stack = MemoryStack.stackPush()){
-                model = model.identity();
-                //model = model.rotate((float)Math.toRadians(-45), 1, 0, 0);
-                model = model.translate(point);
-                model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
+            Vector3f currentPos = new Vector3f(cameraPos);
 
-                float x = (float) (12 * Math.sin(glfwGetTime()/5));
-                float z = (float) (12 * Math.cos(glfwGetTime()/5));
+            view = view.identity();
+            view = view.lookAt(cameraPos,
+                    currentPos.add(cameraFront),
+                    cameraUp);
 
-                Vector3f currentPos = new Vector3f(cameraPos);
+            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("model", model);
+            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("view", view);
+            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("proj", proj);
 
-                view = view.identity();
-                view = view.lookAt(cameraPos,
-                        currentPos.add(cameraFront),
-//                        new Vector3f(0, 0, 0),
-                        cameraUp);
-
-                int modelLoc = glGetUniformLocation(program.getProgram(), "model");
-                int viewLoc = glGetUniformLocation(program.getProgram(), "view");
-                int projLoc = glGetUniformLocation(program.getProgram(), "proj");
-
-                glUniformMatrix4fv(modelLoc, false, model.get(stack.mallocFloat(16)));
-                glUniformMatrix4fv(viewLoc, false, view.get(stack.mallocFloat(16)));
-                glUniformMatrix4fv(projLoc, false, proj.get(stack.mallocFloat(16)));
-            }
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-
-            i++;
+            mBoxRenderer.render();
         }
 
         lastTime = glfwGetTime();
@@ -358,7 +233,7 @@ public class Main {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(.2f, 0.26f, 0.2f, 1.0f);
+        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
         prepare();
 

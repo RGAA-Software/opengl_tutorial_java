@@ -1,5 +1,8 @@
 package com.sk.tutorial.shader;
 
+import org.joml.Matrix4f;
+import org.lwjgl.system.MemoryStack;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,6 +65,16 @@ public class ShaderProgram {
 
     public int getProgram() {
         return program;
+    }
+
+    public void setUniform1i(String name, int val) {
+        glUniform1i(glGetUniformLocation(program, name), val);
+    }
+
+    public void setUniformMatrix4fv(String name, Matrix4f matrix) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            glUniformMatrix4fv(glGetUniformLocation(program, name), false, matrix.get(stack.mallocFloat(16)));
+        }
     }
 
     private String readFileAsString(String path) {
