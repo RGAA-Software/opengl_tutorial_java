@@ -3,6 +3,7 @@ package com.sk.tutorial;
 import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.MultiBoxLayer;
+import com.sk.tutorial.layer.SingleLightCubeLayer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -108,6 +109,7 @@ public class Main {
     private double mDeltaTime = 0;
 
     private MultiBoxLayer mBoxLayer;
+    private SingleLightCubeLayer mSingleLightLayer;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -116,6 +118,7 @@ public class Main {
                         0.1f, 100.0f);
 
         mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
+        mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
@@ -128,6 +131,7 @@ public class Main {
         mDeltaTime = glfwGetTime() - mLastTime;
 
         mBoxLayer.render(deltaTime);
+        mSingleLightLayer.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

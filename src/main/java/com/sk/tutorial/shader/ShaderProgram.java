@@ -1,6 +1,7 @@
 package com.sk.tutorial.shader;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.ByteArrayOutputStream;
@@ -69,6 +70,16 @@ public class ShaderProgram {
 
     public void setUniform1i(String name, int val) {
         glUniform1i(glGetUniformLocation(program, name), val);
+    }
+
+    public void setUniform3fv(String name, Vector3f val) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            glUniform3fv(glGetUniformLocation(program, name), val.get(stack.mallocFloat(3)));
+        }
+    }
+
+    public int getAttribLocation(String name) {
+        return glGetAttribLocation(program, name);
     }
 
     public void setUniformMatrix4fv(String name, Matrix4f matrix) {
