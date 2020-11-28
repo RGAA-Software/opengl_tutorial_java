@@ -8,6 +8,7 @@ public abstract class IRenderer {
 
     public IRenderer(ShaderProgram program) {
         mShaderProgram = program;
+        init();
     }
 
     public IRenderer(String vertexShaderPath, String fragmentShaderPath) {
@@ -16,15 +17,15 @@ public abstract class IRenderer {
         init();
     }
 
-    public abstract void init();
+    public void init() {
+
+    }
 
     public void prepare() {
         mShaderProgram.use();
     }
 
-    public void render() {
-
-    }
+    public abstract void render(double deltaTime);
 
     public ShaderProgram getShaderProgram() {
         return mShaderProgram;

@@ -1,24 +1,22 @@
 package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
-import com.sk.tutorial.renderer.BoxRenderer;
+import com.sk.tutorial.input.InputProcessor;
+import com.sk.tutorial.scene.MultiBoxScene;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.*;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 
-import java.nio.*;
-import java.util.Random;
+import java.nio.IntBuffer;
 
-import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.system.MemoryUtil.*;
-
-import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Main {
 
@@ -29,36 +27,23 @@ public class Main {
     private float height = 600;
 
     public void run() {
-        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
         init();
         loop();
 
-        // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
 
-        // Terminate GLFW and free the error callback
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
 
-    private Vector3f[] boxPositions = new Vector3f[] {
-        new Vector3f( 0.0f,  0.0f,  0.0f),
-        new Vector3f( 2.0f,  5.0f, -15.0f),
-        new Vector3f(-1.5f, -2.2f, -2.5f),
-        new Vector3f(-3.8f, -2.0f, -12.3f),
-        new Vector3f( 2.4f, -0.4f, -3.5f),
-        new Vector3f(-1.7f,  3.0f, -7.5f),
-        new Vector3f( 1.3f, -2.0f, -2.5f),
-        new Vector3f( 1.5f,  2.0f, -2.5f),
-        new Vector3f( 1.5f,  0.2f, -1.5f),
-        new Vector3f(-1.3f,  1.0f, -1.5f)
-    };
-
-    private int[] rotateFactor = new int[10];
-
     private void init() {
+
+        mCamera = new Camera(new Vector3f(0, 0, 5),
+                new Vector3f(0, 0, -1),
+                new Vector3f(0, 1, 0),
+                0, 270, 0);
+
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
         GLFWErrorCallback.createPrint(System.err).set();
@@ -112,176 +97,56 @@ public class Main {
 
         // Make the window visible
         glfwShowWindow(window);
-        glfwSetCursorPos(window, lastX, lastY);
-        glfwSetCursorPosCallback(window, new GLFWCursorPosCallbackI() {
-            @Override
-            public void invoke(long window, double xpos, double ypos) {
 
-                if (firstEnter) {
-                    lastX =  xpos;
-                    lastY =  ypos;
-                    firstEnter = false;
-                    return;
-                }
-
-                double deltaX = xpos - lastX;
-                double deltaY = ypos - lastY;
-
-                lastX = xpos;
-                lastY = ypos;
-
-                pitch -= deltaY * 0.05f;
-                yaw += deltaX * 0.05f;
-
-                if (pitch >= 89.8) {
-                    pitch = 89.8;
-                }
-                if (pitch <= -89.8) {
-                    pitch = -89.8;
-                }
-
-//                cameraFront.x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
-//                cameraFront.y = (float) Math.sin( Math.toRadians(pitch) );
-//                cameraFront.z = (float) (Math.cos( Math.toRadians(pitch) ) * Math.sin( Math.toRadians(yaw) ));
-//                cameraFront = cameraFront.normalize();
-
-                mCamera.getCameraFront().x = (float) (Math.cos( Math.toRadians(pitch) ) * Math.cos( Math.toRadians(yaw) ));
-                mCamera.getCameraFront().y = (float) Math.sin( Math.toRadians(pitch) );
-                mCamera.getCameraFront().z = (float) (Math.cos( Math.toRadians(pitch) ) * Math.sin( Math.toRadians(yaw) ));
-                mCamera.getCameraFront().normalize();
-            }
-        });
+        InputProcessor.getInstance().processCursorCallback(window, width, height, mCamera);
 
     }
 
-    private Matrix4f model;
-    private Matrix4f view;
-    private Matrix4f proj;
-
     private Camera mCamera;
 
-    private double lastTime = 0;
-    private double deltaTime = 0;
-    private double cameraSpeed = 3;
+    private double mLastTime = 0;
+    private double mDeltaTime = 0;
 
-    private boolean firstEnter = true;
-    private double lastX = width/2, lastY = height/2;
-    private double pitch = 0 , yaw = 270;
-
-    private BoxRenderer mBoxRenderer;
+    private MultiBoxScene mBoxScene;
 
     private void prepare() {
+        Matrix4f projMatrix = new Matrix4f()
+                .perspective((float) Math.toRadians(45),
+                        width / height,
+                        0.1f, 100.0f);
 
-        mBoxRenderer = BoxRenderer.createBoxRenderer();
-
-        mCamera = new Camera(new Vector3f(0, 0, 5),
-                new Vector3f(0, 0, -1),
-                new Vector3f(0, 1, 0));
-
-        model = new Matrix4f();
-        view = new Matrix4f();
-        proj = new Matrix4f().perspective((float)Math.toRadians(45), width/height, 0.1f, 100.0f);
+        mBoxScene = new MultiBoxScene(mCamera, projMatrix, "shader/base/vs.glsl", "shader/base/fs.glsl");
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
     }
 
-    private Random random = new Random();
-
-    private void render() {
-        if (lastTime <= 0) {
-            lastTime = glfwGetTime();
+    private void render(double deltaTime) {
+        if (mLastTime <= 0) {
+            mLastTime = glfwGetTime();
         }
-        deltaTime = glfwGetTime() - lastTime;
+        mDeltaTime = glfwGetTime() - mLastTime;
 
-        for (int i = 0; i < boxPositions.length; i++) {
+        mBoxScene.render(deltaTime);
 
-            mBoxRenderer.prepare();
-            Vector3f point = boxPositions[i];
-            if (rotateFactor[i] == 0) {
-                rotateFactor[i] = random.nextInt(28) + 1;
-            }
-
-            model = model.identity();
-            model = model.translate(point);
-            model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
-
-            Vector3f currentPos = new Vector3f(mCamera.getCameraPos());
-
-            view = view.identity();
-            view = view.lookAt(mCamera.getCameraPos(),
-                    currentPos.add(mCamera.getCameraFront()),
-                    mCamera.getCameraUp());
-
-            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("model", model);
-            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("view", view);
-            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("proj", proj);
-
-            mBoxRenderer.render();
-        }
-
-        lastTime = glfwGetTime();
+        mLastTime = glfwGetTime();
     }
 
     private void loop() {
-        // This line is critical for LWJGL's interoperation with GLFW's
-        // OpenGL context, or any context that is managed externally.
-        // LWJGL detects the context that is current in the current thread,
-        // creates the GLCapabilities instance and makes the OpenGL
-        // bindings available for use.
         GL.createCapabilities();
-
-        // Set the clear color
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
         prepare();
 
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
         while ( !glfwWindowShouldClose(window) ) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            render();
-            processKey(window);
+            render(mDeltaTime);
 
-            glfwSwapBuffers(window); // swap the color buffers
+            InputProcessor.getInstance().processKey(window, mCamera, (float) mDeltaTime);
 
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
+            glfwSwapBuffers(window);
             glfwPollEvents();
-        }
-    }
-
-    private void processKey(long window) {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
-
-        float scaledSpeed = (float) (cameraSpeed * deltaTime);
-        Vector3f tmpFront = new Vector3f(mCamera.getCameraFront());
-        Vector3f tmpUp = new Vector3f(mCamera.getCameraUp());
-
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            //cameraPos = cameraPos.add(tmpFront.mul(scaledSpeed));
-            mCamera.setCameraPos(mCamera.getCameraPos().add(tmpFront.mul(scaledSpeed)));
-
-        } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            //cameraPos = cameraPos.sub(tmpFront.mul(scaledSpeed));
-            mCamera.setCameraPos(mCamera.getCameraPos().sub(tmpFront.mul(scaledSpeed)));
-
-        } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            //cameraPos = cameraPos.sub(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
-            mCamera.setCameraPos( mCamera.getCameraPos().sub( tmpFront.cross(mCamera.getCameraUp()).normalize().mul(scaledSpeed)) );
-
-        } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            //cameraPos = cameraPos.add(tmpFront.cross(cameraUp).normalize().mul(scaledSpeed));
-            mCamera.setCameraPos( mCamera.getCameraPos().add( tmpFront.cross(mCamera.getCameraUp()).normalize().mul(scaledSpeed)) );
-        } else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-            //cameraPos = cameraPos.add(tmpUp.mul(scaledSpeed));
-            mCamera.setCameraPos( mCamera.getCameraPos().add(tmpUp.mul(scaledSpeed)) );
-
-        } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-            //cameraPos = cameraPos.sub(tmpUp.mul(scaledSpeed));
-            mCamera.setCameraPos( mCamera.getCameraPos().sub(tmpUp.mul(scaledSpeed)) );
         }
     }
 

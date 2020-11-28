@@ -1,5 +1,6 @@
 package com.sk.tutorial.renderer;
 
+import com.sk.tutorial.shader.ShaderProgram;
 import org.lwjgl.stb.STBImage;
 
 import java.nio.ByteBuffer;
@@ -16,8 +17,8 @@ public class BoxRenderer extends IRenderer {
     private int mTexture1;
     private int mTexture2;
 
-    public static BoxRenderer createBoxRenderer() {
-        return new BoxRenderer("shader/base/vs.glsl", "shader/base/fs.glsl");
+    public BoxRenderer(ShaderProgram program) {
+        super(program);
     }
 
     public BoxRenderer(String vertexShaderPath, String fragmentShaderPath) {
@@ -118,8 +119,7 @@ public class BoxRenderer extends IRenderer {
     }
 
     @Override
-    public void render() {
-        super.render();
+    public void render(double deltaTime) {
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mTexture1);
