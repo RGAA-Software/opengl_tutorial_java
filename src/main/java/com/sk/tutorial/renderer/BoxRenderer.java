@@ -28,47 +28,48 @@ public class BoxRenderer extends IRenderer {
     @Override
     public void init() {
         float[] vertex = {
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
 
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+            0.5f, 0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
+            -0.5f, 0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
 
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f,   0.0f,  0.0f,  1.0f,    0.0f, 0.0f,
+            0.5f, -0.5f, 0.5f,   0.0f,  0.0f,  1.0f,    1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f,    0.0f,  0.0f,  1.0f,    1.0f, 1.0f,
+            0.5f, 0.5f, 0.5f,    0.0f,  0.0f,  1.0f,    1.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f,    0.0f,  0.0f,  1.0f,    0.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f,   0.0f,  0.0f,  1.0f,    0.0f, 0.0f,
 
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f,   -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f,  -1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f,   -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
 
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+            0.5f, 0.5f, 0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f,   1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+            0.5f, -0.5f, 0.5f,   1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
 
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
+            -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
+            0.5f, -0.5f, 0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
+            0.5f, -0.5f, 0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
+
+            -0.5f, 0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
+            0.5f, 0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
+            0.5f, 0.5f, 0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f,   0.0f,  1.0f,  0.0f,  0.0f, 1.0f
         };
 
         int vbo = glGenBuffers();
@@ -76,11 +77,15 @@ public class BoxRenderer extends IRenderer {
         glBufferData(GL_ARRAY_BUFFER, vertex, GL_STATIC_DRAW);
 
         int posLoc = glGetAttribLocation(mShaderProgram.getProgram(), "aPos");
-        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 5*4, 0);
+        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 8*4, 0);
         glEnableVertexAttribArray(posLoc);
 
+        int normalLoc = glGetAttribLocation(mShaderProgram.getProgram(), "aNormal");
+        glVertexAttribPointer(normalLoc, 3, GL_FLOAT, false, 8 * 4, 3*4);
+        glEnableVertexAttribArray(normalLoc);
+
         int texLoc = glGetAttribLocation(mShaderProgram.getProgram(), "aTex");
-        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 5*4, 3*4);
+        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 8*4, 6*4);
         glEnableVertexAttribArray(texLoc);
 
         mTexture1 = glGenTextures();
