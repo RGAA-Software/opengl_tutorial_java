@@ -170,6 +170,8 @@ public class BoxRenderer extends IRenderer {
     private Vector3f mLightDiffuseEM = new Vector3f(0.9f, 0.9f, 0.9f);
     private Vector3f mLightSpecularEM = new Vector3f(1.0f, 1.0f, 1.0f);
 
+    private Vector3f mLightDirection = new Vector3f(-0.2f, -1.0f, -0.3f);
+
     @Override
     public void render(double deltaTime) {
         if (!mEmission) {
@@ -206,7 +208,7 @@ public class BoxRenderer extends IRenderer {
 //        mShaderProgram.setUniform1f("material.shininess", 32.0f);
 
 
-        mShaderProgram.setUniform3fv("light.position", mLightPos);
+        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
 
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
