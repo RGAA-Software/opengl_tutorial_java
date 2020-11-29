@@ -37,7 +37,12 @@ public class MultiBoxLayer extends IRenderer {
         mCamera = camera;
         mProjection = proj;
         for (int i = 0; i < mBoxRenderer.length; i++) {
-            mBoxRenderer[i] = new BoxRenderer(mCamera, vertexPath, fragPath);
+            if (i %2 == 0) {
+
+                mBoxRenderer[i] = new BoxRenderer(mCamera, vertexPath, fragPath, true);
+            } else {
+                mBoxRenderer[i] = new BoxRenderer(mCamera, vertexPath, fragPath, false);
+            }
         }
 
     }
