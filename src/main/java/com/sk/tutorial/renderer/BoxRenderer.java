@@ -137,6 +137,14 @@ public class BoxRenderer extends IRenderer {
         }
     }
 
+    private Vector3f mMaterialAmbient = new Vector3f(1.0f, 0.5f, 0.31f);
+    private Vector3f mMaterialDiffuse = new Vector3f(1.0f, 0.5f, 0.31f);
+    private Vector3f mMaterialSpecular = new Vector3f(0.5f, 0.5f, 0.5f);
+
+    private Vector3f mLightAmbient = new Vector3f(0.2f, 0.2f, 0.2f);
+    private Vector3f mLightDiffuse = new Vector3f(0.5f, 0.5f, 0.5f);
+    private Vector3f mLightSpecular = new Vector3f(1.0f, 1.0f, 1.0f);
+
     @Override
     public void render(double deltaTime) {
 
@@ -149,6 +157,16 @@ public class BoxRenderer extends IRenderer {
         mShaderProgram.setUniform3fv("lightPos", mLightPos);
         mShaderProgram.setUniform3fv("lightColor", mLightColor);
         mShaderProgram.setUniform3fv("cameraPos", mCamera.getCameraPos());
+
+        mShaderProgram.setUniform3fv("material.ambient",  mMaterialAmbient);
+        mShaderProgram.setUniform3fv("material.diffuse",  mMaterialDiffuse);
+        mShaderProgram.setUniform3fv("material.specular", mMaterialSpecular);
+        mShaderProgram.setUniform1f("material.shininess", 32.0f);
+
+        mShaderProgram.setUniform3fv("light.ambient",  mLightAmbient);
+        mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuse); // 将光照调暗了一些以搭配场景
+        mShaderProgram.setUniform3fv("light.specular", mLightSpecular);
+
         mShaderProgram.setUniform1i("image1", 0);
         mShaderProgram.setUniform1i("image2", 1);
 
