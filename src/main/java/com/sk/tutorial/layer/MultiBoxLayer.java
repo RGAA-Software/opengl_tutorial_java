@@ -34,11 +34,12 @@ public class MultiBoxLayer extends IRenderer {
 
     public MultiBoxLayer(Camera camera, Matrix4f proj, String vertexPath, String fragPath) {
         super(vertexPath, fragPath);
-        for (int i = 0; i < mBoxRenderer.length; i++) {
-            mBoxRenderer[i] = new BoxRenderer(vertexPath, fragPath);
-        }
         mCamera = camera;
         mProjection = proj;
+        for (int i = 0; i < mBoxRenderer.length; i++) {
+            mBoxRenderer[i] = new BoxRenderer(mCamera, vertexPath, fragPath);
+        }
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.sk.tutorial.renderer;
 
+import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.shader.ShaderProgram;
 
 import org.joml.Vector3f;
@@ -22,13 +23,16 @@ public class BoxRenderer extends IRenderer {
     private Vector3f mAmbient;
     private Vector3f mLightPos;
     private Vector3f mLightColor;
+    private Camera mCamera;
 
-    public BoxRenderer(ShaderProgram program) {
+    public BoxRenderer(Camera camera, ShaderProgram program) {
         super(program);
+        mCamera = camera;
     }
 
-    public BoxRenderer(String vertexShaderPath, String fragmentShaderPath) {
+    public BoxRenderer(Camera camera, String vertexShaderPath, String fragmentShaderPath) {
         super(vertexShaderPath, fragmentShaderPath);
+        mCamera = camera;
     }
 
     @Override
@@ -144,6 +148,7 @@ public class BoxRenderer extends IRenderer {
         mShaderProgram.setUniform3fv("ambient", mAmbient);
         mShaderProgram.setUniform3fv("lightPos", mLightPos);
         mShaderProgram.setUniform3fv("lightColor", mLightColor);
+        mShaderProgram.setUniform3fv("cameraPos", mCamera.getCameraPos());
         mShaderProgram.setUniform1i("image1", 0);
         mShaderProgram.setUniform1i("image2", 1);
 
