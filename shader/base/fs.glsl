@@ -31,20 +31,17 @@ uniform Material light;
 
 void main()
 {
-//    vec3 texColor = mix(texture(image1, outTex), texture(image2, outTex), 0.8).xyz;
-//    vec3 diffuse = max( dot( normalize((lightPos - outPos)), normalize(outNormal) ), 0)  * lightColor;
-//    float specularFactor = max( dot( reflect(normalize(outPos - lightPos), normalize(outNormal)), normalize(cameraPos - outPos)) , 0);
-//    specularFactor = pow(specularFactor, 64);
-//    vec3 specular = specularFactor * lightColor;
-//
-    vec3 ambient = material.ambient * light.ambient;
+    vec3 diffuseColor = vec3(texture(image1, outTex));
+    vec3 specularColor = vec3(texture(image2, outTex));
+
+    vec3 ambient = diffuseColor * light.ambient;
 
     float diffuseFactor = max( dot( normalize((lightPos - outPos)), normalize(outNormal) ), 0);
-    vec3 diffuse = diffuseFactor * material.diffuse * light.diffuse;
+    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse;
 
     float specularFactor = max( dot( reflect(normalize(outPos - lightPos), normalize(outNormal)), normalize(cameraPos - outPos)) , 0);
     specularFactor = pow(specularFactor, 64);
-    vec3 specular = specularFactor * material.specular * light.specular;
+    vec3 specular = specularFactor * specularColor * light.specular;
 
     gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
 }

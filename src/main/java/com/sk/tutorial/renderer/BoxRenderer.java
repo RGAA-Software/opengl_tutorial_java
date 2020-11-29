@@ -112,9 +112,9 @@ public class BoxRenderer extends IRenderer {
         int[] y = new int[1];
         int[] c = new int[1];
         STBImage.stbi_set_flip_vertically_on_load(true);
-        ByteBuffer imageData = STBImage.stbi_load("resources/images/image1.jpg", x, y, c, 3);
+        ByteBuffer imageData = STBImage.stbi_load("resources/images/container2.png", x, y, c, 4);
         if (imageData != null) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x[0], y[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(imageData);
         }
@@ -129,17 +129,17 @@ public class BoxRenderer extends IRenderer {
         y = new int[1];
         c = new int[1];
         STBImage.stbi_set_flip_vertically_on_load(true);
-        imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
+        imageData = STBImage.stbi_load("resources/images/container2_specular.png", x, y, c, 4);
         if (imageData != null) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x[0], y[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(imageData);
         }
     }
 
-    private Vector3f mMaterialAmbient = new Vector3f(1.0f, 0.5f, 0.31f);
-    private Vector3f mMaterialDiffuse = new Vector3f(1.0f, 0.5f, 0.31f);
-    private Vector3f mMaterialSpecular = new Vector3f(0.5f, 0.5f, 0.5f);
+//    private Vector3f mMaterialAmbient = new Vector3f(1.0f, 0.5f, 0.31f);
+//    private Vector3f mMaterialDiffuse = new Vector3f(1.0f, 0.5f, 0.31f);
+//    private Vector3f mMaterialSpecular = new Vector3f(0.5f, 0.5f, 0.5f);
 
     private Vector3f mLightAmbient = new Vector3f(0.2f, 0.2f, 0.2f);
     private Vector3f mLightDiffuse = new Vector3f(0.5f, 0.5f, 0.5f);
@@ -158,13 +158,13 @@ public class BoxRenderer extends IRenderer {
         mShaderProgram.setUniform3fv("lightColor", mLightColor);
         mShaderProgram.setUniform3fv("cameraPos", mCamera.getCameraPos());
 
-        mShaderProgram.setUniform3fv("material.ambient",  mMaterialAmbient);
-        mShaderProgram.setUniform3fv("material.diffuse",  mMaterialDiffuse);
-        mShaderProgram.setUniform3fv("material.specular", mMaterialSpecular);
-        mShaderProgram.setUniform1f("material.shininess", 32.0f);
+//        mShaderProgram.setUniform3fv("material.ambient",  mMaterialAmbient);
+//        mShaderProgram.setUniform3fv("material.diffuse",  mMaterialDiffuse);
+//        mShaderProgram.setUniform3fv("material.specular", mMaterialSpecular);
+//        mShaderProgram.setUniform1f("material.shininess", 32.0f);
 
         mShaderProgram.setUniform3fv("light.ambient",  mLightAmbient);
-        mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuse); // 将光照调暗了一些以搭配场景
+        mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuse);
         mShaderProgram.setUniform3fv("light.specular", mLightSpecular);
 
         mShaderProgram.setUniform1i("image1", 0);
