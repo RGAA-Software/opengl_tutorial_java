@@ -24,8 +24,12 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
-//    vec3 position;
-    vec3 direction;
+    vec3 position;
+//    vec3 direction;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 //uniform Material material;
@@ -41,14 +45,17 @@ void main()
         specularColor = diffuseColor;
     }
 
-    vec3 ambient = diffuseColor * light.ambient;
+    float distance = length(light.position - outPos);
+    float attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * distance * distance);
 
-    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0);
-    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse;
+    vec3 ambient = diffuseColor * light.ambient * attenuation;
 
-    float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(cameraPos - outPos)) , 0);
+    float diffuseFactor = max( dot( normalize(light.position - outPos), normalize(outNormal) ), 0);
+    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse * attenuation;
+
+    float specularFactor = max( dot( reflect(normalize(outPos - light.position), normalize(outNormal)), normalize(cameraPos - outPos)) , 0);
     specularFactor = pow(specularFactor, 64);
-    vec3 specular = specularFactor * specularColor * light.specular;
+    vec3 specular = specularFactor * specularColor * light.specular * attenuation;
 
     gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
 }
