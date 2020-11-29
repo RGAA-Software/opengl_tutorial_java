@@ -26,7 +26,7 @@ public class MultiBoxLayer extends IRenderer {
 
     private int[] rotateFactor = new int[10];
 
-    private BoxRenderer mBoxRenderer;
+    private BoxRenderer[] mBoxRenderer = new BoxRenderer[10];
     private Camera mCamera;
     private Random mRandom = new Random();
     private Matrix4f model = new Matrix4f();
@@ -34,7 +34,9 @@ public class MultiBoxLayer extends IRenderer {
 
     public MultiBoxLayer(Camera camera, Matrix4f proj, String vertexPath, String fragPath) {
         super(vertexPath, fragPath);
-        mBoxRenderer = new BoxRenderer(mShaderProgram);
+        for (int i = 0; i < mBoxRenderer.length; i++) {
+            mBoxRenderer[i] = new BoxRenderer(vertexPath, fragPath);
+        }
         mCamera = camera;
         mProjection = proj;
     }
@@ -48,7 +50,7 @@ public class MultiBoxLayer extends IRenderer {
     public void render(double deltaTime) {
         for (int i = 0; i < boxPositions.length; i++) {
 
-            mBoxRenderer.prepare();
+            mBoxRenderer[i].prepare();
             Vector3f point = boxPositions[i];
             if (rotateFactor[i] == 0) {
                 rotateFactor[i] = mRandom.nextInt(28) + 1;
@@ -57,12 +59,13 @@ public class MultiBoxLayer extends IRenderer {
             model = model.identity();
             model = model.translate(point);
             model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 0, 1);
+            model = model.rotate((float)Math.toRadians(glfwGetTime() * rotateFactor[i]), 0, 1, 0);
 
-            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("model", model);
-            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
-            mBoxRenderer.getShaderProgram().setUniformMatrix4fv("proj", mProjection);
+            mBoxRenderer[i].getShaderProgram().setUniformMatrix4fv("model", model);
+            mBoxRenderer[i].getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
+            mBoxRenderer[i].getShaderProgram().setUniformMatrix4fv("proj", mProjection);
 
-            mBoxRenderer.render(deltaTime);
+            mBoxRenderer[i].render(deltaTime);
         }
     }
 

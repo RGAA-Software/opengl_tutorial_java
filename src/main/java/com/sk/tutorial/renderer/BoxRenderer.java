@@ -1,6 +1,8 @@
 package com.sk.tutorial.renderer;
 
 import com.sk.tutorial.shader.ShaderProgram;
+
+import org.joml.Vector3f;
 import org.lwjgl.stb.STBImage;
 
 import java.nio.ByteBuffer;
@@ -17,6 +19,10 @@ public class BoxRenderer extends IRenderer {
     private int mTexture1;
     private int mTexture2;
 
+    private Vector3f mAmbient;
+    private Vector3f mLightPos;
+    private Vector3f mLightColor;
+
     public BoxRenderer(ShaderProgram program) {
         super(program);
     }
@@ -27,6 +33,10 @@ public class BoxRenderer extends IRenderer {
 
     @Override
     public void init() {
+        mAmbient = new Vector3f(0.12f, 0.12f, 0.12f);
+        mLightPos = new Vector3f(1.0f, 1.0f, 1.0f);
+        mLightColor = new Vector3f(1.0f, 1.0f, 1.0f);
+
         float[] vertex = {
 
             -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
@@ -131,6 +141,9 @@ public class BoxRenderer extends IRenderer {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, mTexture2);
 
+        mShaderProgram.setUniform3fv("ambient", mAmbient);
+        mShaderProgram.setUniform3fv("lightPos", mLightPos);
+        mShaderProgram.setUniform3fv("lightColor", mLightColor);
         mShaderProgram.setUniform1i("image1", 0);
         mShaderProgram.setUniform1i("image2", 1);
 

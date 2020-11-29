@@ -74,7 +74,8 @@ public class ShaderProgram {
 
     public void setUniform3fv(String name, Vector3f val) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            glUniform3fv(glGetUniformLocation(program, name), val.get(stack.mallocFloat(3)));
+            int loc = glGetUniformLocation(program, name);
+            glUniform3fv(loc, val.get(stack.mallocFloat(3)));
         }
     }
 
