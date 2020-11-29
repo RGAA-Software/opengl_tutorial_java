@@ -187,10 +187,6 @@ public class BoxRenderer extends IRenderer {
             mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuse);
             mShaderProgram.setUniform3fv("light.specular", mLightSpecular);
 
-            mShaderProgram.setUniform1f("light.constant",  1.0f);
-            mShaderProgram.setUniform1f("light.linear",    0.09f);
-            mShaderProgram.setUniform1f("light.quadratic", 0.032f);
-
         } else {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, mTexture3);
@@ -212,8 +208,7 @@ public class BoxRenderer extends IRenderer {
 //        mShaderProgram.setUniform1f("material.shininess", 32.0f);
 
 
-//        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
-        mShaderProgram.setUniform3fv("light.position", mLightPos);
+        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
 
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
