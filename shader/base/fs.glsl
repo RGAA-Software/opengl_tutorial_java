@@ -57,22 +57,9 @@ void main()
     specularFactor = pow(specularFactor, 64);
     vec3 specular = specularFactor * specularColor * light.specular;
 
+    float e = light.cosCutoff - light.outerCutoff;
+    float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
 
-    if (cosTheta > light.cosCutoff) {
-
-        gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
-    } else if (cosTheta > light.outerCutoff && cosTheta < light.cosCutoff) {
-        float diff = light.cosCutoff - light.outerCutoff;
-        float distanceFromInner = light.cosCutoff - cosTheta;
-        float progress = 1 - distanceFromInner / diff;
-
-        gl_FragColor = vec4((ambient + diffuse + specular) * progress, 1.0);
-
-    } else {
-        gl_FragColor = vec4(0, 0, 0, 1);
-    }
-
-//    float distance = length(light.position - outPos);
-//    float attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * distance * distance);
+    gl_FragColor = vec4(ambient + (diffuse + specular) * intensity, 1.0);
 
 }
