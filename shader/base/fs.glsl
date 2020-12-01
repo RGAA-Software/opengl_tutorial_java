@@ -25,7 +25,9 @@ struct Light {
     vec3 diffuse;
     vec3 specular;
     vec3 position;
-//    vec3 direction;
+    vec3 direction;
+    float cosCutoff;
+    float outerCutoff;
 
     float constant;
     float linear;
@@ -45,17 +47,32 @@ void main()
         specularColor = diffuseColor;
     }
 
-    float distance = length(light.position - outPos);
-    float attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * distance * distance);
+    float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
+    vec3 ambient = diffuseColor * light.ambient;
 
-    vec3 ambient = diffuseColor * light.ambient * attenuation;
+    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0);
+    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse;
 
-    float diffuseFactor = max( dot( normalize(light.position - outPos), normalize(outNormal) ), 0);
-    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse * attenuation;
-
-    float specularFactor = max( dot( reflect(normalize(outPos - light.position), normalize(outNormal)), normalize(cameraPos - outPos)) , 0);
+    float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(light.position - outPos)) , 0);
     specularFactor = pow(specularFactor, 64);
-    vec3 specular = specularFactor * specularColor * light.specular * attenuation;
+    vec3 specular = specularFactor * specularColor * light.specular;
 
-    gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
+
+    if (cosTheta > light.cosCutoff) {
+
+        gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
+    } else if (cosTheta > light.outerCutoff && cosTheta < light.cosCutoff) {
+        float diff = light.cosCutoff - light.outerCutoff;
+        float distanceFromInner = light.cosCutoff - cosTheta;
+        float progress = 1 - distanceFromInner / diff;
+
+        gl_FragColor = vec4((ambient + diffuse + specular) * progress, 1.0);
+
+    } else {
+        gl_FragColor = vec4(0, 0, 0, 1);
+    }
+
+//    float distance = length(light.position - outPos);
+//    float attenuation = 1.0 / (1 + light.linear * distance + light.quadratic * distance * distance);
+
 }

@@ -24,8 +24,8 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
     private int vao;
 
     public void run() {
@@ -136,7 +136,7 @@ public class Main {
         mDeltaTime = glfwGetTime() - mLastTime;
 
         mBoxLayer.render(deltaTime);
-        mSingleLightLayer.render(deltaTime);
+        //mSingleLightLayer.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

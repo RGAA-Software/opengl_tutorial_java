@@ -212,8 +212,10 @@ public class BoxRenderer extends IRenderer {
 //        mShaderProgram.setUniform1f("material.shininess", 32.0f);
 
 
-//        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
-        mShaderProgram.setUniform3fv("light.position", mLightPos);
+        mShaderProgram.setUniform3fv("light.direction", mCamera.getCameraFront());
+        mShaderProgram.setUniform1f("light.cosCutoff", (float)Math.cos(Math.toRadians(12.5)));
+        mShaderProgram.setUniform1f("light.outerCutoff", (float)Math.cos(Math.toRadians(17.5)));
+        mShaderProgram.setUniform3fv("light.position", mCamera.getCameraPos());
 
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
