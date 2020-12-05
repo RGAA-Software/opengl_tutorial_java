@@ -4,6 +4,10 @@ import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
+import com.sk.tutorial.model.Model;
+import com.sk.tutorial.model.ModelLoader;
+import com.sk.tutorial.shader.ShaderProgram;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -62,7 +66,7 @@ public class Main {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SAMPLES, 4);
-        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+        //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 
         // Create the window
         window = glfwCreateWindow((int)width, (int)height, "Hello World!", NULL, NULL);
@@ -113,6 +117,7 @@ public class Main {
 
     private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
+    private Model mModel;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -127,6 +132,13 @@ public class Main {
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
+
+        ShaderProgram modelShader = new ShaderProgram();
+        modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
+
+        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+        mModel.setCamera(mCamera);
+        mModel.setProjection(mProjMat);
     }
 
     private void render(double deltaTime) {
@@ -134,10 +146,10 @@ public class Main {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
-
-        mBoxLayer.render(deltaTime);
-        //mSingleLightLayer.render(deltaTime);
-
+        glBindVertexArray(vao);
+//        mSingleLightLayer.render(deltaTime);
+//        mBoxLayer.render(deltaTime);
+        mModel.render(deltaTime);
         mLastTime = glfwGetTime();
     }
 

@@ -21,6 +21,10 @@ public abstract class IRenderer {
 
     }
 
+    public void setShaderProgram(ShaderProgram program) {
+        mShaderProgram = program;
+    }
+
     public void prepare() {
         mShaderProgram.use();
     }

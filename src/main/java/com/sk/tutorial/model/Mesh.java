@@ -2,6 +2,7 @@ package com.sk.tutorial.model;
 
 import com.sk.tutorial.renderer.IRenderer;
 import com.sk.tutorial.shader.ShaderProgram;
+import com.sk.tutorial.util.TextUtils;
 
 import java.util.List;
 
@@ -12,27 +13,27 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public class Mesh extends IRenderer {
 
     public List<Vertex> vertices;
     public List<Integer> indices;
-    public List<Texture> textures;
+    public Material material;
 
     private int VAO;
     private int VBO;
     private int EBO;
 
-    public Mesh(List<Vertex> vs, List<Integer> is, List<Texture> ts, ShaderProgram program) {
+    public Mesh(List<Vertex> vs, List<Integer> is, Material ts, ShaderProgram program) {
         super(program);
         vertices = vs;
         indices = is;
-        textures = ts;
+        material = ts;
+
+        setupData();
     }
 
-    @Override
-    public void init() {
+    private void setupData() {
         VAO = glGenVertexArrays();
         VBO = glGenBuffers();
         EBO = glGenBuffers();
@@ -41,8 +42,6 @@ public class Mesh extends IRenderer {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         float[] verticles = new float[vertices.size() * (3 + 3 + 2)];
-//        float[] normals = new float[vertices.size() * 3];
-//        float[] texCoords = new float[vertices.size() * 2];
         for (int i = 0; i < vertices.size(); i++) {
             Vertex vertex = vertices.get(i);
             verticles[i * 8 + 0] = vertex.position.x;
@@ -85,22 +84,24 @@ public class Mesh extends IRenderer {
 
     @Override
     public void render(double deltaTime) {
-         int diffuseNr = 1;
-         int specularNr = 1;
-        for( int i = 0; i < textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i); // 在绑定之前激活相应的纹理单元
-            // 获取纹理序号（diffuse_textureN 中的 N）
-            String number = "";
-            String name = textures.get(i).type;
-            if(name.equals("texture_diffuse"))
-                number = String.valueOf(diffuseNr++);
-        else if(name.equals("texture_specular"))
-            number = String.valueOf(specularNr++);
-            mShaderProgram.setUniform1f(("material." + name + number), i);
-            glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
+        int diffuseNr = 1;
+        int specularNr = 1;
+        List<Texture> textures = material.textures;
+        if (textures != null) {
+            for (int i = 0; i < textures.size(); i++) {
+                glActiveTexture(GL_TEXTURE0 + i);
+                String number = "";
+                String type = textures.get(i).type;
+                if (TextUtils.equals(type, Texture.TYPE_DIFFUSE))
+                    number = String.valueOf(diffuseNr++);
+                else if (TextUtils.equals(type, Texture.TYPE_SPECULAR)) {
+                    number = String.valueOf(specularNr++);
+                }
+                mShaderProgram.setUniform1i(("material." + type + "_" + number), i);
+                glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
+            }
         }
-        glActiveTexture(GL_TEXTURE0);
+//        glActiveTexture(GL_TEXTURE0);
 
         // 绘制网格
         glBindVertexArray(VAO);

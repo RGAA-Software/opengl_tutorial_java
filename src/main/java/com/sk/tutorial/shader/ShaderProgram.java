@@ -55,7 +55,7 @@ public class ShaderProgram {
             String shaderLog = glGetShaderInfoLog(shader);
             System.out.println("shader : " + source + " \nErr : " + shaderLog);
         } else {
-            System.out.println("compile shader ok .");
+            //System.out.println("compile shader ok .");
         }
         return shader;
     }
