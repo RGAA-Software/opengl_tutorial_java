@@ -31,6 +31,8 @@ import java.util.List;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengles.GLES20.GL_IMPLEMENTATION_COLOR_READ_FORMAT;
+import static org.lwjgl.opengles.GLES20.GL_IMPLEMENTATION_COLOR_READ_TYPE;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -257,8 +259,8 @@ public class Main {
         // create a color attachment texture
         int textureColorbuffer = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-        ByteBuffer buffer = ByteBuffer.allocate((int) (width*height*3)).order(ByteOrder.nativeOrder());
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)width, (int)height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+        ByteBuffer buffer = ByteBuffer.allocate((int) (width*height*4)).order(ByteOrder.nativeOrder());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)width, (int)height, 0, GL_RGB, GL_UNSIGNED_BYTE, (ByteBuffer) null);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
@@ -270,7 +272,15 @@ public class Main {
         // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             System.out.println("ERROR ==== ");
+            return;
         }
+        int[] readType = new int[1];
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, readType);
+
+        int[] readFormat = new int[1];
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, readFormat);
+
+        System.out.println("type : " + readType[0] + " format : " + readFormat[0]);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
@@ -294,7 +304,7 @@ public class Main {
                 1.0f, 1.0f
         };
 
-        mFrameBufferShot = new Sprite((int)width, (int)height, 4);
+        mFrameBufferShot = new Sprite(textureColorbuffer);
         mFrameBufferShot.setVertices(bufferShotTexVertices, null, bufferShotTexCoords);
         STBImage.stbi_set_flip_vertically_on_load(true);
         int[] x = new int[1];
@@ -305,9 +315,9 @@ public class Main {
 
         //mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 3);
         //mFrameBufferShot.getTexture().updateTextureData(imageData, x[0], y[0], 4);
-    }
 
-    boolean read = false;
+
+    }
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
@@ -315,17 +325,12 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        //glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+        // make sure we clear the framebuffer's content
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindVertexArray(vao);
-//        mSingleLightLayer.render(deltaTime);
-//        mBoxLayer.render(deltaTime);
-
-//        mModel.render(deltaTime);
-//        glDisable(GL_STENCIL_TEST);
         mModel.render(deltaTime);
         mFloor.render(deltaTime);
-
 
         for (Vector3f pos : grassPos) {
             mGrass.setPosition(pos);
@@ -333,16 +338,18 @@ public class Main {
         }
 
         mModel.render(deltaTime);
-        imageData.position(0);
-        glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-
-        imageData.position(0);
+//        imageData.position(0);
+//        //glPixelStorei(GL_PACK_ALIGNMENT, 1);
+//        glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+//        imageData.position(0);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+
+        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 4);
+//        mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 4);
         mFrameBufferShot.render(deltaTime);
+
 //        glEnable(GL_DEPTH_TEST);
 //        glEnable(GL_STENCIL_TEST);
 //        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);

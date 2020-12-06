@@ -21,6 +21,11 @@ public class Sprite extends IRenderer {
     private int mVerticleSize;
     private Vector3f mPosition;
 
+    public Sprite(int textureId) {
+        super("shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
+        mTexture = new Texture(textureId);
+    }
+
     public Sprite(String imagePath, boolean flip) {
         super("shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
         mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip);

@@ -41,6 +41,10 @@ public class Texture {
 
     private ByteBuffer imageData;
 
+    public Texture(int id) {
+        this.id = id;
+    }
+
     public Texture(String path, String type) {
         this(path, type, true);
     }
