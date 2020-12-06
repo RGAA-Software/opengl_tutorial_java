@@ -124,6 +124,7 @@ public class Main {
 
     private Sprite mFloor;
     private Sprite mGrass;
+    private Vector3f[] grassPos;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -162,7 +163,7 @@ public class Main {
         mOutlineModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
 //        mOutlineModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
         mOutlineModel.setScale(0.001f);
-        mOutlineModel.setPosition(new Vector3f(0, 0, -13));
+        mOutlineModel.setPosition(new Vector3f(0, 0, -6));
         mOutlineModel.setCamera(mCamera);
         mOutlineModel.setProjection(mProjMat);
 
@@ -216,6 +217,14 @@ public class Main {
         mGrass = new Sprite("resources/images/grass.png", false);
         mGrass.setVertices(grassVertices, null, grassTexCoord);
         //mGrass.setPosition(new Vector3f());
+
+         grassPos = new Vector3f[]{
+            new Vector3f(-1.5f, -1.0f, -0.48f),
+            new Vector3f(1.5f, -1.0f, 0.51f),
+            new Vector3f(0.0f, -1.0f, 0.7f),
+            new Vector3f(-0.3f, -1.0f, -2.3f),
+            new Vector3f(0.5f, -1.0f, -0.6f),
+        };
     }
 
     private void render(double deltaTime) {
@@ -230,21 +239,26 @@ public class Main {
 //        mModel.render(deltaTime);
         glDisable(GL_STENCIL_TEST);
         mFloor.render(deltaTime);
-        mGrass.render(deltaTime);
+        for (Vector3f pos : grassPos) {
+            mGrass.setPosition(pos);
+            mGrass.render(deltaTime);
+        }
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_STENCIL_TEST);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
         mModel.render(deltaTime);
 
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
-        mOutlineModel.render(deltaTime);
-        glStencilMask(0xFF);
-        glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_STENCIL_TEST);
+//        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+//        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+//        glStencilMask(0xFF);
+//        mModel.render(deltaTime);
+//
+//        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+//        glStencilMask(0x00);
+//        glDisable(GL_DEPTH_TEST);
+//        mOutlineModel.render(deltaTime);
+//        glStencilMask(0xFF);
+//        glEnable(GL_DEPTH_TEST);
 
         mLastTime = glfwGetTime();
     }
