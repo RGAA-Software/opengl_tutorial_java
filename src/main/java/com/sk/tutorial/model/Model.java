@@ -20,6 +20,8 @@ public class Model extends IRenderer {
     private Matrix4f model = new Matrix4f();
     private Matrix4f mProjection;
 
+    private float scale;
+
     public Model(ShaderProgram program) {
         super(program);
     }
@@ -30,6 +32,10 @@ public class Model extends IRenderer {
 
     public void setProjection(Matrix4f proj) {
         mProjection = proj;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 
     private Vector3f mLightAmbient = new Vector3f(0.1f, 0.1f, 0.1f);
@@ -46,14 +52,14 @@ public class Model extends IRenderer {
     public void render(double deltaTime) {
         mShaderProgram.use();
         model = model.identity();
-        model = model.scale(0.2f);
+        model = model.scale(scale);
         getShaderProgram().setUniformMatrix4fv("model", model);
         getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
         getShaderProgram().setUniformMatrix4fv("proj", mProjection);
         mShaderProgram.setUniform3fv("light.ambient",  mLightAmbientEM);
         mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuseEM);
         mShaderProgram.setUniform3fv("light.specular", mLightSpecularEM);
-        mShaderProgram.setUniform3fv("light.direction", mCamera.getCameraFront());
+        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
         mShaderProgram.setUniform1f("light.cosCutoff", (float)Math.cos(Math.toRadians(12.5)));
         mShaderProgram.setUniform1f("light.outerCutoff", (float)Math.cos(Math.toRadians(17.5)));
         mShaderProgram.setUniform3fv("light.position", mCamera.getCameraPos());

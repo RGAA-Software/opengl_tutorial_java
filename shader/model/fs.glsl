@@ -56,18 +56,24 @@ void main()
 
 
     float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
-    vec3 ambient = vec3(0.1, 0.1, 0.1);
+    vec3 diffuseColorCompose = diffuseColor1 + diffuseColor2 + diffuseColor3;
+    vec3 ambient = vec3(0.3, 0.3, 0.3);
+    if (diffuseColorCompose.r <= 0 && diffuseColorCompose.g <= 0 && diffuseColorCompose.b <= 0) {
+        diffuseColorCompose = ambient;
+    }
+
+    vec3 specularColorCompose = specularColor1 + specularColor2 + specularColor3;
 
     float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0);
-    vec3 diffuse = diffuseFactor * (diffuseColor1 + diffuseColor2 + diffuseColor3) * light.diffuse;
+    vec3 diffuse = diffuseFactor * diffuseColorCompose * light.diffuse;
 
     float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(light.position - outPos)) , 0);
     specularFactor = pow(specularFactor, 64);
-    vec3 specular = specularFactor * (specularColor1 + specularColor2 + specularColor3) * light.specular;
+    vec3 specular = specularFactor * specularColorCompose * light.specular;
 
-    float e = light.cosCutoff - light.outerCutoff;
-    float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
+    //float e = light.cosCutoff - light.outerCutoff;
+    //float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
 
-    gl_FragColor = vec4(ambient + (diffuse + specular) * intensity, 1.0);
-//    gl_FragColor = vec4(diffuse , 1.0);
+    gl_FragColor = vec4(ambient + (diffuse + specular), 1.0);
+//    gl_FragColor = vec4(diffuseColor1 , 1.0);
 }

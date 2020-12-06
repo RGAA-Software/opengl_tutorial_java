@@ -22,7 +22,7 @@ public class ModelLoader {
 
     public static Model loadModel(String path, ShaderProgram shaderProgram) {
         String basePath = path.substring(0, path.lastIndexOf("/"));
-        AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate/*|Assimp.aiProcess_FlipUVs*/);
+        AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate|Assimp.aiProcess_GenNormals/*|Assimp.aiProcess_FlipUVs*/);
 
         System.out.println("materials : " + aiScene.mNumMaterials());
         System.out.println("meshs : " + aiScene.mNumMeshes());
@@ -189,6 +189,7 @@ public class ModelLoader {
         int result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT, Assimp.aiTextureType_NONE, 0, color);
         if (result == 0) {
             diffuseColor = new Vector3f(color.r(), color.g(), color.b());
+            material.color = diffuseColor;
             System.out.println("diffuse color : r : " + diffuseColor.x + " g : " + diffuseColor.y + " b : " + diffuseColor.z);
         }
 

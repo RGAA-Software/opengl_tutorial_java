@@ -127,7 +127,7 @@ public class Main {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
-        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
+//        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
 
         glEnable(GL_MULTISAMPLE);
@@ -136,7 +136,9 @@ public class Main {
         ShaderProgram modelShader = new ShaderProgram();
         modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
 
-        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+        //mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
+        mModel.setScale(0.002f);
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
     }
