@@ -1,10 +1,18 @@
 package com.sk.tutorial.renderer;
 
+import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.shader.ShaderProgram;
+
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public abstract class IRenderer {
 
     protected ShaderProgram mShaderProgram;
+
+    protected Matrix4f mProjection;
+    protected Camera mCamera;
+    protected Vector3f mPosition;
 
     public IRenderer(ShaderProgram program) {
         mShaderProgram = program;
@@ -23,6 +31,18 @@ public abstract class IRenderer {
 
     public void setShaderProgram(ShaderProgram program) {
         mShaderProgram = program;
+    }
+
+    public void setProjection(Matrix4f projection) {
+        mProjection = projection;
+    }
+
+    public void setCamera(Camera camera) {
+        mCamera = camera;
+    }
+
+    public void setPosition(Vector3f position) {
+        mPosition = position;
     }
 
     public void prepare() {

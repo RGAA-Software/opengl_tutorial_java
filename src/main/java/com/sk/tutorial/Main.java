@@ -6,7 +6,9 @@ import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
+import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
+import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -120,11 +122,19 @@ public class Main {
     private Model mModel;
     private Model mOutlineModel;
 
+    private Sprite mFloor;
+    private Sprite mGrass;
+
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
                         width / height,
                         0.1f, 100.0f);
+
+        Director.getInstance()
+                .setProjection(mProjMat)
+                .setCamera(mCamera);
+
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
@@ -140,7 +150,8 @@ public class Main {
 //        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
         mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
-        mModel.setScale(0.002f);
+        mModel.setScale(0.001f);
+        mModel.setPosition(new Vector3f(0, 0, -13));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
 
@@ -150,9 +161,61 @@ public class Main {
 //        mOutlineModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
         mOutlineModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
 //        mOutlineModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
-        mOutlineModel.setScale(0.002f);
+        mOutlineModel.setScale(0.001f);
+        mOutlineModel.setPosition(new Vector3f(0, 0, -13));
         mOutlineModel.setCamera(mCamera);
         mOutlineModel.setProjection(mProjMat);
+
+
+        mFloor = new Sprite("resources/images/floor.jpg");
+        mFloor.setCamera(mCamera);
+        mFloor.setProjection(mProjMat);
+        mFloor.setPosition(new Vector3f(0, -1, 0));
+        float floorVertices[] = {
+                // positions          // texture Coords
+                8f, -0.5f,  8f,
+                -8f, -0.5f,  8f,
+                -8f, -0.5f, -8f,
+
+                8f, -0.5f,  8f,
+                -8f, -0.5f, -8f,
+                8f, -0.5f, -8f,
+        };
+        float floorTexcoord[] = {
+                8.0f, 0.0f,
+                0.0f, 0.0f,
+                0.0f, 8.0f,
+
+                8.0f, 0.0f,
+                0.0f, 8.0f,
+                8.0f, 8.0f
+        };
+        mFloor.setVertices(floorVertices, null,  floorTexcoord);
+
+
+        float[] grassVertices = {
+                // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+                0.0f,  0.5f,  0.0f,
+                0.0f, -0.5f,  0.0f,
+                1.0f, -0.5f,  0.0f,
+
+                0.0f,  0.5f,  0.0f,
+                1.0f, -0.5f,  0.0f,
+                1.0f,  0.5f,  0.0f,
+        };
+
+        float[] grassTexCoord = {
+                0.0f,  0.0f,
+                0.0f,  1.0f,
+                1.0f,  1.0f,
+                0.0f,  0.0f,
+                1.0f,  1.0f,
+                1.0f,  0.0f
+        };
+
+        mGrass = new Sprite("resources/images/grass.png", false);
+        mGrass.setVertices(grassVertices, null, grassTexCoord);
+        //mGrass.setPosition(new Vector3f());
     }
 
     private void render(double deltaTime) {
@@ -165,6 +228,9 @@ public class Main {
 //        mBoxLayer.render(deltaTime);
 
 //        mModel.render(deltaTime);
+        glDisable(GL_STENCIL_TEST);
+        mFloor.render(deltaTime);
+        mGrass.render(deltaTime);
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);

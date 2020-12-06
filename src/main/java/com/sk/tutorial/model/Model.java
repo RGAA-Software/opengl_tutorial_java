@@ -55,8 +55,12 @@ public class Model extends IRenderer {
     public void render(double deltaTime) {
         mShaderProgram.use();
         model = model.identity();
-        model = model.translate(0, 0, -1);
+
+        if (mPosition != null) {
+            model = model.translate(mPosition);
+        }
         model = model.scale(scale);
+
         getShaderProgram().setUniformMatrix4fv("model", model);
         getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
         getShaderProgram().setUniformMatrix4fv("proj", mProjection);
