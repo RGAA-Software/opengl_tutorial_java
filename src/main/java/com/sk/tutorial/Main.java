@@ -15,9 +15,14 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
+import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -129,6 +134,9 @@ public class Main {
     private Sprite mFloor;
     private Sprite mGrass;
     private List<Vector3f> grassPos;
+    private Sprite mFrameBufferShot;
+    private int framebuffer;
+    private ByteBuffer imageData;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -241,13 +249,74 @@ public class Main {
         for (Vector3f p : grassPos) {
             System.out.println("p : " + p.z);
         }
+
+        // framebuffer configuration
+        // -------------------------
+        framebuffer = glGenFramebuffers();
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        // create a color attachment texture
+        int textureColorbuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        ByteBuffer buffer = ByteBuffer.allocate((int) (width*height*3)).order(ByteOrder.nativeOrder());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)width, (int)height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+        // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+        int rbo = glGenRenderbuffers();
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)width, (int)height); // use a single renderbuffer object for both a depth AND stencil buffer.
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+        // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            System.out.println("ERROR ==== ");
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        float bufferShotTexVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+                // positions   // texCoords
+                -1.0f,  1.0f, 0,
+                -1.0f, -1.0f, 0,
+                1.0f, -1.0f,  0,
+
+                -1.0f,  1.0f, 0,
+                1.0f, -1.0f,  0,
+                1.0f,  1.0f,  0,
+        };
+
+        float[] bufferShotTexCoords = new float[] {
+                0.0f, 1.0f,
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f
+        };
+
+        mFrameBufferShot = new Sprite((int)width, (int)height, 4);
+        mFrameBufferShot.setVertices(bufferShotTexVertices, null, bufferShotTexCoords);
+        STBImage.stbi_set_flip_vertically_on_load(true);
+        int[] x = new int[1];
+        int[] y = new int[1];
+        int[] c = new int[1];
+        imageData = mFrameBufferShot.getTexture().getImageData();//ByteBuffer.allocate((int)width * (int)height * 4).order(ByteOrder.nativeOrder());//STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
+        //imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
+
+        //mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 3);
+        //mFrameBufferShot.getTexture().updateTextureData(imageData, x[0], y[0], 4);
     }
+
+    boolean read = false;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        //glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+
         glBindVertexArray(vao);
 //        mSingleLightLayer.render(deltaTime);
 //        mBoxLayer.render(deltaTime);
@@ -257,13 +326,23 @@ public class Main {
         mModel.render(deltaTime);
         mFloor.render(deltaTime);
 
+
         for (Vector3f pos : grassPos) {
             mGrass.setPosition(pos);
             mGrass.render(deltaTime);
         }
 
         mModel.render(deltaTime);
+        imageData.position(0);
+        glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
 
+        imageData.position(0);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 4);
+        mFrameBufferShot.render(deltaTime);
 //        glEnable(GL_DEPTH_TEST);
 //        glEnable(GL_STENCIL_TEST);
 //        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);

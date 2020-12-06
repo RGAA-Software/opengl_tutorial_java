@@ -5,6 +5,7 @@ import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GREMEDYFrameTerminator;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -27,6 +28,11 @@ public class Sprite extends IRenderer {
 
     public Sprite(String imagePath) {
         this(imagePath, true);
+    }
+
+    public Sprite(int width, int height, int channel) {
+        super("shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
+        mTexture = new Texture(width, height, channel);
     }
 
     public void setVertices(float[] vertices, float[] normals, float[] texCoords) {
@@ -67,6 +73,10 @@ public class Sprite extends IRenderer {
 
     public void setPosition(Vector3f position) {
         mPosition = position;
+    }
+
+    public Texture getTexture() {
+        return mTexture;
     }
 
     private Matrix4f model = new Matrix4f();
