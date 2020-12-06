@@ -84,6 +84,7 @@ public class Mesh extends IRenderer {
 
     @Override
     public void render(double deltaTime) {
+        mShaderProgram.use();
         int diffuseNr = 1;
         int specularNr = 1;
         List<Texture> textures = material.textures;

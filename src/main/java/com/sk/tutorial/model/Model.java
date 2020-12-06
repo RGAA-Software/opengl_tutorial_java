@@ -9,6 +9,7 @@ import org.joml.Random;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Vector;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
@@ -48,10 +49,13 @@ public class Model extends IRenderer {
 
     private Vector3f mLightDirection = new Vector3f(-0.2f, -1.0f, -0.3f);
 
+    private Vector3f mOutlineColor = new Vector3f(0.5f, 0.2f, 0.8f);
+
     @Override
     public void render(double deltaTime) {
         mShaderProgram.use();
         model = model.identity();
+        model = model.translate(0, 0, -1);
         model = model.scale(scale);
         getShaderProgram().setUniformMatrix4fv("model", model);
         getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
@@ -60,9 +64,8 @@ public class Model extends IRenderer {
         mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuseEM);
         mShaderProgram.setUniform3fv("light.specular", mLightSpecularEM);
         mShaderProgram.setUniform3fv("light.direction", mLightDirection);
-        mShaderProgram.setUniform1f("light.cosCutoff", (float)Math.cos(Math.toRadians(12.5)));
-        mShaderProgram.setUniform1f("light.outerCutoff", (float)Math.cos(Math.toRadians(17.5)));
-        mShaderProgram.setUniform3fv("light.position", mCamera.getCameraPos());
+        mShaderProgram.setUniform3fv("singleColor", mOutlineColor);
+        mShaderProgram.setUniform1f("scale", 10.2f);
         for (Mesh mesh : meshes) {
             mesh.render(deltaTime);
         }

@@ -118,6 +118,7 @@ public class Main {
     private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
     private Model mModel;
+    private Model mOutlineModel;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -136,11 +137,22 @@ public class Main {
         ShaderProgram modelShader = new ShaderProgram();
         modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
 
-        //mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
-        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
+//        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
+//        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
         mModel.setScale(0.002f);
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
+
+        ShaderProgram outlineModelShader = new ShaderProgram();
+        outlineModelShader.initWithShaderPath("shader/model/vs_outline.glsl", "shader/model/fs_outline.glsl");
+
+//        mOutlineModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
+        mOutlineModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
+//        mOutlineModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
+        mOutlineModel.setScale(0.002f);
+        mOutlineModel.setCamera(mCamera);
+        mOutlineModel.setProjection(mProjMat);
     }
 
     private void render(double deltaTime) {
@@ -151,7 +163,23 @@ public class Main {
         glBindVertexArray(vao);
 //        mSingleLightLayer.render(deltaTime);
 //        mBoxLayer.render(deltaTime);
+
+//        mModel.render(deltaTime);
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
         mModel.render(deltaTime);
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+        mOutlineModel.render(deltaTime);
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
+
         mLastTime = glfwGetTime();
     }
 
@@ -162,7 +190,7 @@ public class Main {
         prepare();
 
         while ( !glfwWindowShouldClose(window) ) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             render(mDeltaTime);
 

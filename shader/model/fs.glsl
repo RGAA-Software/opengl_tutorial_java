@@ -57,7 +57,7 @@ void main()
 
     float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
     vec3 diffuseColorCompose = diffuseColor1 + diffuseColor2 + diffuseColor3;
-    vec3 ambient = vec3(0.3, 0.3, 0.3);
+    vec3 ambient = vec3(0.1, 0.1, 0.1);
     if (diffuseColorCompose.r <= 0 && diffuseColorCompose.g <= 0 && diffuseColorCompose.b <= 0) {
         diffuseColorCompose = ambient;
     }
