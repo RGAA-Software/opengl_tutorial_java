@@ -18,6 +18,10 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -124,7 +128,7 @@ public class Main {
 
     private Sprite mFloor;
     private Sprite mGrass;
-    private Vector3f[] grassPos;
+    private List<Vector3f> grassPos;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -144,6 +148,8 @@ public class Main {
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderProgram modelShader = new ShaderProgram();
         modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
@@ -214,17 +220,27 @@ public class Main {
                 1.0f,  0.0f
         };
 
-        mGrass = new Sprite("resources/images/grass.png", false);
+        mGrass = new Sprite("resources/images/window.png", false);
         mGrass.setVertices(grassVertices, null, grassTexCoord);
         //mGrass.setPosition(new Vector3f());
 
-         grassPos = new Vector3f[]{
+         Vector3f[] posArray = new Vector3f[]{
             new Vector3f(-1.5f, -1.0f, -0.48f),
             new Vector3f(1.5f, -1.0f, 0.51f),
             new Vector3f(0.0f, -1.0f, 0.7f),
             new Vector3f(-0.3f, -1.0f, -2.3f),
             new Vector3f(0.5f, -1.0f, -0.6f),
         };
+        grassPos = Arrays.asList(posArray);
+        grassPos.sort(new Comparator<Vector3f>() {
+            @Override
+            public int compare(Vector3f left, Vector3f right) {
+                return Float.compare(left.z, right.z);
+            }
+        });
+        for (Vector3f p : grassPos) {
+            System.out.println("p : " + p.z);
+        }
     }
 
     private void render(double deltaTime) {
@@ -237,8 +253,10 @@ public class Main {
 //        mBoxLayer.render(deltaTime);
 
 //        mModel.render(deltaTime);
-        glDisable(GL_STENCIL_TEST);
+//        glDisable(GL_STENCIL_TEST);
+        mModel.render(deltaTime);
         mFloor.render(deltaTime);
+
         for (Vector3f pos : grassPos) {
             mGrass.setPosition(pos);
             mGrass.render(deltaTime);

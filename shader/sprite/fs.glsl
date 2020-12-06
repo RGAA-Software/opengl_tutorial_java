@@ -38,9 +38,7 @@ uniform Light light;
 void main()
 {
     vec4 diffuseColor = texture(image, outTex);
-    if (diffuseColor.a < 0.1) {
-        discard;
-    }
+
     gl_FragColor = diffuseColor;
 
 //    vec3 specularColor;
