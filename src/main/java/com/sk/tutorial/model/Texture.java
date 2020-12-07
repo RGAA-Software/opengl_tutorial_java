@@ -63,7 +63,7 @@ public class Texture {
         int[] y = new int[1];
         int[] c = new int[1];
         STBImage.stbi_set_flip_vertically_on_load(false);
-        imageData = ByteBuffer.allocate(width*height*channel).order(ByteOrder.nativeOrder());
+        imageData = ByteBuffer.allocateDirect((int)width * (int)height * 4).order(ByteOrder.nativeOrder());
         if (channel == 4) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
         } else if (channel == 3) {

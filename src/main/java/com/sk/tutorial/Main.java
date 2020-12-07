@@ -41,8 +41,12 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
+//    private float width = 1920;
+//    private float height = 1080;
+
+    private float width = 800;
+    private float height = 600;
+
     private int vao;
 
     public void run() {
@@ -304,18 +308,13 @@ public class Main {
                 1.0f, 1.0f
         };
 
-        mFrameBufferShot = new Sprite(textureColorbuffer);
+        mFrameBufferShot = new Sprite((int)width, (int)height, 4);
         mFrameBufferShot.setVertices(bufferShotTexVertices, null, bufferShotTexCoords);
         STBImage.stbi_set_flip_vertically_on_load(true);
         int[] x = new int[1];
         int[] y = new int[1];
         int[] c = new int[1];
-        imageData = mFrameBufferShot.getTexture().getImageData();//ByteBuffer.allocate((int)width * (int)height * 4).order(ByteOrder.nativeOrder());//STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
-        //imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
-
-        //mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 3);
-        //mFrameBufferShot.getTexture().updateTextureData(imageData, x[0], y[0], 4);
-
+        imageData = mFrameBufferShot.getTexture().getImageData();////STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
 
     }
 
@@ -338,16 +337,16 @@ public class Main {
         }
 
         mModel.render(deltaTime);
-//        imageData.position(0);
+        imageData.position(0);
 //        //glPixelStorei(GL_PACK_ALIGNMENT, 1);
-//        glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-//        imageData.position(0);
+        glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+        imageData.position(0);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-//        mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 4);
+        mFrameBufferShot.getTexture().updateTextureData(imageData, (int)width, (int)height, 4);
         mFrameBufferShot.render(deltaTime);
 
 //        glEnable(GL_DEPTH_TEST);
