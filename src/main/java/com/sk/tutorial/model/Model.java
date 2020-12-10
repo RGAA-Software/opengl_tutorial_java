@@ -51,13 +51,17 @@ public class Model extends IRenderer {
 
     private Vector3f mOutlineColor = new Vector3f(0.5f, 0.2f, 0.8f);
 
+    private float mRotate = 0;
     @Override
     public void render(double deltaTime) {
         mShaderProgram.use();
         model = model.identity();
 
+        mRotate += (float)deltaTime *3;
+
         if (mPosition != null) {
             model = model.translate(mPosition);
+            model = model.rotate(mRotate, 0, 1, 0);
         }
         model = model.scale(scale);
 
