@@ -261,8 +261,6 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
-        mSkybox.render(deltaTime);
-
         mFloor.render(deltaTime);
 
         for (Vector3f pos : grassPos) {
@@ -272,6 +270,7 @@ public class Main {
 
         mModel.render(deltaTime);
 
+        mSkybox.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

@@ -125,12 +125,12 @@ public class Skybox extends IRenderer {
     @Override
     public void render(double deltaTime) {
         super.render(deltaTime);
-        glDepthMask(false);
 
         glBindVertexArray(mRenderVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, mCubeMapTexId);
 
+        glDepthFunc(GL_LEQUAL);
         model = model.identity();
         if (mPosition != null) {
             model = model.translate(mPosition);
@@ -148,6 +148,6 @@ public class Skybox extends IRenderer {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindVertexArray(0);
-        glDepthMask(true);
+        glDepthFunc(GL_LESS);
     }
 }
