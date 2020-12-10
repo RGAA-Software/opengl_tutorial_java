@@ -20,7 +20,6 @@ import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -125,7 +124,7 @@ public class Main {
     private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
     private Model mModel;
-    private Model mOutlineModel;
+    private Model mRefractModel;
 
     private Sprite mFloor;
     private Sprite mGrass;
@@ -157,23 +156,23 @@ public class Main {
         modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
 
 //        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
-        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
-//        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
+//        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
+        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
         mModel.setScale(0.001f);
-        mModel.setPosition(new Vector3f(0, 0, -13));
+        mModel.setPosition(new Vector3f(0, 0, -3));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
 
         ShaderProgram outlineModelShader = new ShaderProgram();
-        outlineModelShader.initWithShaderPath("shader/model/vs_outline.glsl", "shader/model/fs_outline.glsl");
+        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
 
-//        mOutlineModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
-        mOutlineModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
-//        mOutlineModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
-        mOutlineModel.setScale(0.001f);
-        mOutlineModel.setPosition(new Vector3f(0, 0, -6));
-        mOutlineModel.setCamera(mCamera);
-        mOutlineModel.setProjection(mProjMat);
+        mRefractModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
+//        mRefractModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
+//        mRefractModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
+        mRefractModel.setScale(0.1f);
+        mRefractModel.setPosition(new Vector3f(1, 0, -3));
+        mRefractModel.setCamera(mCamera);
+        mRefractModel.setProjection(mProjMat);
 
 
         mFloor = new Sprite("resources/images/floor.jpg");
@@ -269,6 +268,7 @@ public class Main {
         }
 
         mModel.render(deltaTime);
+        mRefractModel.render(deltaTime);
 
         mSkybox.render(deltaTime);
 

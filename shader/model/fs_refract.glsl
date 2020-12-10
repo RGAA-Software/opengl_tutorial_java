@@ -77,7 +77,8 @@ void main()
     //float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
 
 //    gl_FragColor = vec4(ambient + (diffuse + specular), 1.0);
+    float ratio = 1.0 / 1.52;
     vec3 I = normalize(outPos - cameraPos);
-    vec3 R = reflect(I, normalize(outNormal));
+    vec3 R = refract(I, normalize(outNormal), ratio);
     gl_FragColor = vec4(texture(skybox, R).rgb, 1.0);
 }
