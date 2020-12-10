@@ -1,5 +1,6 @@
 package com.sk.tutorial.renderer;
 
+import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.world.Director;
 import org.joml.Matrix4f;
 import org.lwjgl.stb.STBImage;
@@ -124,6 +125,8 @@ public class Skybox extends IRenderer {
     @Override
     public void render(double deltaTime) {
         super.render(deltaTime);
+        glDepthMask(false);
+
         glBindVertexArray(mRenderVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, mCubeMapTexId);
@@ -133,10 +136,18 @@ public class Skybox extends IRenderer {
             model = model.translate(mPosition);
         }
         getShaderProgram().setUniformMatrix4fv("model", model);
-        Director.getInstance().updateProjectionCamera(this);
+        Camera camera = Director.getInstance().getCamera();
+        Matrix4f viewMatrix = camera.lookAt();
+        viewMatrix.set(3, 0, 0);
+        viewMatrix.set(3, 1, 0);
+        viewMatrix.set(3, 2, 0);
+
+        Director.getInstance().updateProjMatrix(this, Director.getInstance().getProjection());
+        Director.getInstance().updateViewMatrix(this, viewMatrix);
         mShaderProgram.setUniform1i("skybox", 0);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindVertexArray(0);
+        glDepthMask(true);
     }
 }

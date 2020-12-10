@@ -37,7 +37,18 @@ public class Director {
     }
 
     public void updateProjectionCamera(IRenderer renderer) {
-        renderer.getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
-        renderer.getShaderProgram().setUniformMatrix4fv("proj", mProjection);
+//        renderer.getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
+//        renderer.getShaderProgram().setUniformMatrix4fv("proj", mProjection);
+//
+        updateViewMatrix(renderer, mCamera.lookAt());
+        updateProjMatrix(renderer, mProjection);
+    }
+
+    public void updateViewMatrix(IRenderer renderer, Matrix4f matrix) {
+        renderer.getShaderProgram().setUniformMatrix4fv("view", matrix);
+    }
+
+    public void updateProjMatrix(IRenderer renderer, Matrix4f matrix) {
+        renderer.getShaderProgram().setUniformMatrix4fv("proj", matrix);
     }
 }
