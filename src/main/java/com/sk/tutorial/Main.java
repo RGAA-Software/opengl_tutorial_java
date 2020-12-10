@@ -165,12 +165,14 @@ public class Main {
 
         ShaderProgram outlineModelShader = new ShaderProgram();
         outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
+//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
 
-        mRefractModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
+//        mRefractModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
+        mRefractModel = ModelLoader.loadModel("resources/model/hehua/hehua.obj", outlineModelShader);
 //        mRefractModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
 //        mRefractModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
-        mRefractModel.setScale(0.1f);
-        mRefractModel.setPosition(new Vector3f(1, 0, -3));
+        mRefractModel.setScale(0.01f);
+        mRefractModel.setPosition(new Vector3f(5, 0, -3));
         mRefractModel.setCamera(mCamera);
         mRefractModel.setProjection(mProjMat);
 

@@ -57,7 +57,7 @@ public class Model extends IRenderer {
         mShaderProgram.use();
         model = model.identity();
 
-        mRotate += (float)deltaTime *3;
+        mRotate += (float)deltaTime /2;
 
         if (mPosition != null) {
             model = model.translate(mPosition);
