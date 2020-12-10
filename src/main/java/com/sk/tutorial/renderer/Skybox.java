@@ -24,6 +24,11 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.*;
 
+/**
+ * A skybox is already simulating a sky infinitely far away from you. If you would increase the size, wouldn't you expect to be the same?
+ *
+ * Cube mapping works by sampling a special cube texture (consisting of six 2D textures, one for each face) by normalized 3d vector coordinates. If you get 3D coordinates from a cube scaled by 1000, and normalize those, you get the same coordinates as you would from a unit cube.
+ */
 public class Skybox extends IRenderer {
 
     private String[] mSkyboxImages;
@@ -39,47 +44,47 @@ public class Skybox extends IRenderer {
     private void initSkybox() {
         float[] skyboxVertices = {
             // positions
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
+            -0.001f,  0.001f, -0.001f,
+            -0.001f, -0.001f, -0.001f,
+            0.001f, -0.001f, -0.001f,
+            0.001f, -0.001f, -0.001f,
+            0.001f,  0.001f, -0.001f,
+            -0.001f,  0.001f, -0.001f,
 
-            -1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+            -0.001f, -0.001f,  0.001f,
+            -0.001f, -0.001f, -0.001f,
+            -0.001f,  0.001f, -0.001f,
+            -0.001f,  0.001f, -0.001f,
+            -0.001f,  0.001f,  0.001f,
+            -0.001f, -0.001f,  0.001f,
 
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
+            0.001f, -0.001f, -0.001f,
+            0.001f, -0.001f,  0.001f,
+            0.001f,  0.001f,  0.001f,
+            0.001f,  0.001f,  0.001f,
+            0.001f,  0.001f, -0.001f,
+            0.001f, -0.001f, -0.001f,
 
-            -1.0f, -1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+            -0.001f, -0.001f,  0.001f,
+            -0.001f,  0.001f,  0.001f,
+            0.001f,  0.001f,  0.001f,
+            0.001f,  0.001f,  0.001f,
+            0.001f, -0.001f,  0.001f,
+            -0.001f, -0.001f,  0.001f,
 
-            -1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f, -1.0f,
+            -0.001f,  0.001f, -0.001f,
+            0.001f,  0.001f, -0.001f,
+            0.001f,  0.001f,  0.001f,
+            0.001f,  0.001f,  0.001f,
+            -0.001f,  0.001f,  0.001f,
+            -0.001f,  0.001f, -0.001f,
 
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f
+            -0.001f, -0.001f, -0.001f,
+            -0.001f, -0.001f,  0.001f,
+            0.001f, -0.001f, -0.001f,
+            0.001f, -0.001f, -0.001f,
+            -0.001f, -0.001f,  0.001f,
+            0.001f, -0.001f,  0.001f
         };
 
         mRenderVAO = glGenVertexArrays();
