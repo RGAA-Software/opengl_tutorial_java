@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL30.*;
 
 public class SingleLightCubeLayer extends IRenderer {
 
@@ -74,17 +74,23 @@ public class SingleLightCubeLayer extends IRenderer {
             -0.5f,  0.5f, -0.5f,
         };
 
+        mRenderVAO = glGenVertexArrays();
+        glBindVertexArray(mRenderVAO);
+
         int vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
         int posLoc = mShaderProgram.getAttribLocation("cubePos");
         glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 0, 0);
         glEnableVertexAttribArray(posLoc);
+
+        glBindVertexArray(mRenderVAO);
     }
 
     @Override
     public void render(double deltaTime) {
-        mShaderProgram.use();
+        super.render(deltaTime);
+        glBindVertexArray(mRenderVAO);
         mModel.identity();
         mModel = mModel.translate(mLightPos);
         mModel = mModel.rotate((float)Math.toRadians(45), 1, 1, 1);

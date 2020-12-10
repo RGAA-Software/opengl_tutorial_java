@@ -14,6 +14,8 @@ public abstract class IRenderer {
     protected Camera mCamera;
     protected Vector3f mPosition;
 
+    protected int mRenderVAO;
+
     public IRenderer(ShaderProgram program) {
         mShaderProgram = program;
         init();
@@ -49,7 +51,11 @@ public abstract class IRenderer {
         mShaderProgram.use();
     }
 
-    public abstract void render(double deltaTime);
+    public void render(double deltaTime) {
+        if (mShaderProgram != null) {
+            mShaderProgram.use();
+        }
+    }
 
     public ShaderProgram getShaderProgram() {
         return mShaderProgram;

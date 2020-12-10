@@ -6,6 +6,7 @@ import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
+import com.sk.tutorial.renderer.Skybox;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.world.Director;
@@ -34,9 +35,9 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-    private int vao;
+    private float width = 800;
+    private float height = 600;
+//    private int vao;
 
     public void run() {
         init();
@@ -129,6 +130,7 @@ public class Main {
     private Sprite mFloor;
     private Sprite mGrass;
     private List<Vector3f> grassPos;
+    private Skybox mSkybox;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -140,8 +142,8 @@ public class Main {
                 .setProjection(mProjMat)
                 .setCamera(mCamera);
 
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
+//        vao = glGenVertexArrays();
+//        glBindVertexArray(vao);
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
@@ -241,6 +243,16 @@ public class Main {
         for (Vector3f p : grassPos) {
             System.out.println("p : " + p.z);
         }
+
+        String[] cubemapImages = new String[] {
+            "resources/skybox/skybox_1/right.jpg",
+            "resources/skybox/skybox_1/left.jpg",
+            "resources/skybox/skybox_1/top.jpg",
+            "resources/skybox/skybox_1/bottom.jpg",
+            "resources/skybox/skybox_1/front.jpg",
+            "resources/skybox/skybox_1/back.jpg",
+        };
+        mSkybox = new Skybox("shader/skybox/vs.glsl", "shader/skybox/fs.glsl", cubemapImages);
     }
 
     private void render(double deltaTime) {
@@ -248,13 +260,7 @@ public class Main {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
-        glBindVertexArray(vao);
-//        mSingleLightLayer.render(deltaTime);
-//        mBoxLayer.render(deltaTime);
 
-//        mModel.render(deltaTime);
-//        glDisable(GL_STENCIL_TEST);
-        mModel.render(deltaTime);
         mFloor.render(deltaTime);
 
         for (Vector3f pos : grassPos) {
@@ -263,20 +269,7 @@ public class Main {
         }
 
         mModel.render(deltaTime);
-
-//        glEnable(GL_DEPTH_TEST);
-//        glEnable(GL_STENCIL_TEST);
-//        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-//        glStencilMask(0xFF);
-//        mModel.render(deltaTime);
-//
-//        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-//        glStencilMask(0x00);
-//        glDisable(GL_DEPTH_TEST);
-//        mOutlineModel.render(deltaTime);
-//        glStencilMask(0xFF);
-//        glEnable(GL_DEPTH_TEST);
+        mSkybox.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }
