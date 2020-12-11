@@ -125,6 +125,7 @@ public class Main {
     private SingleLightCubeLayer mSingleLightLayer;
     private Model mModel;
     private Model mRefractModel;
+    private Model mWolf;
 
     private Sprite mFloor;
     private Sprite mGrass;
@@ -158,10 +159,19 @@ public class Main {
 //        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
         mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
+//        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
         mModel.setScale(0.001f);
         mModel.setPosition(new Vector3f(0, 0, -3));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
+
+        ShaderProgram refractShader = new ShaderProgram();
+        refractShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
+        mWolf = ModelLoader.loadModel("resources/model/wolf/wolf.obj", refractShader);
+        mWolf.setScale(0.0036f);
+        mWolf.setPosition(new Vector3f(2.5f, 0, -1));
+        mWolf.setCamera(mCamera);
+        mWolf.setProjection(mProjMat);
 
         ShaderProgram outlineModelShader = new ShaderProgram();
 //        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
@@ -274,6 +284,7 @@ public class Main {
 
         mModel.render(deltaTime);
         mRefractModel.render(deltaTime);
+        mWolf.render(deltaTime);
 
         mSkybox.render(deltaTime);
 
