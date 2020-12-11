@@ -34,8 +34,8 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
 
     public void run() {
@@ -164,11 +164,14 @@ public class Main {
         mModel.setProjection(mProjMat);
 
         ShaderProgram outlineModelShader = new ShaderProgram();
-        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
-//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
+//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
+        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
 
 //        mRefractModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
-        mRefractModel = ModelLoader.loadModel("resources/model/hehua/hehua.obj", outlineModelShader);
+        mRefractModel = ModelLoader.loadModel("resources/model/statue/12328_Statue_v1_L2.obj", outlineModelShader);
+        mRefractModel.setRotateDegree(-90);
+        mRefractModel.setRotateAxis(new Vector3f(1, 0, 0));
 //        mRefractModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
 //        mRefractModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
         mRefractModel.setScale(0.01f);

@@ -13,6 +13,8 @@ public abstract class IRenderer {
     protected Matrix4f mProjection;
     protected Camera mCamera;
     protected Vector3f mPosition;
+    protected float mRotateDegree;
+    protected Vector3f mRotateAxis;
 
     protected int mRenderVAO;
 
@@ -45,6 +47,14 @@ public abstract class IRenderer {
 
     public void setPosition(Vector3f position) {
         mPosition = position;
+    }
+
+    public void setRotateDegree(float degree) {
+        mRotateDegree = degree;
+    }
+
+    public void setRotateAxis(Vector3f axis) {
+        mRotateAxis = axis;
     }
 
     public void prepare() {

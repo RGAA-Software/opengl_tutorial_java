@@ -4,6 +4,7 @@ import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.renderer.IRenderer;
 import com.sk.tutorial.shader.ShaderProgram;
 
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
@@ -62,6 +63,9 @@ public class Model extends IRenderer {
         if (mPosition != null) {
             model = model.translate(mPosition);
             model = model.rotate(mRotate, 0, 1, 0);
+        }
+        if (mRotateDegree != 0) {
+            model = model.rotate(Math.toRadians(mRotateDegree), mRotateAxis);
         }
         model = model.scale(scale);
 

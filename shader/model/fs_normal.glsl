@@ -59,14 +59,14 @@ void main()
 
     float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
     vec3 diffuseColorCompose = diffuseColor1 + diffuseColor2 + diffuseColor3;
-    vec3 ambient = vec3(0.1, 0.1, 0.1);
+    vec3 ambient = vec3(0.01, 0.01, 0.01);
     if (diffuseColorCompose.r <= 0 && diffuseColorCompose.g <= 0 && diffuseColorCompose.b <= 0) {
         diffuseColorCompose = ambient;
     }
 
     vec3 specularColorCompose = specularColor1 + specularColor2 + specularColor3;
 
-    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0);
+    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0) / 2;
     vec3 diffuse = diffuseFactor * diffuseColorCompose * light.diffuse;
 
     float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(light.position - outPos)) , 0);
