@@ -19,13 +19,13 @@ void main() {
 
     vec4 position = gl_in[0].gl_Position;
     color = vec4(1, 0.5, 0.5, 1);
-    gl_Position = position + vec4(-0.2, -0.2, 0.0, 0.0);// 1:左下
+    gl_Position = position + vec4(-0.1, -0.1, 0.0, 0.0);// 1:左下
     EmitVertex();
-    gl_Position = position + vec4( 0.2, -0.2, 0.0, 0.0);    // 2:右下
+    gl_Position = position + vec4( 0.1, -0.1, 0.0, 0.0);    // 2:右下
     EmitVertex();
-    gl_Position = position + vec4(-0.2,  0.2, 0.0, 0.0);    // 3:左上
+    gl_Position = position + vec4(-0.1,  0.1, 0.0, 0.0);    // 3:左上
     EmitVertex();
-    gl_Position = position + vec4( 0.2,  0.2, 0.0, 0.0);    // 4:右上
+    gl_Position = position + vec4( 0.1,  0.1, 0.0, 0.0);    // 4:右上
     EmitVertex();
 
     color = vec4(1, 1, 1, 1);

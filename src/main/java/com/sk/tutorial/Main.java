@@ -158,17 +158,21 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-//        ShaderProgram modelShader = new ShaderProgram();
-//        modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
-//
-////        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
-////        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
+        ShaderProgram modelShader = new ShaderProgram();
+        modelShader.initWithShaderPath("shader/model/vs_explode.glsl",
+                "shader/model/fs_explode.glsl",
+                "shader/model/gs_explode.glsl");
+//        modelShader.initWithShaderPath("shader/model/vs_explode.glsl",
+//                "shader/model/fs_explode.glsl");
+
+        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+//        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
-////        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
-//        mModel.setScale(0.001f);
-//        mModel.setPosition(new Vector3f(0, 0, -3));
-//        mModel.setCamera(mCamera);
-//        mModel.setProjection(mProjMat);
+//        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
+        mModel.setScale(0.1f);
+        mModel.setPosition(new Vector3f(0, 0, 0));
+        mModel.setCamera(mCamera);
+        mModel.setProjection(mProjMat);
 //
 //        ShaderProgram refractShader = new ShaderProgram();
 //        refractShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
@@ -272,7 +276,7 @@ public class Main {
 //            "resources/skybox/skybox_1/back.jpg",
 //        };
 //        mSkybox = new Skybox("shader/skybox/vs.glsl", "shader/skybox/fs.glsl", cubemapImages);
-
+//
         mPoint = new GeometryPoint("shader/geometry/vs.glsl",
                 "shader/geometry/fs.glsl",
                 "shader/geometry/gs.glsl");
@@ -286,6 +290,7 @@ public class Main {
         mDeltaTime = glfwGetTime() - mLastTime;
         mSingleLightLayer.render(deltaTime);
         mPoint.render(deltaTime);
+        mModel.render(deltaTime);
 
 //        mFloor.render(deltaTime);
 //

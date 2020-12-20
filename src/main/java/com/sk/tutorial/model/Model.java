@@ -8,6 +8,7 @@ import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Vector;
@@ -78,6 +79,7 @@ public class Model extends IRenderer {
         mShaderProgram.setUniform3fv("light.direction", mLightDirection);
         mShaderProgram.setUniform3fv("singleColor", mOutlineColor);
         mShaderProgram.setUniform1f("scale", 10.2f);
+        mShaderProgram.setUniform1f("time", (float) GLFW.glfwGetTime());
         for (Mesh mesh : meshes) {
             mesh.render(deltaTime);
         }
