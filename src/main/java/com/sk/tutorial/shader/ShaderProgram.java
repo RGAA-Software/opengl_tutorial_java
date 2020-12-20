@@ -2,6 +2,8 @@ package com.sk.tutorial.shader;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.ByteArrayOutputStream;
@@ -22,26 +24,65 @@ public class ShaderProgram {
     }
 
     public void initWithShaderPath(String vsPath, String fsPath) {
+//        String vs = readFileAsString(vsPath);
+//        String fs = readFileAsString(fsPath);
+//        if (vs == null || fs == null) {
+//            System.out.println("error : " + vsPath + " " + fsPath);
+//            return;
+//        }
+//        initWithShaderSource(vs, fs);
+        initWithShaderPath(vsPath, fsPath, null);
+    }
+
+    public void initWithShaderPath(String vsPath, String fsPath, String geometryPath) {
         String vs = readFileAsString(vsPath);
         String fs = readFileAsString(fsPath);
+        String gs = null;
+        if (geometryPath != null) {
+            gs = readFileAsString(geometryPath);
+        }
         if (vs == null || fs == null) {
             System.out.println("error : " + vsPath + " " + fsPath);
             return;
         }
-        initWithShaderSource(vs, fs);
+        initWithShaderSource(vs, fs, gs);
     }
 
     private void initWithShaderSource(String vs, String fs) {
+        initWithShaderSource(vs, fs, null);
+//        int vtShader = genShader(vs, GL_VERTEX_SHADER);
+//        int fsShader = genShader(fs, GL_FRAGMENT_SHADER);
+//
+//        program = glCreateProgram();
+//        glAttachShader(program, vtShader);
+//        glAttachShader(program, fsShader);
+//        glLinkProgram(program);
+//
+//        glDeleteShader(vtShader);
+//        glDeleteShader(fsShader);
+    }
+
+    private void initWithShaderSource(String vs, String fs, String gs) {
         int vtShader = genShader(vs, GL_VERTEX_SHADER);
         int fsShader = genShader(fs, GL_FRAGMENT_SHADER);
+        int gsShader = -1;
+        if (gs != null) {
+            gsShader =genShader(gs, GL33.GL_GEOMETRY_SHADER);
+        }
 
         program = glCreateProgram();
         glAttachShader(program, vtShader);
         glAttachShader(program, fsShader);
+        if (gs != null) {
+            glAttachShader(program, gsShader);
+        }
         glLinkProgram(program);
 
         glDeleteShader(vtShader);
         glDeleteShader(fsShader);
+        if (gs != null) {
+            glDeleteShader(gsShader);
+        }
     }
 
     private int genShader(String source, int type) {
@@ -55,7 +96,7 @@ public class ShaderProgram {
             String shaderLog = glGetShaderInfoLog(shader);
             System.out.println("shader : " + source + " \nErr : " + shaderLog);
         } else {
-            //System.out.println("compile shader ok .");
+            //System.out.println("compile shader ok : " + type);
         }
         return shader;
     }

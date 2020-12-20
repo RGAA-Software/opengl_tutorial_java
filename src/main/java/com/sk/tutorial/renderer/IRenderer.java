@@ -6,6 +6,8 @@ import com.sk.tutorial.shader.ShaderProgram;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+
 public abstract class IRenderer {
 
     protected ShaderProgram mShaderProgram;
@@ -16,7 +18,7 @@ public abstract class IRenderer {
     protected float mRotateDegree;
     protected Vector3f mRotateAxis;
 
-    protected int mRenderVAO;
+    protected int mRenderVAO = -1;
 
     public IRenderer(ShaderProgram program) {
         mShaderProgram = program;
@@ -26,6 +28,12 @@ public abstract class IRenderer {
     public IRenderer(String vertexShaderPath, String fragmentShaderPath) {
         mShaderProgram = new ShaderProgram();
         mShaderProgram.initWithShaderPath(vertexShaderPath, fragmentShaderPath);
+        init();
+    }
+
+    public IRenderer(String vertexShaderPath, String fragmentShaderPath, String geometryShaderPath) {
+        mShaderProgram = new ShaderProgram();
+        mShaderProgram.initWithShaderPath(vertexShaderPath, fragmentShaderPath, geometryShaderPath);
         init();
     }
 
@@ -64,6 +72,9 @@ public abstract class IRenderer {
     public void render(double deltaTime) {
         if (mShaderProgram != null) {
             mShaderProgram.use();
+        }
+        if (mRenderVAO != -1) {
+            glBindVertexArray(mRenderVAO);
         }
     }
 

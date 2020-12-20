@@ -6,6 +6,7 @@ import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
+import com.sk.tutorial.renderer.GeometryPoint;
 import com.sk.tutorial.renderer.Skybox;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
@@ -26,6 +27,7 @@ import java.util.List;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL32.GL_PROGRAM_POINT_SIZE;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -34,8 +36,8 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
 //    private int vao;
 
     public void run() {
@@ -132,6 +134,8 @@ public class Main {
     private List<Vector3f> grassPos;
     private Skybox mSkybox;
 
+    private GeometryPoint mPoint;
+
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
@@ -152,121 +156,127 @@ public class Main {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        ShaderProgram modelShader = new ShaderProgram();
-        modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
+//        ShaderProgram modelShader = new ShaderProgram();
+//        modelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
+//
+////        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+////        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
+//        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
+////        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
+//        mModel.setScale(0.001f);
+//        mModel.setPosition(new Vector3f(0, 0, -3));
+//        mModel.setCamera(mCamera);
+//        mModel.setProjection(mProjMat);
+//
+//        ShaderProgram refractShader = new ShaderProgram();
+//        refractShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
+//        mWolf = ModelLoader.loadModel("resources/model/wolf/wolf.obj", refractShader);
+//        mWolf.setScale(0.0036f);
+//        mWolf.setPosition(new Vector3f(2.5f, 0, -1));
+//        mWolf.setCamera(mCamera);
+//        mWolf.setProjection(mProjMat);
+//
+//        ShaderProgram outlineModelShader = new ShaderProgram();
+////        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
+////        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
+//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+//
+////        mRefractModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
+//        mRefractModel = ModelLoader.loadModel("resources/model/statue/12328_Statue_v1_L2.obj", outlineModelShader);
+//        mRefractModel.setRotateDegree(-90);
+//        mRefractModel.setRotateAxis(new Vector3f(1, 0, 0));
+////        mRefractModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
+////        mRefractModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
+//        mRefractModel.setScale(0.01f);
+//        mRefractModel.setPosition(new Vector3f(5, 0, -3));
+//        mRefractModel.setCamera(mCamera);
+//        mRefractModel.setProjection(mProjMat);
+//
+//
+//        mFloor = new Sprite("resources/images/floor.jpg");
+//        mFloor.setCamera(mCamera);
+//        mFloor.setProjection(mProjMat);
+//        mFloor.setPosition(new Vector3f(0, -1, 0));
+//        float floorVertices[] = {
+//                // positions          // texture Coords
+//                8f, -0.5f,  8f,
+//                -8f, -0.5f,  8f,
+//                -8f, -0.5f, -8f,
+//
+//                8f, -0.5f,  8f,
+//                -8f, -0.5f, -8f,
+//                8f, -0.5f, -8f,
+//        };
+//        float floorTexcoord[] = {
+//                8.0f, 0.0f,
+//                0.0f, 0.0f,
+//                0.0f, 8.0f,
+//
+//                8.0f, 0.0f,
+//                0.0f, 8.0f,
+//                8.0f, 8.0f
+//        };
+//        mFloor.setVertices(floorVertices, null,  floorTexcoord);
+//
+//
+//        float[] grassVertices = {
+//                // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+//                0.0f,  0.5f,  0.0f,
+//                0.0f, -0.5f,  0.0f,
+//                1.0f, -0.5f,  0.0f,
+//
+//                0.0f,  0.5f,  0.0f,
+//                1.0f, -0.5f,  0.0f,
+//                1.0f,  0.5f,  0.0f,
+//        };
+//
+//        float[] grassTexCoord = {
+//                0.0f,  0.0f,
+//                0.0f,  1.0f,
+//                1.0f,  1.0f,
+//                0.0f,  0.0f,
+//                1.0f,  1.0f,
+//                1.0f,  0.0f
+//        };
+//
+//        mGrass = new Sprite("resources/images/window.png", false);
+//        mGrass.setVertices(grassVertices, null, grassTexCoord);
+//        //mGrass.setPosition(new Vector3f());
+//
+//         Vector3f[] posArray = new Vector3f[]{
+//            new Vector3f(-1.5f, -1.0f, -0.48f),
+//            new Vector3f(1.5f, -1.0f, 0.51f),
+//            new Vector3f(0.0f, -1.0f, 0.7f),
+//            new Vector3f(-0.3f, -1.0f, -2.3f),
+//            new Vector3f(0.5f, -1.0f, -0.6f),
+//        };
+//        grassPos = Arrays.asList(posArray);
+//        grassPos.sort(new Comparator<Vector3f>() {
+//            @Override
+//            public int compare(Vector3f left, Vector3f right) {
+//                return Float.compare(left.z, right.z);
+//            }
+//        });
+//        for (Vector3f p : grassPos) {
+//            System.out.println("p : " + p.z);
+//        }
+//
+//        String[] cubemapImages = new String[] {
+//            "resources/skybox/skybox_1/right.jpg",
+//            "resources/skybox/skybox_1/left.jpg",
+//            "resources/skybox/skybox_1/top.jpg",
+//            "resources/skybox/skybox_1/bottom.jpg",
+//            "resources/skybox/skybox_1/front.jpg",
+//            "resources/skybox/skybox_1/back.jpg",
+//        };
+//        mSkybox = new Skybox("shader/skybox/vs.glsl", "shader/skybox/fs.glsl", cubemapImages);
 
-//        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
-//        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
-        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
-//        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
-        mModel.setScale(0.001f);
-        mModel.setPosition(new Vector3f(0, 0, -3));
-        mModel.setCamera(mCamera);
-        mModel.setProjection(mProjMat);
+        mPoint = new GeometryPoint("shader/geometry/vs.glsl",
+                "shader/geometry/fs.glsl",
+                "shader/geometry/gs.glsl");
 
-        ShaderProgram refractShader = new ShaderProgram();
-        refractShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
-        mWolf = ModelLoader.loadModel("resources/model/wolf/wolf.obj", refractShader);
-        mWolf.setScale(0.0036f);
-        mWolf.setPosition(new Vector3f(2.5f, 0, -1));
-        mWolf.setCamera(mCamera);
-        mWolf.setProjection(mProjMat);
-
-        ShaderProgram outlineModelShader = new ShaderProgram();
-//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
-//        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs.glsl");
-        outlineModelShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
-
-//        mRefractModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", outlineModelShader);
-        mRefractModel = ModelLoader.loadModel("resources/model/statue/12328_Statue_v1_L2.obj", outlineModelShader);
-        mRefractModel.setRotateDegree(-90);
-        mRefractModel.setRotateAxis(new Vector3f(1, 0, 0));
-//        mRefractModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", outlineModelShader);
-//        mRefractModel = ModelLoader.loadModel("resources/model/deer/deer.obj", outlineModelShader);
-        mRefractModel.setScale(0.01f);
-        mRefractModel.setPosition(new Vector3f(5, 0, -3));
-        mRefractModel.setCamera(mCamera);
-        mRefractModel.setProjection(mProjMat);
-
-
-        mFloor = new Sprite("resources/images/floor.jpg");
-        mFloor.setCamera(mCamera);
-        mFloor.setProjection(mProjMat);
-        mFloor.setPosition(new Vector3f(0, -1, 0));
-        float floorVertices[] = {
-                // positions          // texture Coords
-                8f, -0.5f,  8f,
-                -8f, -0.5f,  8f,
-                -8f, -0.5f, -8f,
-
-                8f, -0.5f,  8f,
-                -8f, -0.5f, -8f,
-                8f, -0.5f, -8f,
-        };
-        float floorTexcoord[] = {
-                8.0f, 0.0f,
-                0.0f, 0.0f,
-                0.0f, 8.0f,
-
-                8.0f, 0.0f,
-                0.0f, 8.0f,
-                8.0f, 8.0f
-        };
-        mFloor.setVertices(floorVertices, null,  floorTexcoord);
-
-
-        float[] grassVertices = {
-                // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
-                0.0f,  0.5f,  0.0f,
-                0.0f, -0.5f,  0.0f,
-                1.0f, -0.5f,  0.0f,
-
-                0.0f,  0.5f,  0.0f,
-                1.0f, -0.5f,  0.0f,
-                1.0f,  0.5f,  0.0f,
-        };
-
-        float[] grassTexCoord = {
-                0.0f,  0.0f,
-                0.0f,  1.0f,
-                1.0f,  1.0f,
-                0.0f,  0.0f,
-                1.0f,  1.0f,
-                1.0f,  0.0f
-        };
-
-        mGrass = new Sprite("resources/images/window.png", false);
-        mGrass.setVertices(grassVertices, null, grassTexCoord);
-        //mGrass.setPosition(new Vector3f());
-
-         Vector3f[] posArray = new Vector3f[]{
-            new Vector3f(-1.5f, -1.0f, -0.48f),
-            new Vector3f(1.5f, -1.0f, 0.51f),
-            new Vector3f(0.0f, -1.0f, 0.7f),
-            new Vector3f(-0.3f, -1.0f, -2.3f),
-            new Vector3f(0.5f, -1.0f, -0.6f),
-        };
-        grassPos = Arrays.asList(posArray);
-        grassPos.sort(new Comparator<Vector3f>() {
-            @Override
-            public int compare(Vector3f left, Vector3f right) {
-                return Float.compare(left.z, right.z);
-            }
-        });
-        for (Vector3f p : grassPos) {
-            System.out.println("p : " + p.z);
-        }
-
-        String[] cubemapImages = new String[] {
-            "resources/skybox/skybox_1/right.jpg",
-            "resources/skybox/skybox_1/left.jpg",
-            "resources/skybox/skybox_1/top.jpg",
-            "resources/skybox/skybox_1/bottom.jpg",
-            "resources/skybox/skybox_1/front.jpg",
-            "resources/skybox/skybox_1/back.jpg",
-        };
-        mSkybox = new Skybox("shader/skybox/vs.glsl", "shader/skybox/fs.glsl", cubemapImages);
     }
 
     private void render(double deltaTime) {
@@ -274,19 +284,21 @@ public class Main {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
+        mSingleLightLayer.render(deltaTime);
+        mPoint.render(deltaTime);
 
-        mFloor.render(deltaTime);
-
-        for (Vector3f pos : grassPos) {
-            mGrass.setPosition(pos);
-            mGrass.render(deltaTime);
-        }
-
-        mModel.render(deltaTime);
-        mRefractModel.render(deltaTime);
-        mWolf.render(deltaTime);
-
-        mSkybox.render(deltaTime);
+//        mFloor.render(deltaTime);
+//
+//        for (Vector3f pos : grassPos) {
+//            mGrass.setPosition(pos);
+//            mGrass.render(deltaTime);
+//        }
+//
+//        mModel.render(deltaTime);
+//        mRefractModel.render(deltaTime);
+//        mWolf.render(deltaTime);
+//
+//        mSkybox.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }
@@ -298,7 +310,7 @@ public class Main {
         prepare();
 
         while ( !glfwWindowShouldClose(window) ) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT |GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             render(mDeltaTime);
 
