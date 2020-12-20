@@ -41,6 +41,10 @@ public class Model extends IRenderer {
         this.scale = scale;
     }
 
+    public void setShaderProgram(ShaderProgram shader) {
+        mShaderProgram = shader;
+    }
+
     private Vector3f mLightAmbient = new Vector3f(0.1f, 0.1f, 0.1f);
     private Vector3f mLightDiffuse = new Vector3f(0.5f, 0.5f, 0.5f);
     private Vector3f mLightSpecular = new Vector3f(1.0f, 1.0f, 1.0f);
@@ -54,6 +58,7 @@ public class Model extends IRenderer {
     private Vector3f mOutlineColor = new Vector3f(0.5f, 0.2f, 0.8f);
 
     private float mRotate = 0;
+
     @Override
     public void render(double deltaTime) {
         mShaderProgram.use();

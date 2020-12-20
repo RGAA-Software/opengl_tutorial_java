@@ -126,6 +126,9 @@ public class Main {
     private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
     private Model mModel;
+    private Model mDebugModel;
+    private ShaderProgram mNormalVisShader;
+    private ShaderProgram mModelShader;
     private Model mRefractModel;
     private Model mWolf;
 
@@ -158,14 +161,16 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        ShaderProgram modelShader = new ShaderProgram();
-        modelShader.initWithShaderPath("shader/model/vs_explode.glsl",
-                "shader/model/fs_explode.glsl",
+        mNormalVisShader = new ShaderProgram();
+        mNormalVisShader.initWithShaderPath("shader/model/vs_explode.glsl",
+                "shader/model/fs_pure_color.glsl",
                 "shader/model/gs_explode.glsl");
-//        modelShader.initWithShaderPath("shader/model/vs_explode.glsl",
-//                "shader/model/fs_explode.glsl");
+        mModelShader = new ShaderProgram();
+        mModelShader.initWithShaderPath("shader/model/vs_explode.glsl",
+                "shader/model/fs_explode.glsl");
 
-        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
+        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", mModelShader);
+
 //        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
@@ -173,7 +178,13 @@ public class Main {
         mModel.setPosition(new Vector3f(0, 0, 0));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
-//
+
+        mDebugModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", mNormalVisShader);
+        mDebugModel.setScale(0.1f);
+        mDebugModel.setPosition(new Vector3f(0, 0, 0));
+        mDebugModel.setCamera(mCamera);
+        mDebugModel.setProjection(mProjMat);
+
 //        ShaderProgram refractShader = new ShaderProgram();
 //        refractShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
 //        mWolf = ModelLoader.loadModel("resources/model/wolf/wolf.obj", refractShader);
@@ -290,7 +301,11 @@ public class Main {
         mDeltaTime = glfwGetTime() - mLastTime;
         mSingleLightLayer.render(deltaTime);
         mPoint.render(deltaTime);
+
+
         mModel.render(deltaTime);
+
+        mDebugModel.render(deltaTime);
 
 //        mFloor.render(deltaTime);
 //
