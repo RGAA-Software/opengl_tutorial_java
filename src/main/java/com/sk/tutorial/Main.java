@@ -7,6 +7,7 @@ import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
 import com.sk.tutorial.renderer.GeometryPoint;
+import com.sk.tutorial.renderer.InstanceRect;
 import com.sk.tutorial.renderer.Skybox;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
@@ -36,8 +37,10 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
 
     public void run() {
@@ -135,6 +138,7 @@ public class Main {
     private Skybox mSkybox;
 
     private GeometryPoint mPoint;
+    private InstanceRect mInstanceRect;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -277,9 +281,11 @@ public class Main {
 //        };
 //        mSkybox = new Skybox("shader/skybox/vs.glsl", "shader/skybox/fs.glsl", cubemapImages);
 //
-        mPoint = new GeometryPoint("shader/geometry/vs.glsl",
-                "shader/geometry/fs.glsl",
-                "shader/geometry/gs.glsl");
+//        mPoint = new GeometryPoint("shader/geometry/vs.glsl",
+//                "shader/geometry/fs.glsl",
+//                "shader/geometry/gs.glsl");
+
+        mInstanceRect = new InstanceRect("shader/instance/vs.glsl", "shader/2d_base/fs.glsl");
 
     }
 
@@ -289,8 +295,10 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
         mSingleLightLayer.render(deltaTime);
-        mPoint.render(deltaTime);
+        //mPoint.render(deltaTime);
         mModel.render(deltaTime);
+
+        mInstanceRect.render(deltaTime);
 
 //        mFloor.render(deltaTime);
 //
