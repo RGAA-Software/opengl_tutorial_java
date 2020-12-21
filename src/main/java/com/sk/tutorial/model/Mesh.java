@@ -3,6 +3,7 @@ package com.sk.tutorial.model;
 import com.sk.tutorial.renderer.IRenderer;
 import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.util.TextUtils;
+import org.lwjgl.opengl.GL33;
 
 import java.util.List;
 
@@ -20,7 +21,8 @@ public class Mesh extends IRenderer {
     public List<Integer> indices;
     public Material material;
 
-    private int VAO;
+    private boolean instance;
+
     private int VBO;
     private int EBO;
 
@@ -34,11 +36,11 @@ public class Mesh extends IRenderer {
     }
 
     private void setupData() {
-        VAO = glGenVertexArrays();
+        mRenderVAO = glGenVertexArrays();
         VBO = glGenBuffers();
         EBO = glGenBuffers();
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(mRenderVAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         float[] verticles = new float[vertices.size() * (3 + 3 + 2)];
@@ -82,6 +84,10 @@ public class Mesh extends IRenderer {
         glBindVertexArray(0);
     }
 
+    public void enableInstanceRender() {
+        instance = true;
+    }
+
     @Override
     public void render(double deltaTime) {
         mShaderProgram.use();
@@ -104,10 +110,17 @@ public class Mesh extends IRenderer {
         }
 //        glActiveTexture(GL_TEXTURE0);
 
-        // 绘制网格
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        if (instance) {
+            glBindVertexArray(mRenderVAO);
+            GL33.glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, 1000);
+            glBindVertexArray(0);
+        } else {
+            // 绘制网格
+            glBindVertexArray(mRenderVAO);
+            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
+
     }
 
 

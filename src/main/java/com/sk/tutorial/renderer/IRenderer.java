@@ -69,12 +69,20 @@ public abstract class IRenderer {
         mShaderProgram.use();
     }
 
+    public void bindVAO() {
+        glBindVertexArray(mRenderVAO);
+    }
+
+    public void unbindVAO() {
+        glBindVertexArray(0);
+    }
+
     public void render(double deltaTime) {
         if (mShaderProgram != null) {
             mShaderProgram.use();
         }
         if (mRenderVAO != -1) {
-            glBindVertexArray(mRenderVAO);
+            bindVAO();
         }
     }
 

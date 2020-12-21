@@ -4,6 +4,7 @@ import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
+import com.sk.tutorial.model.Mesh;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
 import com.sk.tutorial.renderer.GeometryPoint;
@@ -15,16 +16,20 @@ import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
+import static java.lang.Math.cos;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -56,7 +61,7 @@ public class Main {
 
     private void init() {
 
-        mCamera = new Camera(new Vector3f(0, 0, 5),
+        mCamera = new Camera(new Vector3f(0, 0, 55),
                 new Vector3f(0, 0, -1),
                 new Vector3f(0, 1, 0),
                 0, 270, 0);
@@ -129,6 +134,7 @@ public class Main {
     private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
     private Model mModel;
+    private Model mRock;
     private Model mRefractModel;
     private Model mWolf;
 
@@ -163,20 +169,118 @@ public class Main {
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         ShaderProgram modelShader = new ShaderProgram();
-        modelShader.initWithShaderPath("shader/model/vs_explode.glsl",
-                "shader/model/fs_explode.glsl",
-                "shader/model/gs_explode.glsl");
 //        modelShader.initWithShaderPath("shader/model/vs_explode.glsl",
-//                "shader/model/fs_explode.glsl");
+//                "shader/model/fs_explode.glsl",
+//                "shader/model/gs_explode.glsl");
+        modelShader.initWithShaderPath("shader/model/vs.glsl",
+                "shader/model/fs_explode.glsl");
 
-        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShader);
-//        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
-//        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
-//        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
+        mModel = ModelLoader.loadModel("resources/model/planet/planet.obj", modelShader);
         mModel.setScale(0.1f);
         mModel.setPosition(new Vector3f(0, 0, 0));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
+
+        ShaderProgram rockShader = new ShaderProgram();
+        rockShader.initWithShaderPath("shader/instance/vs_model.glsl",
+                "shader/model/fs_explode.glsl");
+        mRock = ModelLoader.loadModel("resources/model/rock/rock.obj", rockShader);
+        mRock.setScale(0.1f);
+        mRock.setPosition(new Vector3f(0, 0, 1));
+        mRock.setCamera(mCamera);
+        mRock.setProjection(mProjMat);
+
+        int amount = 1000;
+        Matrix4f[] modelMatrices = new Matrix4f[amount];
+        Random random = new Random();
+        float radius = 50.0f;
+        float offset = 2.5f;
+        for(int i = 0; i < amount; i++)
+        {
+            Matrix4f model = new Matrix4f();
+            model = model.identity();
+            // 1. 位移：分布在半径为 'radius' 的圆形上，偏移的范围是 [-offset, offset]
+            float angle = (float)i / (float)amount * 360.0f;
+            float displacement = (random.nextInt() % (int)(2 * offset * 100)) / 100.0f - offset;
+            float x = (float) (Math.sin(angle) * radius + displacement);
+            displacement = (random.nextInt() % (int)(2 * offset * 100)) / 100.0f - offset;
+            float y = displacement * 0.4f; // 让行星带的高度比x和z的宽度要小
+            displacement = (random.nextInt() % (int)(2 * offset * 100)) / 100.0f - offset;
+            float z = (float) (cos(angle) * radius + displacement);
+            model = model.translate(x, y, z);
+
+            // 2. 缩放：在 0.05 和 0.25f 之间缩放
+            float scale = (float) ((random.nextInt() % 20) / 100.0f + 0.05);
+            model = model.scale(scale);
+
+            // 3. 旋转：绕着一个（半）随机选择的旋转轴向量进行随机的旋转
+            float rotAngle = (random.nextInt() % 360);
+            model = model.rotate(rotAngle, 0.4f, 0.6f, 0.8f);
+
+            // 4. 添加到矩阵的数组中
+            modelMatrices[i] = model;
+        }
+
+        float[] rockMatrix = new float[modelMatrices.length * 16];
+        for (int i = 0; i < modelMatrices.length; i++) {
+            Matrix4f matrix = modelMatrices[i];
+            Vector4f dest = new Vector4f();
+            matrix.getColumn(0, dest);
+            rockMatrix[i * 16 + 0] = dest.x;
+            rockMatrix[i * 16 + 1] = dest.y;
+            rockMatrix[i * 16 + 2] = dest.z;
+            rockMatrix[i * 16 + 3] = dest.w;
+
+            matrix.getColumn(1, dest);
+            rockMatrix[i * 16 + 4] = dest.x;
+            rockMatrix[i * 16 + 5] = dest.y;
+            rockMatrix[i * 16 + 6] = dest.z;
+            rockMatrix[i * 16 + 7] = dest.w;
+
+            matrix.getColumn(2, dest);
+            rockMatrix[i * 16 + 8] = dest.x;
+            rockMatrix[i * 16 + 9] = dest.y;
+            rockMatrix[i * 16 + 10] = dest.z;
+            rockMatrix[i * 16 + 11] = dest.w;
+
+            matrix.getColumn(3, dest);
+            rockMatrix[i * 16 + 12] = dest.x;
+            rockMatrix[i * 16 + 13] = dest.y;
+            rockMatrix[i * 16 + 14] = dest.z;
+            rockMatrix[i * 16 + 15] = dest.w;
+
+        }
+
+        int rockVBO = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, rockVBO);
+        glBufferData(GL_ARRAY_BUFFER, rockMatrix, GL_STATIC_DRAW);
+
+        for (int i = 0; i < mRock.meshes.size(); i++) {
+            Mesh mesh = mRock.meshes.get(i);
+            mesh.enableInstanceRender();
+            mesh.bindVAO();
+            ShaderProgram program = mRock.getShaderProgram();
+            int matrixLoc = program.getAttribLocation("aInstanceMatrix");
+            glEnableVertexAttribArray(matrixLoc);
+            glVertexAttribPointer(matrixLoc, 4, GL_FLOAT, false, 4 * 16, 0);
+
+            glEnableVertexAttribArray(matrixLoc+1);
+            glVertexAttribPointer(matrixLoc+1, 4, GL_FLOAT, false, 4 * 16, 4*4);
+
+            glEnableVertexAttribArray(matrixLoc+2);
+            glVertexAttribPointer(matrixLoc+2, 4, GL_FLOAT, false, 4 * 16, 4*8);
+
+            glEnableVertexAttribArray(matrixLoc+3);
+            glVertexAttribPointer(matrixLoc+3, 4, GL_FLOAT, false, 4 * 16, 4*12);
+
+            GL33.glVertexAttribDivisor(matrixLoc, 1);
+            GL33.glVertexAttribDivisor(matrixLoc+1, 1);
+            GL33.glVertexAttribDivisor(matrixLoc+2, 1);
+            GL33.glVertexAttribDivisor(matrixLoc+3, 1);
+
+            mesh.unbindVAO();
+        }
+
 //
 //        ShaderProgram refractShader = new ShaderProgram();
 //        refractShader.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_refract.glsl");
@@ -284,8 +388,8 @@ public class Main {
 //        mPoint = new GeometryPoint("shader/geometry/vs.glsl",
 //                "shader/geometry/fs.glsl",
 //                "shader/geometry/gs.glsl");
-
-        mInstanceRect = new InstanceRect("shader/instance/vs.glsl", "shader/2d_base/fs.glsl");
+//
+//        mInstanceRect = new InstanceRect("shader/instance/vs.glsl", "shader/2d_base/fs.glsl");
 
     }
 
@@ -294,11 +398,12 @@ public class Main {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
-        mSingleLightLayer.render(deltaTime);
+//        mSingleLightLayer.render(deltaTime);
         //mPoint.render(deltaTime);
         mModel.render(deltaTime);
+        mRock.render(deltaTime);
 
-        mInstanceRect.render(deltaTime);
+//        mInstanceRect.render(deltaTime);
 
 //        mFloor.render(deltaTime);
 //
