@@ -170,7 +170,26 @@ public class Main {
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         mFloor = new Sprite("resources/images/wood.png");
-        //mFloor.setVertices();
+        float[] grassVertices = {
+            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            0.0f,  0.5f,  0.0f,
+            0.0f, -0.5f,  0.0f,
+            1.0f, -0.5f,  0.0f,
+
+            0.0f,  0.5f,  0.0f,
+            1.0f, -0.5f,  0.0f,
+            1.0f,  0.5f,  0.0f,
+        };
+
+        float[] grassTexCoord = {
+            0.0f,  0.0f,
+            0.0f,  1.0f,
+            1.0f,  1.0f,
+            0.0f,  0.0f,
+            1.0f,  1.0f,
+            1.0f,  0.0f
+        };
+        mFloor.setVertices(grassVertices, null, grassTexCoord);
     }
 
     private void render(double deltaTime) {
