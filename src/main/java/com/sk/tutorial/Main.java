@@ -61,7 +61,7 @@ public class Main {
 
     private void init() {
 
-        mCamera = new Camera(new Vector3f(0, 0, 55),
+        mCamera = new Camera(new Vector3f(0, 0, 85),
                 new Vector3f(0, 0, -1),
                 new Vector3f(0, 1, 0),
                 0, 270, 0);
@@ -150,7 +150,7 @@ public class Main {
         Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
                         width / height,
-                        0.1f, 100.0f);
+                        0.1f, 1000.0f);
 
         Director.getInstance()
                 .setProjection(mProjMat)
@@ -176,7 +176,7 @@ public class Main {
                 "shader/model/fs_explode.glsl");
 
         mModel = ModelLoader.loadModel("resources/model/planet/planet.obj", modelShader);
-        mModel.setScale(0.1f);
+        mModel.setScale(2f);
         mModel.setPosition(new Vector3f(0, 0, 0));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
