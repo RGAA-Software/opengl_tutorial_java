@@ -61,8 +61,8 @@ public class Main {
 
     private void init() {
 
-        mCamera = new Camera(new Vector3f(0, 0, 85),
-                new Vector3f(0, 0, -1),
+        mCamera = new Camera(new Vector3f(0, 19, 85),
+                new Vector3f(0, -8, -1),
                 new Vector3f(0, 1, 0),
                 0, 270, 0);
 
