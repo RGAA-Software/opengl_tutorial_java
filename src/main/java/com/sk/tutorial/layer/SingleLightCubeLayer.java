@@ -96,8 +96,9 @@ public class SingleLightCubeLayer extends IRenderer {
             mModel = mModel.translate(mPosition);
         }
         //mModel = mModel.rotate((float)Math.toRadians(45), 1, 1, 1);
-
-        mModel = mModel.scale(1f);
+        if (mScale != 0) {
+            mModel = mModel.scale(mScale);
+        }
         mShaderProgram.setUniform3fv("lightColor", mColor);
         mShaderProgram.setUniformMatrix4fv("model", mModel);
         mShaderProgram.setUniformMatrix4fv("view", mCamera.lookAt());

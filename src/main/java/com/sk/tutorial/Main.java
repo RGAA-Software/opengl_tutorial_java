@@ -161,7 +161,9 @@ public class Main {
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
-        mSingleLightLayer.setPosition(new Vector3f(0, 0.3f, 0));
+        Vector3f lightDirection = new Vector3f(0, -1.5f, 1.5f);
+        mSingleLightLayer.setPosition(lightDirection.mul(-2));
+        mSingleLightLayer.setScale(0.3f);
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);

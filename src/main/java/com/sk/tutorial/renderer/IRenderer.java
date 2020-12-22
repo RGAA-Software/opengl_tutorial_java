@@ -17,6 +17,7 @@ public abstract class IRenderer {
     protected Vector3f mPosition;
     protected float mRotateDegree;
     protected Vector3f mRotateAxis;
+    protected float mScale;
 
     protected int mRenderVAO = -1;
 
@@ -63,6 +64,10 @@ public abstract class IRenderer {
 
     public void setRotateAxis(Vector3f axis) {
         mRotateAxis = axis;
+    }
+
+    public void setScale(float scale) {
+        mScale = scale;
     }
 
     public void prepare() {

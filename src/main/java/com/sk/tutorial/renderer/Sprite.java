@@ -79,7 +79,7 @@ public class Sprite extends IRenderer {
     private Vector3f mLightAmbient = new Vector3f(0.1f, 0.1f, 0.1f);
     private Vector3f mLightDiffuse = new Vector3f(0.6f, 0.6f, 0.6f);
     private Vector3f mLightSpecular = new Vector3f(0.3f, 0.3f, 0.3f);
-    private Vector3f mLightDirection = new Vector3f(0, -0.5f, 0.5f);
+    private Vector3f mLightDirection = new Vector3f(0, -1.5f, 1.5f);
 
     @Override
     public void render(double deltaTime) {
