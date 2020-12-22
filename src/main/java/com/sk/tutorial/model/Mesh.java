@@ -90,7 +90,7 @@ public class Mesh extends IRenderer {
 
     @Override
     public void render(double deltaTime) {
-        mShaderProgram.use();
+        super.render(deltaTime);
         int diffuseNr = 1;
         int specularNr = 1;
         List<Texture> textures = material.textures;
@@ -108,6 +108,7 @@ public class Mesh extends IRenderer {
                 glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
             }
         }
+
 //        glActiveTexture(GL_TEXTURE0);
 
         if (instance) {

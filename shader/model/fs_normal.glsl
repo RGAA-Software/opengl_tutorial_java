@@ -62,19 +62,15 @@ void main()
     vec4 ambient = vec4(0.05,0.05, 0.05, 1) * vec4(diffuseColorCompose, 1);
 
     vec3 specularColorCompose = specularColor1 + specularColor2 + specularColor3;
+    vec3 specularC ;//= specularColor3;
 
     float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0) / 2.5;
     vec3 diffuse = diffuseFactor * diffuseColorCompose * light.diffuse;
 
-    float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(light.position - outPos)) , 0);
+    float specularFactor = max( dot( normalize(reflect(light.direction, outNormal)), normalize(cameraPos - outPos)) , 0);
     specularFactor = pow(specularFactor, 16) / 2;
-    vec3 specular = specularFactor * specularColorCompose * light.specular;
+    vec3 specular = specularFactor * specularC * light.specular;
 
-//    float e = light.cosCutoff - light.outerCutoff;
-//    float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
 
     gl_FragColor = vec4((diffuse + specular), 1.0) + ambient;
-//    vec3 I = normalize(outPos - cameraPos);
-//    vec3 R = reflect(I, normalize(outNormal));
-//    gl_FragColor = vec4(texture(skybox, R).rgb, 1.0);
 }

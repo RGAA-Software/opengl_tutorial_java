@@ -56,7 +56,7 @@ public class Model extends IRenderer {
     private float mRotate = 0;
     @Override
     public void render(double deltaTime) {
-        mShaderProgram.use();
+        super.render(deltaTime);
         model = model.identity();
 
         mRotate += (float)deltaTime /2;
@@ -83,10 +83,10 @@ public class Model extends IRenderer {
         getShaderProgram().setUniformMatrix4fv("model", model);
         getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
         getShaderProgram().setUniformMatrix4fv("proj", mProjection);
-        mShaderProgram.setUniform3fv("light.ambient",  mLightAmbientEM);
-        mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuseEM);
-        mShaderProgram.setUniform3fv("light.specular", mLightSpecularEM);
-        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
+//        mShaderProgram.setUniform3fv("light.ambient",  mLightAmbientEM);
+//        mShaderProgram.setUniform3fv("light.diffuse",  mLightDiffuseEM);
+//        mShaderProgram.setUniform3fv("light.specular", mLightSpecularEM);
+//        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
         mShaderProgram.setUniform3fv("singleColor", mOutlineColor);
         //mShaderProgram.setUniform1f("scale", 10.2f);
         //mShaderProgram.setUniform1f("time", (float) GLFW.glfwGetTime());

@@ -1,6 +1,7 @@
 package com.sk.tutorial.renderer;
 
 import com.sk.tutorial.camera.Camera;
+import com.sk.tutorial.light.Light;
 import com.sk.tutorial.shader.ShaderProgram;
 
 import org.joml.Matrix4f;
@@ -18,6 +19,7 @@ public abstract class IRenderer {
     protected float mRotateDegree;
     protected Vector3f mRotateAxis;
     protected float mScale;
+    protected Light mLight;
 
     protected int mRenderVAO = -1;
 
@@ -82,12 +84,23 @@ public abstract class IRenderer {
         glBindVertexArray(0);
     }
 
+    public void setLight(Light light) {
+        mLight = light;
+    }
+
     public void render(double deltaTime) {
         if (mShaderProgram != null) {
             mShaderProgram.use();
         }
         if (mRenderVAO != -1) {
             bindVAO();
+        }
+        if (mLight != null && mShaderProgram != null) {
+            mShaderProgram.setUniform3fv("light.position", mLight.position);
+            mShaderProgram.setUniform3fv("light.ambient", mLight.ambient);
+            mShaderProgram.setUniform3fv("light.diffuse", mLight.diffuse);
+            mShaderProgram.setUniform3fv("light.specular", mLight.specular);
+            mShaderProgram.setUniform3fv("light.direction", mLight.direction);
         }
     }
 

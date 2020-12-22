@@ -16,7 +16,6 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 public class Sprite extends IRenderer {
 
     private Texture mTexture;
-    private int VAO;
     private int mVerticleSize;
     private Vector3f mPosition;
 
@@ -34,8 +33,8 @@ public class Sprite extends IRenderer {
     }
 
     public void setVertices(float[] vertices, float[] normals, float[] texCoords) {
-        VAO = glGenVertexArrays();
-        glBindVertexArray(VAO);
+        mRenderVAO = glGenVertexArrays();
+        glBindVertexArray(mRenderVAO);
 
         assert (vertices != null);
 
@@ -75,16 +74,9 @@ public class Sprite extends IRenderer {
 
     private Matrix4f model = new Matrix4f();
 
-    private Vector3f mLightPos = new Vector3f(0.0f, 0.0f, 0.0f);
-    private Vector3f mLightAmbient = new Vector3f(0.1f, 0.1f, 0.1f);
-    private Vector3f mLightDiffuse = new Vector3f(0.6f, 0.6f, 0.6f);
-    private Vector3f mLightSpecular = new Vector3f(0.3f, 0.3f, 0.3f);
-    private Vector3f mLightDirection = new Vector3f(0, -1.5f, 1.5f);
-
     @Override
     public void render(double deltaTime) {
-        mShaderProgram.use();
-        glBindVertexArray(VAO);
+        super.render(deltaTime);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mTexture.id);
         mShaderProgram.setUniform1i("image", 0);
@@ -98,11 +90,7 @@ public class Sprite extends IRenderer {
             model = model.rotate((float)Math.toRadians(mRotateDegree), mRotateAxis);
         }
 
-        mShaderProgram.setUniform3fv("light.position", mLightPos);
-        mShaderProgram.setUniform3fv("light.ambient", mLightAmbient);
-        mShaderProgram.setUniform3fv("light.diffuse", mLightDiffuse);
-        mShaderProgram.setUniform3fv("light.specular", mLightSpecular);
-        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
+
         mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
 
         getShaderProgram().setUniformMatrix4fv("model", model);

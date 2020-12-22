@@ -4,7 +4,7 @@ import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
-import com.sk.tutorial.model.Mesh;
+import com.sk.tutorial.light.Sun;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
 import com.sk.tutorial.renderer.GeometryPoint;
@@ -16,24 +16,17 @@ import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 
-import static java.lang.Math.cos;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL32.GL_PROGRAM_POINT_SIZE;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -42,10 +35,10 @@ public class Main {
     // The window handle
     private long window;
 
-//    private float width = 1920;
-//    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
+//    private float width = 800;
+//    private float height = 600;
 //    private int vao;
 
     public void run() {
@@ -157,6 +150,12 @@ public class Main {
                 .setProjection(mProjMat)
                 .setCamera(mCamera);
 
+        Sun sun = new Sun();
+        sun.direction = new Vector3f(0, -1.5f, 1.5f);
+        sun.position = new Vector3f(0.0f, 0.0f, 0.0f);
+        sun.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
+        sun.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
+        sun.specular = new Vector3f(0.3f, 0.3f, 0.3f);
 
         ShaderProgram modelShaderProgram = new ShaderProgram();
         modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
@@ -165,6 +164,7 @@ public class Main {
         mModel.setProjection(mProjMat);
         mModel.setScale(0.13f);
         mModel.setPosition(new Vector3f(0, 0, 0));
+        mModel.setLight(sun);
 
         ShaderProgram wolfShaderProgram = new ShaderProgram();
         wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
@@ -173,13 +173,14 @@ public class Main {
         mWolf.setProjection(mProjMat);
         mWolf.setScale(0.0023f);
         mWolf.setPosition(new Vector3f(-1, -0.25f, 0));
+        mWolf.setLight(sun);
 
 //        vao = glGenVertexArrays();
 //        glBindVertexArray(vao);
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
-        Vector3f lightDirection = new Vector3f(0, -1.5f, 1.5f);
+        Vector3f lightDirection = new Vector3f(sun.direction);
         mSingleLightLayer.setPosition(lightDirection.mul(-2));
         mSingleLightLayer.setScale(0.3f);
 
@@ -226,6 +227,7 @@ public class Main {
         };
         mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
+        mFloor.setLight(sun);
 //        mFloor.setRotateAxis(new Vector3f(1.0f, 0, 0));
 //        mFloor.setRotateDegree(-90);
     }
