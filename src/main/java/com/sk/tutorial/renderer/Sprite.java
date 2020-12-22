@@ -21,12 +21,16 @@ public class Sprite extends IRenderer {
     private Vector3f mPosition;
 
     public Sprite(String imagePath, boolean flip) {
-        super("shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
-        mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip);
+        this(imagePath, flip, "shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
     }
 
     public Sprite(String imagePath) {
         this(imagePath, true);
+    }
+
+    public Sprite(String imagePath, boolean flip, String vsPath, String fsPath) {
+        super(vsPath, fsPath);
+        mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip);
     }
 
     public void setVertices(float[] vertices, float[] normals, float[] texCoords) {
@@ -71,6 +75,11 @@ public class Sprite extends IRenderer {
 
     private Matrix4f model = new Matrix4f();
 
+    private Vector3f mLightPos = new Vector3f(0.0f, 0.0f, 0.0f);
+    private Vector3f mLightAmbient = new Vector3f(0.1f, 0.1f, 0.1f);
+    private Vector3f mLightDiffuse = new Vector3f(0.6f, 0.6f, 0.6f);
+    private Vector3f mLightSpecular = new Vector3f(0.3f, 0.3f, 0.3f);
+
     @Override
     public void render(double deltaTime) {
         mShaderProgram.use();
@@ -83,6 +92,17 @@ public class Sprite extends IRenderer {
         if (mPosition != null) {
             model = model.translate(mPosition);
         }
+
+        if (mRotateAxis != null) {
+            model = model.rotate((float)Math.toRadians(mRotateDegree), mRotateAxis);
+        }
+
+        mShaderProgram.setUniform3fv("light.position", mLightPos);
+        mShaderProgram.setUniform3fv("light.ambient", mLightAmbient);
+        mShaderProgram.setUniform3fv("light.diffuse", mLightDiffuse);
+        mShaderProgram.setUniform3fv("light.specular", mLightSpecular);
+        mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
+
         getShaderProgram().setUniformMatrix4fv("model", model);
         Director.getInstance().updateProjectionCamera(this);
 

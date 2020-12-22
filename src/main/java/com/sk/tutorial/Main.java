@@ -61,7 +61,7 @@ public class Main {
 
     private void init() {
 
-        mCamera = new Camera(new Vector3f(0, 2, 5),
+        mCamera = new Camera(new Vector3f(0, 0.5f, 3.3f),
                 new Vector3f(0, 0, -1),
                 new Vector3f(0, 1, 0),
                 0, 270, 0);
@@ -161,7 +161,7 @@ public class Main {
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
-        mSingleLightLayer.setPosition(new Vector3f(0, 0, -5));
+        mSingleLightLayer.setPosition(new Vector3f(0, 0.3f, 0));
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
@@ -169,27 +169,46 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        mFloor = new Sprite("resources/images/wood.png");
-        float[] grassVertices = {
-            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
-            0.0f,  0.5f,  0.0f,
-            0.0f, -0.5f,  0.0f,
-            1.0f, -0.5f,  0.0f,
+//        // positions            // normals         // texcoords
+//        10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+//        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+//        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+//
+//        10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+//        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+//        10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
 
-            0.0f,  0.5f,  0.0f,
-            1.0f, -0.5f,  0.0f,
-            1.0f,  0.5f,  0.0f,
+        mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn.glsl");
+        float[] grassVertices = {
+            10.0f, -0.5f,  10.0f,
+            -10.0f, -0.5f,  10.0f,
+            -10.0f, -0.5f, -10.0f,
+            10.0f, -0.5f,  10.0f,
+            -10.0f, -0.5f, -10.0f,
+            10.0f, -0.5f, -10.0f,
+        };
+
+        float[] grassNormals = {
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
         };
 
         float[] grassTexCoord = {
-            0.0f,  0.0f,
-            0.0f,  1.0f,
-            1.0f,  1.0f,
-            0.0f,  0.0f,
-            1.0f,  1.0f,
-            1.0f,  0.0f
+                10.0f,  0.0f,
+                0.0f,  0.0f,
+                0.0f, 10.0f,
+                10.0f,  0.0f,
+                0.0f, 10.0f,
+                10.0f, 10.0f
         };
-        mFloor.setVertices(grassVertices, null, grassTexCoord);
+        mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
+//        mFloor.setRotateAxis(new Vector3f(1.0f, 0, 0));
+//        mFloor.setRotateDegree(-90);
     }
 
     private void render(double deltaTime) {
@@ -197,7 +216,7 @@ public class Main {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
-        mSingleLightLayer.render(deltaTime);
+        //mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mLastTime = glfwGetTime();
     }
