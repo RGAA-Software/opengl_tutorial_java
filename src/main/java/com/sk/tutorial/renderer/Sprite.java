@@ -79,6 +79,7 @@ public class Sprite extends IRenderer {
     private Vector3f mLightAmbient = new Vector3f(0.1f, 0.1f, 0.1f);
     private Vector3f mLightDiffuse = new Vector3f(0.6f, 0.6f, 0.6f);
     private Vector3f mLightSpecular = new Vector3f(0.3f, 0.3f, 0.3f);
+    private Vector3f mLightDirection = new Vector3f(0, -0.5f, 0.5f);
 
     @Override
     public void render(double deltaTime) {
@@ -101,6 +102,7 @@ public class Sprite extends IRenderer {
         mShaderProgram.setUniform3fv("light.ambient", mLightAmbient);
         mShaderProgram.setUniform3fv("light.diffuse", mLightDiffuse);
         mShaderProgram.setUniform3fv("light.specular", mLightSpecular);
+        mShaderProgram.setUniform3fv("light.direction", mLightDirection);
         mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
 
         getShaderProgram().setUniformMatrix4fv("model", model);

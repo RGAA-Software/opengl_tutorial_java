@@ -28,11 +28,11 @@ void main()
 {
     vec4 texColor = texture(image, outTex);
 
-    vec3 toLightDir = normalize(light.position - outPos);
-    float diffuseFactor = max(dot(normalize(outNormal), toLightDir), 0);
+//    vec3 toLightDir = normalize(light.position - outPos);
+    float diffuseFactor = max(dot(normalize(outNormal), -light.direction), 0);
 
     vec3 toCameraDir = normalize(cameraPos - outPos);
-    vec3 halfWay = normalize(toLightDir + toCameraDir);
+    vec3 halfWay = normalize(-light.direction + toCameraDir);
     float specularFactor = pow( max(dot(normalize(outNormal), halfWay), 0), 32);
 
     vec3 totalColor = light.ambient + light.diffuse * diffuseFactor;
