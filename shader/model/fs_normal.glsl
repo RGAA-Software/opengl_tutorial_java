@@ -59,24 +59,21 @@ void main()
 
     float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
     vec3 diffuseColorCompose = diffuseColor1 + diffuseColor2 + diffuseColor3;
-    vec3 ambient = vec3(0.01, 0.01, 0.01);
-    if (diffuseColorCompose.r <= 0 && diffuseColorCompose.g <= 0 && diffuseColorCompose.b <= 0) {
-        diffuseColorCompose = ambient;
-    }
+    vec4 ambient = vec4(0.05,0.05, 0.05, 1) * vec4(diffuseColorCompose, 1);
 
     vec3 specularColorCompose = specularColor1 + specularColor2 + specularColor3;
 
-    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0) / 2;
+    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0) / 2.5;
     vec3 diffuse = diffuseFactor * diffuseColorCompose * light.diffuse;
 
     float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(light.position - outPos)) , 0);
-    specularFactor = pow(specularFactor, 64);
+    specularFactor = pow(specularFactor, 16) / 2;
     vec3 specular = specularFactor * specularColorCompose * light.specular;
 
 //    float e = light.cosCutoff - light.outerCutoff;
 //    float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
 
-    gl_FragColor = vec4(ambient + (diffuse + specular), 1.0);
+    gl_FragColor = vec4((diffuse + specular), 1.0) + ambient;
 //    vec3 I = normalize(outPos - cameraPos);
 //    vec3 R = reflect(I, normalize(outNormal));
 //    gl_FragColor = vec4(texture(skybox, R).rgb, 1.0);

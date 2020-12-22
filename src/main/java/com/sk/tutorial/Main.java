@@ -133,6 +133,7 @@ public class Main {
 
     private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
+    private SingleLightCubeLayer mSingleCube;
     private Model mModel;
     private Model mRock;
     private Model mRefractModel;
@@ -156,6 +157,23 @@ public class Main {
                 .setProjection(mProjMat)
                 .setCamera(mCamera);
 
+
+        ShaderProgram modelShaderProgram = new ShaderProgram();
+        modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+        mModel = ModelLoader.loadModel("resources/model/planet/planet.obj", modelShaderProgram);
+        mModel.setCamera(mCamera);
+        mModel.setProjection(mProjMat);
+        mModel.setScale(0.13f);
+        mModel.setPosition(new Vector3f(0, 0, 0));
+
+        ShaderProgram wolfShaderProgram = new ShaderProgram();
+        wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+        mWolf = ModelLoader.loadModel("resources/model/hehua/hehua.obj", wolfShaderProgram);
+        mWolf.setCamera(mCamera);
+        mWolf.setProjection(mProjMat);
+        mWolf.setScale(0.0023f);
+        mWolf.setPosition(new Vector3f(-1, -0.25f, 0));
+
 //        vao = glGenVertexArrays();
 //        glBindVertexArray(vao);
 
@@ -165,6 +183,11 @@ public class Main {
         mSingleLightLayer.setPosition(lightDirection.mul(-2));
         mSingleLightLayer.setScale(0.3f);
 
+        mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
+        mSingleCube.setScale(0.5f);
+        mSingleCube.setPosition(new Vector3f(1, -0.25f, 0));
+        mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
+
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -173,23 +196,14 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-//        // positions            // normals         // texcoords
-//        10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-//        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-//        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
-//
-//        10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-//        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
-//        10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
-
         mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn.glsl");
         float[] grassVertices = {
-            10.0f, -0.5f,  10.0f,
-            -10.0f, -0.5f,  10.0f,
-            -10.0f, -0.5f, -10.0f,
-            10.0f, -0.5f,  10.0f,
-            -10.0f, -0.5f, -10.0f,
-            10.0f, -0.5f, -10.0f,
+            10.0f,  0,  10.0f,
+            -10.0f, 0,  10.0f,
+            -10.0f, 0, -10.0f,
+            10.0f,  0,  10.0f,
+            -10.0f, 0, -10.0f,
+            10.0f,  0, -10.0f,
         };
 
         float[] grassNormals = {
@@ -211,6 +225,7 @@ public class Main {
                 10.0f, 10.0f
         };
         mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
+        mFloor.setPosition(new Vector3f(0, -0.5f, 0));
 //        mFloor.setRotateAxis(new Vector3f(1.0f, 0, 0));
 //        mFloor.setRotateDegree(-90);
     }
@@ -222,6 +237,9 @@ public class Main {
         mDeltaTime = glfwGetTime() - mLastTime;
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
+        mModel.render(deltaTime);
+        mWolf.render(deltaTime);
+        mSingleCube.render(deltaTime);
         mLastTime = glfwGetTime();
     }
 

@@ -61,14 +61,24 @@ public class Model extends IRenderer {
 
         mRotate += (float)deltaTime /2;
 
+
+
         if (mPosition != null) {
             model = model.translate(mPosition);
-            model = model.rotate(mRotate, 0, 1, 0);
         }
+
         if (mRotateDegree != 0) {
             model = model.rotate(Math.toRadians(mRotateDegree), mRotateAxis);
         }
-        model = model.scale(scale);
+
+        if (scale != 0) {
+            model = model.scale(scale);
+        }
+
+
+        //model = model.rotate(mRotate, 0, 1, 0);
+
+
 
         getShaderProgram().setUniformMatrix4fv("model", model);
         getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
@@ -78,8 +88,8 @@ public class Model extends IRenderer {
         mShaderProgram.setUniform3fv("light.specular", mLightSpecularEM);
         mShaderProgram.setUniform3fv("light.direction", mLightDirection);
         mShaderProgram.setUniform3fv("singleColor", mOutlineColor);
-        mShaderProgram.setUniform1f("scale", 10.2f);
-        mShaderProgram.setUniform1f("time", (float) GLFW.glfwGetTime());
+        //mShaderProgram.setUniform1f("scale", 10.2f);
+        //mShaderProgram.setUniform1f("time", (float) GLFW.glfwGetTime());
         for (Mesh mesh : meshes) {
             mesh.render(deltaTime);
         }

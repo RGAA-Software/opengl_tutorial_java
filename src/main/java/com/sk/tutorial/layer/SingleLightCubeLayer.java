@@ -27,6 +27,10 @@ public class SingleLightCubeLayer extends IRenderer {
         mProjMat = proj;
     }
 
+    public void setColor(Vector3f color) {
+        mColor = color;
+    }
+
     @Override
     public void init() {
         super.init();
