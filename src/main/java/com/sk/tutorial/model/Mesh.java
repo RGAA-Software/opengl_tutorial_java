@@ -91,25 +91,21 @@ public class Mesh extends IRenderer {
     @Override
     public void render(double deltaTime) {
         super.render(deltaTime);
-        int diffuseNr = 1;
-        int specularNr = 1;
         List<Texture> textures = material.textures;
         if (textures != null) {
             for (int i = 0; i < textures.size(); i++) {
                 glActiveTexture(GL_TEXTURE0 + i);
-                String number = "";
                 String type = textures.get(i).type;
-                if (TextUtils.equals(type, Texture.TYPE_DIFFUSE))
-                    number = String.valueOf(diffuseNr++);
-                else if (TextUtils.equals(type, Texture.TYPE_SPECULAR)) {
-                    number = String.valueOf(specularNr++);
+                if ( TextUtils.equals(type, Texture.TYPE_DIFFUSE)) {
+                    mShaderProgram.setUniform1i("material[" + i + "].type", 1);
+                } else if (TextUtils.equals(type, Texture.TYPE_SPECULAR)) {
+                    mShaderProgram.setUniform1i("material[" + i + "].type", 2);
                 }
-                mShaderProgram.setUniform1i(("material." + type + "_" + number), i);
+
+                mShaderProgram.setUniform1i(("material[" + i + "].image"), i);
                 glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
             }
         }
-
-//        glActiveTexture(GL_TEXTURE0);
 
         if (instance) {
             glBindVertexArray(mRenderVAO);

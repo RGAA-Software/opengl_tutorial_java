@@ -24,6 +24,7 @@ public class Model extends IRenderer {
     private Matrix4f mProjection;
 
     private float scale;
+    private boolean mDebugRotate;
 
     public Model(ShaderProgram program) {
         super(program);
@@ -53,6 +54,10 @@ public class Model extends IRenderer {
 
     private Vector3f mOutlineColor = new Vector3f(0.5f, 0.2f, 0.8f);
 
+    public void enableDebugRotate() {
+        mDebugRotate = true;
+    }
+
     private float mRotate = 0;
     @Override
     public void render(double deltaTime) {
@@ -71,12 +76,14 @@ public class Model extends IRenderer {
             model = model.rotate(Math.toRadians(mRotateDegree), mRotateAxis);
         }
 
+        if (mDebugRotate) {
+            model = model.rotate(mRotate, 0, 1, 0);
+        }
+
         if (scale != 0) {
             model = model.scale(scale);
         }
 
-
-        //model = model.rotate(mRotate, 0, 1, 0);
 
 
 

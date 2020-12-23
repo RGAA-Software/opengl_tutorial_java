@@ -35,10 +35,10 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-//    private float width = 800;
-//    private float height = 600;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
 
     public void run() {
@@ -128,7 +128,7 @@ public class Main {
     private SingleLightCubeLayer mSingleLightLayer;
     private SingleLightCubeLayer mSingleCube;
     private Model mModel;
-    private Model mRock;
+    private Model mNanoSuit;
     private Model mRefractModel;
     private Model mWolf;
 
@@ -175,8 +175,15 @@ public class Main {
         mWolf.setPosition(new Vector3f(-1, -0.25f, 0));
         mWolf.setLight(sun);
 
-//        vao = glGenVertexArrays();
-//        glBindVertexArray(vao);
+        ShaderProgram nanosuitShaderProgram = new ShaderProgram();
+        nanosuitShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", nanosuitShaderProgram);
+        mNanoSuit.setCamera(mCamera);
+        mNanoSuit.setProjection(mProjMat);
+        mNanoSuit.setScale(0.1f);
+        mNanoSuit.setPosition(new Vector3f(-2, -0.25f, 0));
+        mNanoSuit.setLight(sun);
+        mNanoSuit.enableDebugRotate();
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
@@ -242,6 +249,7 @@ public class Main {
         mModel.render(deltaTime);
         mWolf.render(deltaTime);
         mSingleCube.render(deltaTime);
+        mNanoSuit.render(deltaTime);
         mLastTime = glfwGetTime();
     }
 

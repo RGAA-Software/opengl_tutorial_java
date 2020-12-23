@@ -34,43 +34,42 @@ struct Light {
 uniform Light light;
 
 struct Material {
-    sampler2D diffuse_1;
-    sampler2D diffuse_2;
-    sampler2D diffuse_3;
-    sampler2D specular_1;
-    sampler2D specular_2;
-    sampler2D specular_3;
+    sampler2D image;
+    int type;
 };
 
-uniform Material material;
+uniform Material material[6];
 
 uniform samplerCube skybox;
 
 void main()
 {
-    vec3 diffuseColor1 = vec3(texture(material.diffuse_1, outTex));
-    vec3 diffuseColor2 = vec3(texture(material.diffuse_2, outTex));
-    vec3 diffuseColor3 = vec3(texture(material.diffuse_3, outTex));
+    vec3 diffuseColor = vec3(0, 0, 0);
+    vec3 specularColor = vec3(0, 0, 0);
 
-    vec3 specularColor1 = vec3(texture(material.specular_1, outTex));
-    vec3 specularColor2 = vec3(texture(material.specular_2, outTex));
-    vec3 specularColor3 = vec3(texture(material.specular_3, outTex));
+    for (int i = 0; i < 6; i++) {
+        int type = material[i].type;
+        if (type == 1) {
+            // diffuse
+            vec3 color = vec3(texture(material[i].image, outTex).xyz);
+            diffuseColor = diffuseColor + color;
 
+        } else if (type == 2) {
+            // specular
+            vec3 color = vec3(texture(material[i].image, outTex).xyz);
+            specularColor = specularColor + color;
+        }
+    }
 
     float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
-    vec3 diffuseColorCompose = diffuseColor1 + diffuseColor2 + diffuseColor3;
-    vec4 ambient = vec4(0.05,0.05, 0.05, 1) * vec4(diffuseColorCompose, 1);
+    vec4 ambient = vec4(0.1,0.1, 0.1, 1) * vec4(diffuseColor, 1);
 
-    vec3 specularColorCompose = specularColor1 + specularColor2 + specularColor3;
-    vec3 specularC ;//= specularColor3;
-
-    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0) / 2.5;
-    vec3 diffuse = diffuseFactor * diffuseColorCompose * light.diffuse;
+    float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0);
+    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse;
 
     float specularFactor = max( dot( normalize(reflect(light.direction, outNormal)), normalize(cameraPos - outPos)) , 0);
-    specularFactor = pow(specularFactor, 16) / 2;
-    vec3 specular = specularFactor * specularC * light.specular;
-
+    specularFactor = pow(specularFactor, 32);
+    vec3 specular = specularFactor * specularColor * light.specular;
 
     gl_FragColor = vec4((diffuse + specular), 1.0) + ambient;
 }
