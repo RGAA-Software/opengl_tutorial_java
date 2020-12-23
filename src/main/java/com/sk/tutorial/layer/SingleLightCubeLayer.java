@@ -88,7 +88,13 @@ public class SingleLightCubeLayer extends IRenderer {
         glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 0, 0);
         glEnableVertexAttribArray(posLoc);
 
-        glBindVertexArray(mRenderVAO);
+        glBindVertexArray(0);
+    }
+
+    private float mRotate = 0;
+    private boolean mEnableRotate;
+    public void enableRotate() {
+        mEnableRotate = true;
     }
 
     @Override
@@ -99,7 +105,10 @@ public class SingleLightCubeLayer extends IRenderer {
         if (mPosition != null) {
             mModel = mModel.translate(mPosition);
         }
-        //mModel = mModel.rotate((float)Math.toRadians(45), 1, 1, 1);
+        if (mEnableRotate) {
+            mRotate += (float)deltaTime /2;
+            mModel = mModel.rotate(mRotate, 0, 1, 0);
+        }
         if (mScale != 0) {
             mModel = mModel.scale(mScale);
         }

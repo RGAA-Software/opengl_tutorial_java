@@ -33,10 +33,10 @@ public class Main {
     // The window handle
     private long window;
 
-//    private float width = 1920;
-//    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
+//    private float width = 800;
+//    private float height = 600;
 //    private int vao;
     private int mShadowMapSize = 2048;
 
@@ -142,7 +142,7 @@ public class Main {
                         0.1f, 1000.0f);
 
         Matrix4f mOrthoProjMat = new Matrix4f()
-                .ortho(-10, 10, -10, 10, -10, 10);
+                .ortho(-5, 5, -10, 10, -10, 10);
 
         Director.getInstance()
                 .setProjection(mProjMat)
@@ -150,7 +150,7 @@ public class Main {
                 .setCamera(mCamera);
 
         Sun sun = new Sun();
-        sun.direction = new Vector3f(0, -1.5f, 1.5f);
+        sun.direction = new Vector3f(0, -1.0f, 1.5f);
         sun.position = new Vector3f(0.0f, 0.0f, 0.0f);
         sun.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         sun.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
@@ -191,15 +191,18 @@ public class Main {
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
         Vector3f lightDirection = new Vector3f(sun.direction);
+        lightDirection = lightDirection.sub(-1, 0, 0);
         mSingleLightLayer.setPosition(lightDirection.mul(-2));
         mSingleLightLayer.setScale(0.3f);
         mSingleLightLayer.setLight(sun);
+        mSingleLightLayer.enableRotate();
 
         mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
         mSingleCube.setScale(0.5f);
         mSingleCube.setPosition(new Vector3f(1, -0.25f, 0));
-        mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
+        //mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
         mSingleCube.setLight(sun);
+        mSingleCube.enableRotate();
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
@@ -284,12 +287,12 @@ public class Main {
         mSingleLightLayer.startRenderShadowMap();
         mSingleCube.startRenderShadowMap();
 
+        mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        mSingleCube.render(deltaTime);
         mDepthFrameBuffer.end();
 
         glViewport(0, 0, (int)width, (int)height);
@@ -311,12 +314,12 @@ public class Main {
         mSingleLightLayer.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
         mSingleCube.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
 
+        mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        mSingleCube.render(deltaTime);
         //mFrameBuffer.end();
 
 
