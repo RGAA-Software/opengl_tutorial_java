@@ -1,6 +1,7 @@
 package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
+import com.sk.tutorial.framebuffer.FrameBuffer;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
@@ -130,7 +131,6 @@ public class Main {
     private double mLastTime = 0;
     private double mDeltaTime = 0;
 
-    private MultiBoxLayer mBoxLayer;
     private SingleLightCubeLayer mSingleLightLayer;
     private SingleLightCubeLayer mSingleCube;
     private Model mModel;
@@ -236,52 +236,21 @@ public class Main {
         mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
         mFloor.setLight(sun);
-//        mFloor.setRotateAxis(new Vector3f(1.0f, 0, 0));
-//        mFloor.setRotateDegree(-90);
 
+        mFrameBuffer = new FrameBuffer();
+        mFrameBuffer.init((int)width, (int)height);
 
-        // framebuffer configuration
-        // -------------------------
-        framebuffer = glGenFramebuffers();
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        // create a color attachment texture
-        int textureColorbuffer = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)width, (int)height, 0, GL_RGB, GL_UNSIGNED_BYTE, (ByteBuffer) null);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-        // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-        int rbo = glGenRenderbuffers();
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)width, (int)height); // use a single renderbuffer object for both a depth AND stencil buffer.
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-        // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            System.out.println("ERROR ==== ");
-            return;
-        }
-        int[] readType = new int[1];
-        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, readType);
-
-        int[] readFormat = new int[1];
-        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, readFormat);
-
-        System.out.println("type : " + readType[0] + " format : " + readFormat[0]);
-
-        mUIImage = new UIImage(textureColorbuffer);
+        mUIImage = new UIImage(mFrameBuffer.getFrameBufferTexId());
         mUIImage.setTranslate(new Vector3f(0.5f, 0.5f, 0));
         mUIImage.setScale(0.5f);
 
-        mMainScene = new UIImage(textureColorbuffer);
+        mMainScene = new UIImage(mFrameBuffer.getFrameBufferTexId());
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
         mMainScene.setScale(1f);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     }
 
-    private int framebuffer;
+    private FrameBuffer mFrameBuffer;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
@@ -289,7 +258,7 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        mFrameBuffer.begin();
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -299,8 +268,8 @@ public class Main {
         mWolf.render(deltaTime);
         mSingleCube.render(deltaTime);
         mNanoSuit.render(deltaTime);
+        mFrameBuffer.end();
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         mUIImage.render(deltaTime);
         mMainScene.render(deltaTime);
