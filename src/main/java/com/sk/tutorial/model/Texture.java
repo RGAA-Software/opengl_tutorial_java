@@ -33,6 +33,14 @@ public class Texture {
     String type;
     String path;
 
+    private int mWidth;
+    private int mHeight;
+    private int mChannel;
+
+    public Texture(int id) {
+        this.id = id;
+    }
+
     public Texture(String path, String type) {
         this(path, type, true);
     }
@@ -48,6 +56,9 @@ public class Texture {
         int[] x = new int[1];
         int[] y = new int[1];
         int[] c = new int[1];
+        mWidth = x[0];
+        mHeight = y[0];
+        mChannel = c[0];
         STBImage.stbi_set_flip_vertically_on_load(flip);
         ByteBuffer imageData = STBImage.stbi_load(path, x, y, c, 4);
         if (imageData != null) {
@@ -58,6 +69,24 @@ public class Texture {
         //System.out.println("type : " + type + " x : " + x[0] + " y: " + y[0]);
     }
 
+    public Texture(int width, int height, int channel) {
+        mWidth = width;
+        mHeight = height;
+        mChannel = channel;
+        id = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, id);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(width*height*channel);
+        buffer.position(0);
+        for (int i = 0; i < buffer.capacity(); i++) {
+            buffer.put((byte) (i%128));
+        }
+        buffer.position(0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    }
 
     @Override
     public String toString() {

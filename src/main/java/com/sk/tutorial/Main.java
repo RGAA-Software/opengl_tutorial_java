@@ -12,6 +12,7 @@ import com.sk.tutorial.renderer.InstanceRect;
 import com.sk.tutorial.renderer.Skybox;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
+import com.sk.tutorial.ui.UIImage;
 import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
@@ -21,6 +22,8 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.List;
 
@@ -29,6 +32,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
+
+import static org.lwjgl.opengles.GLES20.GL_IMPLEMENTATION_COLOR_READ_FORMAT;
+import static org.lwjgl.opengles.GLES20.GL_IMPLEMENTATION_COLOR_READ_TYPE;
 
 public class Main {
 
@@ -129,16 +135,11 @@ public class Main {
     private SingleLightCubeLayer mSingleCube;
     private Model mModel;
     private Model mNanoSuit;
-    private Model mRefractModel;
     private Model mWolf;
 
     private Sprite mFloor;
-    private Sprite mGrass;
-    private List<Vector3f> grassPos;
-    private Skybox mSkybox;
-
-    private GeometryPoint mPoint;
-    private InstanceRect mInstanceRect;
+    private UIImage mUIImage;
+    private UIImage mMainScene;
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -237,19 +238,73 @@ public class Main {
         mFloor.setLight(sun);
 //        mFloor.setRotateAxis(new Vector3f(1.0f, 0, 0));
 //        mFloor.setRotateDegree(-90);
+
+
+        // framebuffer configuration
+        // -------------------------
+        framebuffer = glGenFramebuffers();
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        // create a color attachment texture
+        int textureColorbuffer = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)width, (int)height, 0, GL_RGB, GL_UNSIGNED_BYTE, (ByteBuffer) null);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+        // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+        int rbo = glGenRenderbuffers();
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)width, (int)height); // use a single renderbuffer object for both a depth AND stencil buffer.
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+        // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            System.out.println("ERROR ==== ");
+            return;
+        }
+        int[] readType = new int[1];
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, readType);
+
+        int[] readFormat = new int[1];
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, readFormat);
+
+        System.out.println("type : " + readType[0] + " format : " + readFormat[0]);
+
+        mUIImage = new UIImage(textureColorbuffer);
+        mUIImage.setTranslate(new Vector3f(0.5f, 0.5f, 0));
+        mUIImage.setScale(0.5f);
+
+        mMainScene = new UIImage(textureColorbuffer);
+        mMainScene.setTranslate(new Vector3f(0, 0, 0));
+        mMainScene.setScale(1f);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     }
+
+    private int framebuffer;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
             mLastTime = glfwGetTime();
         }
         mDeltaTime = glfwGetTime() - mLastTime;
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
         mWolf.render(deltaTime);
         mSingleCube.render(deltaTime);
         mNanoSuit.render(deltaTime);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+        mUIImage.render(deltaTime);
+        mMainScene.render(deltaTime);
+
         mLastTime = glfwGetTime();
     }
 
