@@ -261,34 +261,38 @@ public class Main {
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //mSingleLightLayer.render(deltaTime);
         mModel.startRenderShadowMap();
         mWolf.startRenderShadowMap();
         mNanoSuit.startRenderShadowMap();
         mFloor.startRenderShadowMap();
+        mSingleLightLayer.startRenderShadowMap();
+        mSingleCube.startRenderShadowMap();
 
+        mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
         mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        //mSingleCube.render(deltaTime);
+        mSingleCube.render(deltaTime);
         mDepthFrameBuffer.end();
 
         mFrameBuffer.begin();
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //mSingleLightLayer.render(deltaTime);
         mModel.stopRenderShadowMap();
         mWolf.stopRenderShadowMap();
         mNanoSuit.stopRenderShadowMap();
         mFloor.stopRenderShadowMap();
+        mSingleLightLayer.stopRenderShadowMap();
+        mSingleCube.stopRenderShadowMap();
 
+        mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
         mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        //mSingleCube.render(deltaTime);
+        mSingleCube.render(deltaTime);
         mDepthFrameBuffer.end();
 
 
