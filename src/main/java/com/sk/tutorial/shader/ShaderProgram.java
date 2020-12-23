@@ -129,6 +129,10 @@ public class ShaderProgram {
         return glGetAttribLocation(program, name);
     }
 
+    public int getUniformLocation(String name) {
+        return glGetUniformLocation(program, name);
+    }
+
     public void setUniformMatrix4fv(String name, Matrix4f matrix) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             glUniformMatrix4fv(glGetUniformLocation(program, name), false, matrix.get(stack.mallocFloat(16)));

@@ -34,13 +34,12 @@ public class UIImage extends IRenderer {
     private Matrix4f mModel = new Matrix4f();
 
     public UIImage(int textureId) {
-        this(textureId, 0);
+        this(textureId, "shader/2d_base/fs_image.glsl");
     }
 
-    public UIImage(int textureId, float z) {
-        super("shader/2d_base/vs.glsl", "shader/2d_base/fs_image.glsl");
+    public UIImage(int textureId, String fsPath) {
+        super("shader/2d_base/vs.glsl", fsPath);
         mTexture = new Texture(textureId);
-        this.z = z;
         initVertices();
     }
 

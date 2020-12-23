@@ -43,4 +43,6 @@ void main()
     vec4 specColor = vec4(light.specular * specularFactor, 1);
     gl_FragColor =  vec4(totalColor, 1) * texColor + specColor;
 
+//    gl_FragColor = vec4(vec3(gl_FragCood.z), 1.0);
+
 }

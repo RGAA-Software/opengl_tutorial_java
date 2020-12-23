@@ -13,6 +13,7 @@ public class Director {
 
     private Matrix4f mProjection;
     private Camera mCamera;
+    private Matrix4f mOrthoProjection;
 
     public static Director getInstance() {
         return sInstance;
@@ -28,6 +29,11 @@ public class Director {
         return this;
     }
 
+    public Director setOrthoProjection(Matrix4f projection) {
+        mOrthoProjection = projection;
+        return this;
+    }
+
     public Matrix4f getProjection() {
         return mProjection;
     }
@@ -37,9 +43,6 @@ public class Director {
     }
 
     public void updateProjectionCamera(IRenderer renderer) {
-//        renderer.getShaderProgram().setUniformMatrix4fv("view", mCamera.lookAt());
-//        renderer.getShaderProgram().setUniformMatrix4fv("proj", mProjection);
-//
         updateViewMatrix(renderer, mCamera.lookAt());
         updateProjMatrix(renderer, mProjection);
     }
@@ -50,5 +53,11 @@ public class Director {
 
     public void updateProjMatrix(IRenderer renderer, Matrix4f matrix) {
         renderer.getShaderProgram().setUniformMatrix4fv("proj", matrix);
+    }
+
+    public void updateOrthoProjMatrix(IRenderer renderer) {
+        if (mOrthoProjection != null) {
+            renderer.getShaderProgram().setUniformMatrix4fv("orthoProj", mOrthoProjection);
+        }
     }
 }

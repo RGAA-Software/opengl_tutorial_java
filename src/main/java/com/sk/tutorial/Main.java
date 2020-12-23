@@ -1,16 +1,13 @@
 package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
+import com.sk.tutorial.framebuffer.DepthFrameBuffer;
 import com.sk.tutorial.framebuffer.FrameBuffer;
 import com.sk.tutorial.input.InputProcessor;
-import com.sk.tutorial.layer.MultiBoxLayer;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.light.Sun;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
-import com.sk.tutorial.renderer.GeometryPoint;
-import com.sk.tutorial.renderer.InstanceRect;
-import com.sk.tutorial.renderer.Skybox;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.ui.UIImage;
@@ -23,19 +20,13 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
-
-import static org.lwjgl.opengles.GLES20.GL_IMPLEMENTATION_COLOR_READ_FORMAT;
-import static org.lwjgl.opengles.GLES20.GL_IMPLEMENTATION_COLOR_READ_TYPE;
 
 public class Main {
 
@@ -147,8 +138,12 @@ public class Main {
                         width / height,
                         0.1f, 1000.0f);
 
+        Matrix4f mOrthoProjMat = new Matrix4f()
+                .ortho(-10, 10, -10, 10, -10, 10);
+
         Director.getInstance()
                 .setProjection(mProjMat)
+                .setOrthoProjection(mOrthoProjMat)
                 .setCamera(mCamera);
 
         Sun sun = new Sun();
@@ -199,6 +194,7 @@ public class Main {
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
+//        glDepthFunc(GL_ALWAYS);
         glEnable(GL_BLEND);
 //        glEnable(GL_CULL_FACE);
         //glCullFace(GL_FRONT);
@@ -240,17 +236,20 @@ public class Main {
         mFrameBuffer = new FrameBuffer();
         mFrameBuffer.init((int)width, (int)height);
 
-        mUIImage = new UIImage(mFrameBuffer.getFrameBufferTexId());
+        mDepthFrameBuffer = new DepthFrameBuffer();
+        mDepthFrameBuffer.init((int)width, (int)height);
+
+        mUIImage = new UIImage(mDepthFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_depth.glsl");
         mUIImage.setTranslate(new Vector3f(0.5f, 0.5f, 0));
         mUIImage.setScale(0.5f);
 
         mMainScene = new UIImage(mFrameBuffer.getFrameBufferTexId());
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
         mMainScene.setScale(1f);
-
     }
 
     private FrameBuffer mFrameBuffer;
+    private DepthFrameBuffer mDepthFrameBuffer;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
@@ -258,17 +257,40 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
+        mDepthFrameBuffer.begin();
+        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //mSingleLightLayer.render(deltaTime);
+        mModel.startRenderShadowMap();
+        mWolf.startRenderShadowMap();
+        mNanoSuit.startRenderShadowMap();
+        mFloor.startRenderShadowMap();
+
+        mFloor.render(deltaTime);
+        mModel.render(deltaTime);
+        mWolf.render(deltaTime);
+        mNanoSuit.render(deltaTime);
+        //mSingleCube.render(deltaTime);
+        mDepthFrameBuffer.end();
+
         mFrameBuffer.begin();
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mSingleLightLayer.render(deltaTime);
+        //mSingleLightLayer.render(deltaTime);
+        mModel.stopRenderShadowMap();
+        mWolf.stopRenderShadowMap();
+        mNanoSuit.stopRenderShadowMap();
+        mFloor.stopRenderShadowMap();
+
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
         mWolf.render(deltaTime);
-        mSingleCube.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        mFrameBuffer.end();
+        //mSingleCube.render(deltaTime);
+        mDepthFrameBuffer.end();
+
 
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         mUIImage.render(deltaTime);

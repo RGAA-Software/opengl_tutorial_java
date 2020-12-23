@@ -4,6 +4,7 @@ import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.light.Light;
 import com.sk.tutorial.shader.ShaderProgram;
 
+import com.sk.tutorial.world.Director;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -22,6 +23,8 @@ public abstract class IRenderer {
     protected Light mLight;
 
     protected int mRenderVAO = -1;
+
+    protected boolean mStartRenderShowMap = false;
 
     public IRenderer(ShaderProgram program) {
         mShaderProgram = program;
@@ -88,6 +91,14 @@ public abstract class IRenderer {
         mLight = light;
     }
 
+    public void startRenderShadowMap() {
+        mStartRenderShowMap = true;
+    }
+
+    public void stopRenderShadowMap() {
+        mStartRenderShowMap = false;
+    }
+
     public void render(double deltaTime) {
         if (mShaderProgram != null) {
             mShaderProgram.use();
@@ -101,6 +112,12 @@ public abstract class IRenderer {
             mShaderProgram.setUniform3fv("light.diffuse", mLight.diffuse);
             mShaderProgram.setUniform3fv("light.specular", mLight.specular);
             mShaderProgram.setUniform3fv("light.direction", mLight.direction);
+        }
+        if (mStartRenderShowMap) {
+            mShaderProgram.setUniform1i("renderShadowMap", 1);
+            Director.getInstance().updateOrthoProjMatrix(this);
+        } else {
+            mShaderProgram.setUniform1i("renderShadowMap", 0);
         }
     }
 
