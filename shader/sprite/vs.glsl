@@ -19,10 +19,10 @@ out vec4 outLightViewPos;
 
 void main()
 {
-    if (renderShadowMap != 1) {
-        gl_Position = proj * view * model * vec4(aPos, 1.0);
-    } else {
+    if (renderShadowMap == 1) {
         gl_Position = orthoProj * orthoView * model * vec4(aPos, 1.0);
+    } else {
+        gl_Position = proj * view * model * vec4(aPos, 1.0);
     }
     outLightViewPos = orthoProj * orthoView * model * vec4(aPos, 1.0);
     outPos = vec3(model * vec4(aPos, 1.0));
