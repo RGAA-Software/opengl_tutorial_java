@@ -24,6 +24,17 @@ struct Light {
 //uniform Material material;
 uniform Light light;
 
+in vec4 outLightViewPos;
+uniform sampler2D shadowMap;
+
+float calculateShadow(vec4 fragPosInLightSpace) {
+    vec3 projCoord = fragPosInLightSpace.xyz / fragPosInLightSpace.w;
+    projCoord = projCoord * 0.5 + 0.5;
+    float currentDepth = projCoord.z;
+    float shadowMapDepth = texture(shadowMap, projCoord.xy).r;
+    return currentDepth - 0.05 > shadowMapDepth ? 1.0 : 0.0;
+}
+
 void main()
 {
     vec4 texColor = texture(image, outTex);
@@ -41,7 +52,10 @@ void main()
 //    float reflectFactor = pow( max(dot(toCameraDir, normalize(reflect)), 0), 8 );
 
     vec4 specColor = vec4(light.specular * specularFactor, 1);
-    gl_FragColor =  vec4(totalColor, 1) * texColor + specColor;
+
+
+    vec4 targetColor = vec4(light.diffuse, 1.0) * diffuseFactor * texColor + specColor;
+    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor * (1 - calculateShadow(outLightViewPos));//vec4(totalColor, 1) * texColor + specColor;
 
 //    gl_FragColor = vec4(vec3(gl_FragCood.z), 1.0);
 

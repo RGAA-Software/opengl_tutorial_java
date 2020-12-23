@@ -7,6 +7,7 @@ import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.world.Director;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
@@ -21,8 +22,10 @@ public abstract class IRenderer {
     protected Vector3f mRotateAxis;
     protected float mScale;
     protected Light mLight;
+    protected Matrix4f mShadowView;
 
     protected int mRenderVAO = -1;
+    protected int mShadowMap = -1;
 
     protected boolean mStartRenderShowMap = false;
 
@@ -99,6 +102,14 @@ public abstract class IRenderer {
         mStartRenderShowMap = false;
     }
 
+    public void bindShadowMap(int id) {
+        mShadowMap = id;
+    }
+
+    public void setShadowView(Matrix4f mat) {
+        mShadowView = mat;
+    }
+
     public void render(double deltaTime) {
         if (mShaderProgram != null) {
             mShaderProgram.use();
@@ -115,7 +126,10 @@ public abstract class IRenderer {
         }
         if (mStartRenderShowMap) {
             mShaderProgram.setUniform1i("renderShadowMap", 1);
-            Director.getInstance().updateOrthoProjMatrix(this);
+            mShaderProgram.setUniformMatrix4fv("orthoProj", Director.getInstance().getOrthoProjection());
+            if (mShadowView != null) {
+                mShaderProgram.setUniformMatrix4fv("orthoView", mShadowView);
+            }
         } else {
             mShaderProgram.setUniform1i("renderShadowMap", 0);
         }

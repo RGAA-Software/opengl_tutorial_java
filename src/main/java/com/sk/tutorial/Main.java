@@ -38,6 +38,7 @@ public class Main {
     private float width = 800;
     private float height = 600;
 //    private int vao;
+    private int mShadowMapSize = 2048;
 
     public void run() {
         init();
@@ -132,6 +133,8 @@ public class Main {
     private UIImage mUIImage;
     private UIImage mMainScene;
 
+    private Matrix4f mShadowView;
+
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
@@ -153,6 +156,10 @@ public class Main {
         sun.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
         sun.specular = new Vector3f(0.3f, 0.3f, 0.3f);
 
+        mShadowView = new Matrix4f()
+                .identity()
+                .lookAt(sun.position, sun.direction, new Vector3f(0, 1, 0));
+
         ShaderProgram modelShaderProgram = new ShaderProgram();
         modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
         mModel = ModelLoader.loadModel("resources/model/planet/planet.obj", modelShaderProgram);
@@ -162,14 +169,14 @@ public class Main {
         mModel.setPosition(new Vector3f(0, 0, 0));
         mModel.setLight(sun);
 
-        ShaderProgram wolfShaderProgram = new ShaderProgram();
-        wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
-        mWolf = ModelLoader.loadModel("resources/model/hehua/hehua.obj", wolfShaderProgram);
-        mWolf.setCamera(mCamera);
-        mWolf.setProjection(mProjMat);
-        mWolf.setScale(0.0023f);
-        mWolf.setPosition(new Vector3f(-1, -0.25f, 0));
-        mWolf.setLight(sun);
+//        ShaderProgram wolfShaderProgram = new ShaderProgram();
+//        wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+//        mWolf = ModelLoader.loadModel("resources/model/hehua/hehua.obj", wolfShaderProgram);
+//        mWolf.setCamera(mCamera);
+//        mWolf.setProjection(mProjMat);
+//        mWolf.setScale(0.0023f);
+//        mWolf.setPosition(new Vector3f(-1, -0.25f, 0));
+//        mWolf.setLight(sun);
 
         ShaderProgram nanosuitShaderProgram = new ShaderProgram();
         nanosuitShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
@@ -177,7 +184,7 @@ public class Main {
         mNanoSuit.setCamera(mCamera);
         mNanoSuit.setProjection(mProjMat);
         mNanoSuit.setScale(0.1f);
-        mNanoSuit.setPosition(new Vector3f(-2, -0.25f, 0));
+        mNanoSuit.setPosition(new Vector3f(0, 0, -1));
         mNanoSuit.setLight(sun);
         mNanoSuit.enableDebugRotate();
 
@@ -186,15 +193,16 @@ public class Main {
         Vector3f lightDirection = new Vector3f(sun.direction);
         mSingleLightLayer.setPosition(lightDirection.mul(-2));
         mSingleLightLayer.setScale(0.3f);
+        mSingleLightLayer.setLight(sun);
 
         mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
         mSingleCube.setScale(0.5f);
         mSingleCube.setPosition(new Vector3f(1, -0.25f, 0));
         mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
+        mSingleCube.setLight(sun);
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
-//        glDepthFunc(GL_ALWAYS);
         glEnable(GL_BLEND);
 //        glEnable(GL_CULL_FACE);
         //glCullFace(GL_FRONT);
@@ -237,7 +245,7 @@ public class Main {
         mFrameBuffer.init((int)width, (int)height);
 
         mDepthFrameBuffer = new DepthFrameBuffer();
-        mDepthFrameBuffer.init((int)width, (int)height);
+        mDepthFrameBuffer.init(mShadowMapSize, mShadowMapSize);
 
         mUIImage = new UIImage(mDepthFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_depth.glsl");
         mUIImage.setTranslate(new Vector3f(0.5f, 0.5f, 0));
@@ -246,6 +254,13 @@ public class Main {
         mMainScene = new UIImage(mFrameBuffer.getFrameBufferTexId());
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
         mMainScene.setScale(1f);
+
+        mModel.setShadowView(mShadowView);
+        //mWolf.setShadowView(mShadowView);
+        mNanoSuit.setShadowView(mShadowView);
+        mFloor.setShadowView(mShadowView);
+        mSingleCube.setShadowView(mShadowView);
+        mSingleLightLayer.setShadowView(mShadowView);
     }
 
     private FrameBuffer mFrameBuffer;
@@ -257,12 +272,13 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
+        glViewport(0, 0, mShadowMapSize, mShadowMapSize);
         mDepthFrameBuffer.begin();
+        glClear(GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mModel.startRenderShadowMap();
-        mWolf.startRenderShadowMap();
+        //mWolf.startRenderShadowMap();
         mNanoSuit.startRenderShadowMap();
         mFloor.startRenderShadowMap();
         mSingleLightLayer.startRenderShadowMap();
@@ -271,34 +287,42 @@ public class Main {
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
-        mWolf.render(deltaTime);
+        //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
         mSingleCube.render(deltaTime);
         mDepthFrameBuffer.end();
 
-        mFrameBuffer.begin();
-        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+        glViewport(0, 0, (int)width, (int)height);
+        //mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
         mModel.stopRenderShadowMap();
-        mWolf.stopRenderShadowMap();
+        //mWolf.stopRenderShadowMap();
         mNanoSuit.stopRenderShadowMap();
         mFloor.stopRenderShadowMap();
         mSingleLightLayer.stopRenderShadowMap();
         mSingleCube.stopRenderShadowMap();
 
+        mModel.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        //mWolf.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        mNanoSuit.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        mFloor.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        mSingleLightLayer.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        mSingleCube.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
         mModel.render(deltaTime);
-        mWolf.render(deltaTime);
+        //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
         mSingleCube.render(deltaTime);
-        mDepthFrameBuffer.end();
+        //mFrameBuffer.end();
 
 
-        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
         mUIImage.render(deltaTime);
-        mMainScene.render(deltaTime);
+        //mMainScene.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

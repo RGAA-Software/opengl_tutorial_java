@@ -107,6 +107,12 @@ public class Mesh extends IRenderer {
             }
         }
 
+        if (mShadowMap != -1) {
+            glActiveTexture(GL_TEXTURE0 + textures.size());
+            glBindTexture(GL_TEXTURE_2D, mShadowMap);
+            mShaderProgram.setUniform1i("shadowMap", textures.size());
+        }
+
         if (instance) {
             glBindVertexArray(mRenderVAO);
             GL33.glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, 1000);

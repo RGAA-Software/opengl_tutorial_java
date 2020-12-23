@@ -54,6 +54,14 @@ public class Model extends IRenderer {
         }
     }
 
+    @Override
+    public void bindShadowMap(int id) {
+        super.bindShadowMap(id);
+        for(Mesh mesh : meshes) {
+            mesh.bindShadowMap(id);
+        }
+    }
+
     private float mRotate = 0;
     @Override
     public void render(double deltaTime) {

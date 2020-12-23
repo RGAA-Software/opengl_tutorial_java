@@ -86,6 +86,12 @@ public class Sprite extends IRenderer {
         glBindTexture(GL_TEXTURE_2D, mTexture.id);
         mShaderProgram.setUniform1i("image", 0);
 
+        if (mShadowMap != -1) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mShadowMap);
+            mShaderProgram.setUniform1i("shadowMap", 1);
+        }
+
         model = model.identity();
         if (mPosition != null) {
             model = model.translate(mPosition);

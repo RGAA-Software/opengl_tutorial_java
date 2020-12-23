@@ -94,7 +94,7 @@ public class SingleLightCubeLayer extends IRenderer {
     @Override
     public void render(double deltaTime) {
         super.render(deltaTime);
-        glBindVertexArray(mRenderVAO);
+
         mModel.identity();
         if (mPosition != null) {
             mModel = mModel.translate(mPosition);
@@ -103,6 +103,13 @@ public class SingleLightCubeLayer extends IRenderer {
         if (mScale != 0) {
             mModel = mModel.scale(mScale);
         }
+
+        if (mShadowMap != -1) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mShadowMap);
+            mShaderProgram.setUniform1i("shadowMap", 0);
+        }
+
         mShaderProgram.setUniform3fv("lightColor", mColor);
         mShaderProgram.setUniformMatrix4fv("model", mModel);
         mShaderProgram.setUniformMatrix4fv("view", mCamera.lookAt());

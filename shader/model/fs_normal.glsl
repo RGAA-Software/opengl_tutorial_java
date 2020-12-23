@@ -42,6 +42,17 @@ uniform Material material[6];
 
 uniform samplerCube skybox;
 
+in vec4 outLightViewPos;
+uniform sampler2D shadowMap;
+
+float calculateShadow(vec4 fragPosInLightSpace) {
+    vec3 projCoord = fragPosInLightSpace.xyz ;/// fragPosInLightSpace.z;
+    projCoord = projCoord * 0.5 + 0.5;
+    float currentDepth = projCoord.z;
+    float shadowMapDepth = texture(shadowMap, projCoord.xy).r;
+    return currentDepth - 0.05 > shadowMapDepth ? 1.0 : 0.0;
+}
+
 void main()
 {
     vec3 diffuseColor = vec3(0, 0, 0);
@@ -71,5 +82,7 @@ void main()
     specularFactor = pow(specularFactor, 32);
     vec3 specular = specularFactor * specularColor * light.specular;
 
-    gl_FragColor = vec4((diffuse + specular), 1.0) + ambient;
+    float shadow = calculateShadow(outLightViewPos);
+    vec3 targetColor = (diffuse + specular) * (1 - shadow);
+    gl_FragColor = vec4(targetColor, 1.0) + ambient;
 }
