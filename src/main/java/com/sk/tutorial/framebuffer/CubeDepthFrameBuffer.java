@@ -25,6 +25,7 @@ public class CubeDepthFrameBuffer {
         // configure depth map FBO
         // -----------------------
         mFrameBufferId = glGenFramebuffers();
+        glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
         // create depth cubemap texture
         mTextureId = glGenTextures();
         glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
@@ -37,7 +38,7 @@ public class CubeDepthFrameBuffer {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         // attach depth texture as FBO's depth buffer
-        glBindFramebuffer(GL_FRAMEBUFFER, mFrameBufferId);
+
         GL33.glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mTextureId, 0);
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);

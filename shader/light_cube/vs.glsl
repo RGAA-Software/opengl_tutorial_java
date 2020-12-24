@@ -2,6 +2,8 @@
 
 in vec3 cubePos;
 
+out vec3 outPos;
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
@@ -20,4 +22,6 @@ void main()
     }
 //    gl_Position = proj * view * model * vec4(cubePos, 1.0);
     outLightViewPos = orthoProj * orthoView * model * vec4(cubePos, 1.0);
+
+    outPos = cubePos;
 }

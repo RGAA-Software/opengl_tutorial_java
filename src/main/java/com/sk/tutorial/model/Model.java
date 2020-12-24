@@ -1,20 +1,14 @@
 package com.sk.tutorial.model;
 
-import com.sk.tutorial.camera.Camera;
+import com.sk.tutorial.light.Light;
 import com.sk.tutorial.renderer.IRenderer;
 import com.sk.tutorial.shader.ShaderProgram;
 
 import com.sk.tutorial.world.Director;
 import org.joml.Math;
 import org.joml.Matrix4f;
-import org.joml.Random;
-import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
-import java.util.Vector;
-
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 public class Model extends IRenderer {
 
@@ -39,18 +33,26 @@ public class Model extends IRenderer {
     }
 
     @Override
-    public void startRenderShadowMap() {
-        super.startRenderShadowMap();
+    public void setLight(Light light) {
+        super.setLight(light);
         for (Mesh mesh : meshes) {
-            mesh.startRenderShadowMap();
+            mesh.setLight(light);
         }
     }
 
     @Override
-    public void stopRenderShadowMap() {
-        super.stopRenderShadowMap();
+    public void startRenderDirectLightShadowMap() {
+        super.startRenderDirectLightShadowMap();
         for (Mesh mesh : meshes) {
-            mesh.stopRenderShadowMap();
+            mesh.startRenderDirectLightShadowMap();
+        }
+    }
+
+    @Override
+    public void stopRenderDirectLightShadowMap() {
+        super.stopRenderDirectLightShadowMap();
+        for (Mesh mesh : meshes) {
+            mesh.stopRenderDirectLightShadowMap();
         }
     }
 
@@ -67,6 +69,30 @@ public class Model extends IRenderer {
         super.setShaderProgram(program);
         for (Mesh mesh : meshes) {
             mesh.setShaderProgram(program);
+        }
+    }
+
+    @Override
+    public void startRenderPointLightShadow() {
+        super.startRenderPointLightShadow();
+        for (Mesh mesh : meshes) {
+            mesh.startRenderPointLightShadow();
+        }
+    }
+
+    @Override
+    public void stopRenderPointLightShadow() {
+        super.stopRenderPointLightShadow();
+        for (Mesh mesh : meshes) {
+            mesh.stopRenderPointLightShadow();
+        }
+    }
+
+    @Override
+    public void setCubeViews(Matrix4f[] views) {
+        super.setCubeViews(views);
+        for (Mesh mesh : meshes) {
+            mesh.setCubeViews(views);
         }
     }
 

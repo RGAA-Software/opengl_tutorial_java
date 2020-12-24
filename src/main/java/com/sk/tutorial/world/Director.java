@@ -14,6 +14,7 @@ public class Director {
     private Matrix4f mProjection;
     private Camera mCamera;
     private Matrix4f mOrthoProjection;
+    private Matrix4f mCubeProjection;
 
     public static Director getInstance() {
         return sInstance;
@@ -34,6 +35,11 @@ public class Director {
         return this;
     }
 
+    public Director setCubeProjection(Matrix4f projection) {
+        mCubeProjection = projection;
+        return this;
+    }
+
     public Matrix4f getProjection() {
         return mProjection;
     }
@@ -44,6 +50,10 @@ public class Director {
 
     public Matrix4f getOrthoProjection() {
         return mOrthoProjection;
+    }
+
+    public Matrix4f getCubeProjection() {
+        return mCubeProjection;
     }
 
     public void updateProjectionCamera(IRenderer renderer) {

@@ -21,6 +21,8 @@ public class SingleLightCubeLayer extends IRenderer {
     private Matrix4f mModel = new Matrix4f();
     private Vector3f mLightPos = new Vector3f(1.2f, 1.0f, 2.0f);
 
+    private int mCubeMap = -1;
+
     public SingleLightCubeLayer(Camera camera, Matrix4f proj, String vertexShaderPath, String fragmentShaderPath) {
         super(vertexShaderPath, fragmentShaderPath);
         mCamera = camera;
@@ -29,6 +31,10 @@ public class SingleLightCubeLayer extends IRenderer {
 
     public void setColor(Vector3f color) {
         mColor = color;
+    }
+
+    public void setCubeMap(int cubeMap) {
+        mCubeMap = cubeMap;
     }
 
     @Override
@@ -117,6 +123,12 @@ public class SingleLightCubeLayer extends IRenderer {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, mShadowMap);
             mShaderProgram.setUniform1i("shadowMap", 0);
+        }
+
+        if (mCubeMap != -1) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, mCubeMap);
+            mShaderProgram.setUniform1i("cube", 1);
         }
 
         mShaderProgram.setUniform3fv("lightColor", mColor);

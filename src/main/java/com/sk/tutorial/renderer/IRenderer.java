@@ -7,7 +7,6 @@ import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.world.Director;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
@@ -24,10 +23,13 @@ public abstract class IRenderer {
     protected Light mLight;
     protected Matrix4f mShadowView;
 
+    protected Matrix4f[] mCubeViews;
+
     protected int mRenderVAO = -1;
     protected int mShadowMap = -1;
 
-    protected boolean mStartRenderShowMap = false;
+    protected boolean mStartRenderDirectLightShadow = false;
+    protected boolean mStartRenderPointLightShadow = false;
 
     public IRenderer(ShaderProgram program) {
         mShaderProgram = program;
@@ -94,12 +96,20 @@ public abstract class IRenderer {
         mLight = light;
     }
 
-    public void startRenderShadowMap() {
-        mStartRenderShowMap = true;
+    public void startRenderDirectLightShadowMap() {
+        mStartRenderDirectLightShadow = true;
     }
 
-    public void stopRenderShadowMap() {
-        mStartRenderShowMap = false;
+    public void stopRenderDirectLightShadowMap() {
+        mStartRenderDirectLightShadow = false;
+    }
+
+    public void startRenderPointLightShadow() {
+        mStartRenderPointLightShadow = true;
+    }
+
+    public void stopRenderPointLightShadow() {
+        mStartRenderPointLightShadow = false;
     }
 
     public void bindShadowMap(int id) {
@@ -108,6 +118,10 @@ public abstract class IRenderer {
 
     public void setShadowView(Matrix4f mat) {
         mShadowView = mat;
+    }
+
+    public void setCubeViews(Matrix4f[] views) {
+        mCubeViews = views;
     }
 
     public void render(double deltaTime) {
@@ -124,14 +138,25 @@ public abstract class IRenderer {
             mShaderProgram.setUniform3fv("light.specular", mLight.specular);
             mShaderProgram.setUniform3fv("light.direction", mLight.direction);
         }
-        if (mStartRenderShowMap) {
+
+        mShaderProgram.setUniform1i("renderShadowMap", 0);
+        mShaderProgram.setUniform1i("renderPointShadow", 0);
+
+        if (mStartRenderDirectLightShadow) {
+
             mShaderProgram.setUniform1i("renderShadowMap", 1);
             mShaderProgram.setUniformMatrix4fv("orthoProj", Director.getInstance().getOrthoProjection());
             if (mShadowView != null) {
                 mShaderProgram.setUniformMatrix4fv("orthoView", mShadowView);
             }
-        } else {
-            mShaderProgram.setUniform1i("renderShadowMap", 0);
+        } else if (mStartRenderPointLightShadow) {
+            mShaderProgram.setUniform1i("renderPointShadow", 1);
+            mShaderProgram.setUniformMatrix4fv("cubeProj", Director.getInstance().getCubeProjection());
+            for (int i = 0; i < mCubeViews.length; i++) {
+                mShaderProgram.setUniformMatrix4fv("cubeViews[" + i + "]", mCubeViews[i]);
+            }
+            mShaderProgram.setUniform3fv("lightPos", mLight.position);
+            mShaderProgram.setUniform1f("farPlane", 25);
         }
     }
 
