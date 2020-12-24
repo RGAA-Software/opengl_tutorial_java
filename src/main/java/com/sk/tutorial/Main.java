@@ -135,6 +135,9 @@ public class Main {
 
     private Matrix4f mShadowView;
 
+    private ShaderProgram mEmptyShaderProgram;
+    private ShaderProgram modelShaderProgram;
+
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
@@ -149,6 +152,12 @@ public class Main {
                 .setOrthoProjection(mOrthoProjMat)
                 .setCamera(mCamera);
 
+        mEmptyShaderProgram = new ShaderProgram();
+        mEmptyShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_empty.glsl");
+
+        modelShaderProgram = new ShaderProgram();
+        modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+
         Sun sun = new Sun();
         sun.direction = new Vector3f(0, -1.0f, 1.5f);
         sun.position = new Vector3f(0.0f, 0.0f, 0.0f);
@@ -160,8 +169,7 @@ public class Main {
                 .identity()
                 .lookAt(sun.position, sun.direction, new Vector3f(0, 1, 0));
 
-        ShaderProgram modelShaderProgram = new ShaderProgram();
-        modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+
         mModel = ModelLoader.loadModel("resources/model/planet/planet.obj", modelShaderProgram);
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
@@ -315,6 +323,13 @@ public class Main {
         mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
+
+        if ((int)glfwGetTime() % 5 == 0) {
+            mModel.setShaderProgram(mEmptyShaderProgram);
+        } else {
+            mModel.setShaderProgram(modelShaderProgram);
+        }
+
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);

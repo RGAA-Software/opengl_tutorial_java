@@ -62,6 +62,14 @@ public class Model extends IRenderer {
         }
     }
 
+    @Override
+    public void setShaderProgram(ShaderProgram program) {
+        super.setShaderProgram(program);
+        for (Mesh mesh : meshes) {
+            mesh.setShaderProgram(program);
+        }
+    }
+
     private float mRotate = 0;
     @Override
     public void render(double deltaTime) {
