@@ -35,6 +35,23 @@ float calculateShadow(vec4 fragPosInLightSpace) {
     return currentDepth - 0.0005 > shadowMapDepth ? 1.0 : 0.0;
 }
 
+float calculateShadowPCF(vec4 fragPosInLightSpace) {
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    float shadow;
+    vec3 projCoord = fragPosInLightSpace.xyz / fragPosInLightSpace.w;
+    projCoord = projCoord * 0.5 + 0.5;
+
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            float pcfDepth = texture(shadowMap, projCoord.xy + vec2(x, y) * texelSize).r;
+            float currentDepth = projCoord.z;
+            float inShadow = currentDepth - 0.003 > pcfDepth ? 1.0 : 0.0;
+            shadow += inShadow;
+        }
+    }
+    return shadow / 9.0;
+}
+
 void main()
 {
     vec4 texColor = texture(image, outTex);
@@ -55,7 +72,7 @@ void main()
 
 
     vec4 targetColor = vec4(light.diffuse, 1.0) * diffuseFactor * texColor + specColor;
-    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor * (1 - calculateShadow(outLightViewPos));//vec4(totalColor, 1) * texColor + specColor;
+    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor * (1 - calculateShadowPCF(outLightViewPos));//vec4(totalColor, 1) * texColor + specColor;
 
 //    gl_FragColor = vec4(vec3(gl_FragCood.z), 1.0);
 

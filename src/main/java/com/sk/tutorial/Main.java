@@ -33,10 +33,10 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-//    private float width = 800;
-//    private float height = 600;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
     private int mShadowMapSize = 2048;
 
@@ -207,8 +207,6 @@ public class Main {
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
-//        glEnable(GL_CULL_FACE);
-        //glCullFace(GL_FRONT);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
