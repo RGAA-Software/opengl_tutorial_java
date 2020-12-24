@@ -18,6 +18,6 @@ float calculateShadow(vec4 fragPosInLightSpace) {
 
 void main()
 {
-    float shadow = calculateShadow(outLightViewPos);
-    gl_FragColor = vec4(lightColor * (1 - shadow), 1);
+    //float shadow = calculateShadow(outLightViewPos);
+    gl_FragColor = vec4(lightColor, 1);
 }

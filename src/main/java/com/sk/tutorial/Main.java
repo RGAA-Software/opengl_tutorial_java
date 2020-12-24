@@ -1,6 +1,7 @@
 package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
+import com.sk.tutorial.framebuffer.CubeDepthFrameBuffer;
 import com.sk.tutorial.framebuffer.DepthFrameBuffer;
 import com.sk.tutorial.framebuffer.FrameBuffer;
 import com.sk.tutorial.input.InputProcessor;
@@ -261,7 +262,7 @@ public class Main {
         mFrameBuffer = new FrameBuffer();
         mFrameBuffer.init((int)width, (int)height);
 
-        mDepthFrameBuffer = new DepthFrameBuffer();
+        mDepthFrameBuffer = new CubeDepthFrameBuffer();
         mDepthFrameBuffer.init(mShadowMapSize, mShadowMapSize);
 
         mUIImage = new UIImage(mDepthFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_depth.glsl");
@@ -282,7 +283,7 @@ public class Main {
     }
 
     private FrameBuffer mFrameBuffer;
-    private DepthFrameBuffer mDepthFrameBuffer;
+    private CubeDepthFrameBuffer mDepthFrameBuffer;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
