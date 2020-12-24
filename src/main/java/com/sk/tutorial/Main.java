@@ -130,6 +130,7 @@ public class Main {
     private Model mWolf;
 
     private Sprite mFloor;
+    private Sprite mWall;
     private UIImage mUIImage;
     private UIImage mMainScene;
 
@@ -145,7 +146,7 @@ public class Main {
                         0.1f, 1000.0f);
 
         Matrix4f mOrthoProjMat = new Matrix4f()
-                .ortho(-5, 5, -10, 10, -10, 10);
+                .ortho(-10, 10, -10, 10, -10, 10);
 
         Director.getInstance()
                 .setProjection(mProjMat)
@@ -156,11 +157,11 @@ public class Main {
         mEmptyShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_empty.glsl");
 
         modelShaderProgram = new ShaderProgram();
-        modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+        modelShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal_point.glsl");
 
         Sun sun = new Sun();
-        sun.direction = new Vector3f(0, -1.0f, 1.5f);
-        sun.position = new Vector3f(0.0f, 0.0f, 0.0f);
+        sun.direction = new Vector3f(0.8f, -1.0f, 1.5f);
+        sun.position = new Vector3f(-1.0f, 1.5f, -1.0f);
         sun.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         sun.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
         sun.specular = new Vector3f(0.3f, 0.3f, 0.3f);
@@ -174,7 +175,7 @@ public class Main {
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
         mModel.setScale(0.13f);
-        mModel.setPosition(new Vector3f(0, 0, 0));
+        mModel.setPosition(new Vector3f(0, 2, 0));
         mModel.setLight(sun);
 
 //        ShaderProgram wolfShaderProgram = new ShaderProgram();
@@ -187,20 +188,20 @@ public class Main {
 //        mWolf.setLight(sun);
 
         ShaderProgram nanosuitShaderProgram = new ShaderProgram();
-        nanosuitShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
+        nanosuitShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal_point.glsl");
         mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", nanosuitShaderProgram);
         mNanoSuit.setCamera(mCamera);
         mNanoSuit.setProjection(mProjMat);
         mNanoSuit.setScale(0.1f);
-        mNanoSuit.setPosition(new Vector3f(0, 0, -1));
+        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
         mNanoSuit.setLight(sun);
         mNanoSuit.enableDebugRotate();
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
-        Vector3f lightDirection = new Vector3f(sun.direction);
-        lightDirection = lightDirection.sub(-1, 0, 0);
-        mSingleLightLayer.setPosition(lightDirection.mul(-2));
+        //Vector3f lightDirection = new Vector3f(sun.direction);
+        //lightDirection = lightDirection.sub(-1, 0, 0);
+        mSingleLightLayer.setPosition(sun.position);
         mSingleLightLayer.setScale(0.3f);
         mSingleLightLayer.setLight(sun);
         mSingleLightLayer.enableRotate();
@@ -218,7 +219,7 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn.glsl");
+        mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl");
         float[] grassVertices = {
             10.0f,  0,  10.0f,
             -10.0f, 0,  10.0f,
@@ -250,6 +251,13 @@ public class Main {
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
         mFloor.setLight(sun);
 
+        mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl");
+        mWall.setRotateDegree(90);
+        mWall.setRotateAxis(new Vector3f(0, 0, 1));
+        mWall.setVertices(grassVertices, grassNormals, grassTexCoord);
+        mWall.setPosition(new Vector3f(3, 0, 0));
+        mWall.setLight(sun);
+
         mFrameBuffer = new FrameBuffer();
         mFrameBuffer.init((int)width, (int)height);
 
@@ -257,8 +265,8 @@ public class Main {
         mDepthFrameBuffer.init(mShadowMapSize, mShadowMapSize);
 
         mUIImage = new UIImage(mDepthFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_depth.glsl");
-        mUIImage.setTranslate(new Vector3f(0.5f, 0.5f, 0));
-        mUIImage.setScale(0.5f);
+        mUIImage.setTranslate(new Vector3f(0.75f, 0.75f, 0));
+        mUIImage.setScale(0.25f);
 
         mMainScene = new UIImage(mFrameBuffer.getFrameBufferTexId());
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
@@ -270,6 +278,7 @@ public class Main {
         mFloor.setShadowView(mShadowView);
         mSingleCube.setShadowView(mShadowView);
         mSingleLightLayer.setShadowView(mShadowView);
+        mWall.setShadowView(mShadowView);
     }
 
     private FrameBuffer mFrameBuffer;
@@ -292,7 +301,9 @@ public class Main {
         mFloor.startRenderShadowMap();
         mSingleLightLayer.startRenderShadowMap();
         mSingleCube.startRenderShadowMap();
+        mWall.startRenderShadowMap();
 
+        mWall.render(deltaTime);
         mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
         mFloor.render(deltaTime);
@@ -312,6 +323,7 @@ public class Main {
         mFloor.stopRenderShadowMap();
         mSingleLightLayer.stopRenderShadowMap();
         mSingleCube.stopRenderShadowMap();
+        mWall.stopRenderShadowMap();
 
         mModel.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
         //mWolf.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
@@ -319,17 +331,13 @@ public class Main {
         mFloor.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
         mSingleLightLayer.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
         mSingleCube.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        mWall.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
 
         mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
+
         mFloor.render(deltaTime);
-
-        if ((int)glfwGetTime() % 5 == 0) {
-            mModel.setShaderProgram(mEmptyShaderProgram);
-        } else {
-            mModel.setShaderProgram(modelShaderProgram);
-        }
-
+        mWall.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
