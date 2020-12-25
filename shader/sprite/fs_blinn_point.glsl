@@ -25,7 +25,32 @@ struct Light {
 uniform Light light;
 
 in vec4 outLightViewPos;
-uniform sampler2D shadowMap;
+uniform samplerCube shadowMap;
+
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
+
+float calculateInShadow() {
+    float shadow;
+    vec3 fragToLight = outPos - light.position;
+    float sampleRadius = 0.005;
+    int sampleSize = 20;
+
+    for (int i = 0; i < sampleSize; i++) {
+        float depth = texture(shadowMap, fragToLight + sampleOffsetDirections[i] * sampleRadius).r;
+        float currentDepth = length(outPos - light.position) / 25;
+        float inShadow = currentDepth - 0.005 < depth ? 0 : 1.0;
+        shadow += inShadow;
+    }
+
+    return shadow / float(sampleSize);
+}
 
 void main()
 {
@@ -44,6 +69,8 @@ void main()
 
     vec4 specColor = vec4(light.specular * specularFactor, 1);
 
+    float shadow = calculateInShadow();
+
     vec4 targetColor = vec4(light.diffuse, 1.0) * diffuseFactor * texColor + specColor;
-    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor;
+    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor * (1 - shadow);
 }

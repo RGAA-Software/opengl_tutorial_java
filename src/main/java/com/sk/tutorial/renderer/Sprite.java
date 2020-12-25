@@ -92,6 +92,12 @@ public class Sprite extends IRenderer {
             mShaderProgram.setUniform1i("shadowMap", 1);
         }
 
+        if (mCubeShadowMap != -1) {
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, mCubeShadowMap);
+            mShaderProgram.setUniform1i("shadowMap", 2);
+        }
+
         model = model.identity();
         if (mPosition != null) {
             model = model.translate(mPosition);
@@ -100,7 +106,6 @@ public class Sprite extends IRenderer {
         if (mRotateAxis != null) {
             model = model.rotate((float)Math.toRadians(mRotateDegree), mRotateAxis);
         }
-
 
         mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
 

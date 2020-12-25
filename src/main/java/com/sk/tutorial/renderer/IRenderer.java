@@ -27,6 +27,7 @@ public abstract class IRenderer {
 
     protected int mRenderVAO = -1;
     protected int mShadowMap = -1;
+    protected int mCubeShadowMap = -1;
 
     protected boolean mStartRenderDirectLightShadow = false;
     protected boolean mStartRenderPointLightShadow = false;
@@ -114,6 +115,10 @@ public abstract class IRenderer {
 
     public void bindShadowMap(int id) {
         mShadowMap = id;
+    }
+
+    public void bindCubeShadowMap(int id) {
+        mCubeShadowMap = id;
     }
 
     public void setShadowView(Matrix4f mat) {

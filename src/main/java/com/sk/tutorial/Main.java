@@ -33,10 +33,10 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-//    private float width = 800;
-//    private float height = 600;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
     private int mShadowMapSize = 2048;
 
@@ -142,6 +142,13 @@ public class Main {
     private Matrix4f mCubeProj = new Matrix4f();
     private Matrix4f[] mCubeViews = new Matrix4f[6];
 
+    private float mSunY = 1.5f;
+    private float MAX_SUN_Y = 8;
+    private float MIN_SUN_Y = 0;
+    private boolean isUping = true;
+
+    private Light light;
+
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
                 .perspective((float) Math.toRadians(45),
@@ -151,13 +158,13 @@ public class Main {
         Matrix4f mOrthoProjMat = new Matrix4f()
                 .ortho(-10, 10, -10, 10, -10, 10);
 
-        float near = 1.0f;
-        float far = 25.0f;
+        float near = 0.1f;
+        float far = 25f;
         mCubeProj = mCubeProj.perspective((float)Math.toRadians(90.0f), mShadowMapSize/mShadowMapSize, near, far);
 
-        Light light = new Light();
+        light = new Light();
         light.direction = new Vector3f(0.8f, -1.0f, 1.5f);
-        light.position = new Vector3f(-1.0f, 1.5f, -1.0f);
+        light.position = new Vector3f(-1.0f, MIN_SUN_Y, -1.0f);
         light.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         light.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
         light.specular = new Vector3f(0.3f, 0.3f, 0.3f);
@@ -178,8 +185,8 @@ public class Main {
         mFrameBuffer = new FrameBuffer();
         mFrameBuffer.init((int)width, (int)height);
 
-        mDepthFrameBuffer = new CubeDepthFrameBuffer();
-        mDepthFrameBuffer.init(mShadowMapSize, mShadowMapSize);
+        mCubeFrameBuffer = new CubeDepthFrameBuffer();
+        mCubeFrameBuffer.init(mShadowMapSize, mShadowMapSize);
 
         mPointDepthShaderProgram = new ShaderProgram();
         mPointDepthShaderProgram.initWithShaderPath("shader/cube_map/vs.glsl", "shader/cube_map/fs.glsl", "shader/cube_map/gs.glsl");
@@ -214,7 +221,7 @@ public class Main {
         mNanoSuit.setCamera(mCamera);
         mNanoSuit.setProjection(mProjMat);
         mNanoSuit.setScale(0.1f);
-        mNanoSuit.setPosition(new Vector3f(10, 1, -1));
+        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
         mNanoSuit.setLight(light);
         mNanoSuit.enableDebugRotate();
 
@@ -228,8 +235,8 @@ public class Main {
         mSingleLightLayer.enableRotate();
 
         mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs_cube_map.glsl");
-        mSingleCube.setCubeMap(mDepthFrameBuffer.getFrameBufferTexId());
-        mSingleCube.setScale(1.2f);
+        mSingleCube.setCubeMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mSingleCube.setScale(1.0f);
         mSingleCube.setPosition(new Vector3f(-3, 1f, 0));
         //mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
         mSingleCube.setLight(light);
@@ -280,7 +287,7 @@ public class Main {
         mWall.setLight(light);
 
 
-        mUIImage = new UIImage(mDepthFrameBuffer.getFrameBufferId(), "shader/2d_base/fs_depth.glsl");
+        mUIImage = new UIImage(mCubeFrameBuffer.getFrameBufferId(), "shader/2d_base/fs_depth.glsl");
         mUIImage.setTranslate(new Vector3f(0.75f, 0.75f, 0));
         mUIImage.setScale(0.25f);
 
@@ -295,7 +302,7 @@ public class Main {
     }
 
     private FrameBuffer mFrameBuffer;
-    private CubeDepthFrameBuffer mDepthFrameBuffer;
+    private CubeDepthFrameBuffer mCubeFrameBuffer;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
@@ -303,8 +310,37 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
+        if (isUping) {
+            if (light.position.y <= MAX_SUN_Y) {
+                light.position.y += deltaTime/2;
+            } else {
+                isUping = false;
+            }
+        }else {
+            if (light.position.y >= MIN_SUN_Y) {
+                light.position.y -= deltaTime/2;
+            } else {
+                isUping = true;
+            }
+        }
+
+        mCubeViews[0].identity();
+        mCubeViews[1].identity();
+        mCubeViews[2].identity();
+        mCubeViews[3].identity();
+        mCubeViews[4].identity();
+        mCubeViews[5].identity();
+
+        mCubeViews[0].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(1.0f, 0.0f, 0.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+        mCubeViews[1].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(-1.0f, 0.0f, 0.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+        mCubeViews[2].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 1.0f, 0.0f)), new Vector3f(0.0f, 0.0f, 1.0f));
+        mCubeViews[3].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, -1.0f, 0.0f)), new Vector3f(0.0f, 0.0f, -1.0f));
+        mCubeViews[4].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 0.0f, 1.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+        mCubeViews[5].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 0.0f, -1.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+
+
         glViewport(0, 0, mShadowMapSize, mShadowMapSize);
-        mDepthFrameBuffer.begin();
+        mCubeFrameBuffer.begin();
         glClear(GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -321,7 +357,7 @@ public class Main {
         mNanoSuit.render(deltaTime);
         mWall.render(deltaTime);
 
-        mDepthFrameBuffer.end();
+        mCubeFrameBuffer.end();
 
         glViewport(0, 0, (int)width, (int)height);
         //mFrameBuffer.begin();
@@ -335,13 +371,13 @@ public class Main {
         mWall.stopRenderPointLightShadow();
         //mWall.setShaderProgram();
 
-        mModel.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
-        //mWolf.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
-        mNanoSuit.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
-        mFloor.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
-        mSingleLightLayer.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
-        mSingleCube.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
-        mWall.bindShadowMap(mDepthFrameBuffer.getFrameBufferTexId());
+        mModel.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+        //mWolf.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mNanoSuit.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mFloor.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mSingleLightLayer.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mSingleCube.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mWall.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
 
         mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
