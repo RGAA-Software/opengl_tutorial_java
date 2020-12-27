@@ -31,7 +31,7 @@ struct Light {
 };
 
 //uniform Material material;
-uniform Light light;
+uniform Light light[5];
 
 struct Material {
     sampler2D image;
@@ -75,10 +75,10 @@ void main()
 
     vec4 ambient = vec4(0.1,0.1, 0.1, 1) * vec4(diffuseColor, 1);
 
-    vec3 toLightDir = light.position - outPos;
+    vec3 toLightDir = light[0].position - outPos;
 
     float diffuseFactor = max( dot( normalize(toLightDir), normalize(outNormal) ), 0);
-    vec3 diffuse = diffuseFactor * diffuseColor * light.diffuse;
+    vec3 diffuse = diffuseFactor * diffuseColor * light[0].diffuse;
 //
 //    float specularFactor = max( dot( normalize(reflect(-toLightDir, outNormal)), normalize(cameraPos - outPos)) , 0);
 //    specularFactor = pow(specularFactor, 32);
@@ -87,7 +87,7 @@ void main()
     vec3 halfWay = normalize(normalize(toLightDir) + toCameraDir);
     float specularFactor = pow( max(dot(normalize(outNormal), halfWay), 0), 32);
 
-    vec3 specular = specularFactor * specularColor * light.specular;
+    vec3 specular = specularFactor * specularColor * light[0].specular;
 
     //float shadow = calculateShadow(outLightViewPos);
     vec3 targetColor = (diffuse + specular);// * (1 - shadow);

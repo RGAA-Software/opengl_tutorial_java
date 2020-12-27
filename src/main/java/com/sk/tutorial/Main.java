@@ -21,6 +21,8 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -148,6 +150,44 @@ public class Main {
     private boolean isUping = true;
 
     private Light light;
+    private List<Light> mLights;
+
+    private List<Light> generateLights() {
+        List<Light> lights = new ArrayList<>();
+
+        Light lt = new Light();
+        lt.direction = new Vector3f(0.8f, -1.0f, 1.5f);
+        lt.position = new Vector3f(-1.0f, MIN_SUN_Y, -1.0f);
+        lt.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
+        lt.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
+        lt.specular = new Vector3f(0.3f, 0.3f, 0.3f);
+        lt.constant = 1.0f;
+        lt.linear = 0.09f;
+        lt.quadratic = 0.032f;
+        lights.add(lt);
+
+        lt = lt.copy();
+        lt.position = new Vector3f(-1.2f, MIN_SUN_Y, -1.0f);
+        lights.add(lt);
+
+        lt = lt.copy();
+        lt.position = new Vector3f(-8.1f, MIN_SUN_Y, -8.0f);
+        lt.diffuse = new Vector3f(1.0f, 0, 0);
+        lights.add(lt);
+
+        lt = lt.copy();
+        lt.position = new Vector3f(-4.3f, MIN_SUN_Y, -8.0f);
+        lt.diffuse = new Vector3f(0, 1.0f, 0);
+        lights.add(lt);
+
+        lt = lt.copy();
+        lt.position = new Vector3f(-1.4f, MIN_SUN_Y, -1.0f);
+        lt.diffuse = new Vector3f(15, 15, 15);
+        lights.add(lt);
+
+        light = lights.get(0);
+        return lights;
+    }
 
     private void prepare() {
         Matrix4f mProjMat = new Matrix4f()
@@ -162,15 +202,7 @@ public class Main {
         float far = 25f;
         mCubeProj = mCubeProj.perspective((float)Math.toRadians(90.0f), mShadowMapSize/mShadowMapSize, near, far);
 
-        light = new Light();
-        light.direction = new Vector3f(0.8f, -1.0f, 1.5f);
-        light.position = new Vector3f(-1.0f, MIN_SUN_Y, -1.0f);
-        light.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
-        light.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
-        light.specular = new Vector3f(0.3f, 0.3f, 0.3f);
-        light.constant = 1.0f;
-        light.linear = 0.09f;
-        light.quadratic = 0.032f;
+        mLights = generateLights();
 
         mCubeViews[0] = (new Matrix4f().lookAt(light.position, new Vector3f(light.position).add(new Vector3f(1.0f,0.0f,0.0f)), new Vector3f(0.0f,-1.0f,0.0f)));
         mCubeViews[1] = (new Matrix4f().lookAt(light.position, new Vector3f(light.position).add(new Vector3f(-1.0f,0.0f,0.0f)), new Vector3f(0.0f,-1.0f,0.0f)));
@@ -280,14 +312,14 @@ public class Main {
         };
         mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
-        mFloor.addLight(light);
+        mFloor.addBatchLights(mLights);
 
         mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl");
         mWall.setRotateDegree(90);
         mWall.setRotateAxis(new Vector3f(0, 0, 1));
         mWall.setVertices(grassVertices, grassNormals, grassTexCoord);
         mWall.setPosition(new Vector3f(3, 0, 0));
-        mWall.addLight(light);
+        mWall.addBatchLights(mLights);
 
 
         mUIImage = new UIImage(mCubeFrameBuffer.getFrameBufferId(), "shader/2d_base/fs_depth.glsl");

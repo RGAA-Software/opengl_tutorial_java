@@ -100,6 +100,10 @@ public abstract class IRenderer {
         mLights.add(light);
     }
 
+    public void addBatchLights(List<Light> lights) {
+        mLights.addAll(lights);
+    }
+
     public void startRenderDirectLightShadowMap() {
         mStartRenderDirectLightShadow = true;
     }
@@ -140,16 +144,17 @@ public abstract class IRenderer {
             bindVAO();
         }
         if (mLights != null && mShaderProgram != null) {
-            for (Light light : mLights) {
-                mShaderProgram.setUniform3fv("light.position", light.position);
-                mShaderProgram.setUniform3fv("light.ambient", light.ambient);
-                mShaderProgram.setUniform3fv("light.diffuse", light.diffuse);
-                mShaderProgram.setUniform3fv("light.specular", light.specular);
-                mShaderProgram.setUniform3fv("light.direction", light.direction);
+            for (int i = 0; i < mLights.size(); i++) {
+                Light light = mLights.get(i);
+                mShaderProgram.setUniform3fv("light[" + i + "].position", light.position);
+                mShaderProgram.setUniform3fv("light[" + i + "].ambient", light.ambient);
+                mShaderProgram.setUniform3fv("light[" + i + "].diffuse", light.diffuse);
+                mShaderProgram.setUniform3fv("light[" + i + "].specular", light.specular);
+                mShaderProgram.setUniform3fv("light[" + i + "].direction", light.direction);
 
-                mShaderProgram.setUniform1f("light.constant", light.constant);
-                mShaderProgram.setUniform1f("light.linear", light.linear);
-                mShaderProgram.setUniform1f("light.quadratic", light.quadratic);
+                mShaderProgram.setUniform1f("light[" + i + "].constant", light.constant);
+                mShaderProgram.setUniform1f("light[" + i + "].linear", light.linear);
+                mShaderProgram.setUniform1f("light[" + i + "].quadratic", light.quadratic);
             }
         }
 
