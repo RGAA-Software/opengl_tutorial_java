@@ -71,6 +71,9 @@ void main()
 
     float shadow = calculateInShadow();
 
+    float distance = length(outPos - light.position);
+    float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * (distance * distance));
+
     vec4 targetColor = vec4(light.diffuse, 1.0) * diffuseFactor * texColor + specColor;
-    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor * (1 - shadow);
+    gl_FragColor =  vec4(light.ambient, 1.0) * texColor + targetColor * (1 - shadow) * attenuation;
 }

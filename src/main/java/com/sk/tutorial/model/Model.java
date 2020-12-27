@@ -33,10 +33,10 @@ public class Model extends IRenderer {
     }
 
     @Override
-    public void setLight(Light light) {
-        super.setLight(light);
+    public void addLight(Light light) {
+        super.addLight(light);
         for (Mesh mesh : meshes) {
-            mesh.setLight(light);
+            mesh.addLight(light);
         }
     }
 

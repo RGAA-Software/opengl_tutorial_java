@@ -9,4 +9,8 @@ public class Light {
     public Vector3f diffuse;
     public Vector3f specular;
     public Vector3f direction;
+
+    public float constant;
+    public float linear;
+    public float quadratic;
 }

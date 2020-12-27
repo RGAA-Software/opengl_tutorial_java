@@ -8,6 +8,9 @@ import com.sk.tutorial.world.Director;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public abstract class IRenderer {
@@ -20,7 +23,7 @@ public abstract class IRenderer {
     protected float mRotateDegree;
     protected Vector3f mRotateAxis;
     protected float mScale;
-    protected Light mLight;
+    protected List<Light> mLights = new ArrayList<>();
     protected Matrix4f mShadowView;
 
     protected Matrix4f[] mCubeViews;
@@ -93,8 +96,8 @@ public abstract class IRenderer {
         glBindVertexArray(0);
     }
 
-    public void setLight(Light light) {
-        mLight = light;
+    public void addLight(Light light) {
+        mLights.add(light);
     }
 
     public void startRenderDirectLightShadowMap() {
@@ -136,12 +139,18 @@ public abstract class IRenderer {
         if (mRenderVAO != -1) {
             bindVAO();
         }
-        if (mLight != null && mShaderProgram != null) {
-            mShaderProgram.setUniform3fv("light.position", mLight.position);
-            mShaderProgram.setUniform3fv("light.ambient", mLight.ambient);
-            mShaderProgram.setUniform3fv("light.diffuse", mLight.diffuse);
-            mShaderProgram.setUniform3fv("light.specular", mLight.specular);
-            mShaderProgram.setUniform3fv("light.direction", mLight.direction);
+        if (mLights != null && mShaderProgram != null) {
+            for (Light light : mLights) {
+                mShaderProgram.setUniform3fv("light.position", light.position);
+                mShaderProgram.setUniform3fv("light.ambient", light.ambient);
+                mShaderProgram.setUniform3fv("light.diffuse", light.diffuse);
+                mShaderProgram.setUniform3fv("light.specular", light.specular);
+                mShaderProgram.setUniform3fv("light.direction", light.direction);
+
+                mShaderProgram.setUniform1f("light.constant", light.constant);
+                mShaderProgram.setUniform1f("light.linear", light.linear);
+                mShaderProgram.setUniform1f("light.quadratic", light.quadratic);
+            }
         }
 
         mShaderProgram.setUniform1i("renderShadowMap", 0);
@@ -160,8 +169,10 @@ public abstract class IRenderer {
             for (int i = 0; i < mCubeViews.length; i++) {
                 mShaderProgram.setUniformMatrix4fv("cubeViews[" + i + "]", mCubeViews[i]);
             }
-            mShaderProgram.setUniform3fv("lightPos", mLight.position);
-            mShaderProgram.setUniform1f("farPlane", 25);
+            if (mLights.size() > 0) {
+                mShaderProgram.setUniform3fv("lightPos", mLights.get(0).position);
+                mShaderProgram.setUniform1f("farPlane", 25);
+            }
         }
     }
 

@@ -33,10 +33,10 @@ public class Main {
     // The window handle
     private long window;
 
-//    private float width = 1920;
-//    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
+//    private float width = 800;
+//    private float height = 600;
 //    private int vao;
     private int mShadowMapSize = 2048;
 
@@ -168,6 +168,9 @@ public class Main {
         light.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         light.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
         light.specular = new Vector3f(0.3f, 0.3f, 0.3f);
+        light.constant = 1.0f;
+        light.linear = 0.09f;
+        light.quadratic = 0.032f;
 
         mCubeViews[0] = (new Matrix4f().lookAt(light.position, new Vector3f(light.position).add(new Vector3f(1.0f,0.0f,0.0f)), new Vector3f(0.0f,-1.0f,0.0f)));
         mCubeViews[1] = (new Matrix4f().lookAt(light.position, new Vector3f(light.position).add(new Vector3f(-1.0f,0.0f,0.0f)), new Vector3f(0.0f,-1.0f,0.0f)));
@@ -205,7 +208,7 @@ public class Main {
         mModel.setProjection(mProjMat);
         mModel.setScale(0.13f);
         mModel.setPosition(new Vector3f(0, 2, 0));
-        mModel.setLight(light);
+        mModel.addLight(light);
 
 //        ShaderProgram wolfShaderProgram = new ShaderProgram();
 //        wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
@@ -222,7 +225,7 @@ public class Main {
         mNanoSuit.setProjection(mProjMat);
         mNanoSuit.setScale(0.1f);
         mNanoSuit.setPosition(new Vector3f(1, 1, -1));
-        mNanoSuit.setLight(light);
+        mNanoSuit.addLight(light);
         mNanoSuit.enableDebugRotate();
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
@@ -231,7 +234,7 @@ public class Main {
         //lightDirection = lightDirection.sub(-1, 0, 0);
         mSingleLightLayer.setPosition(light.position);
         mSingleLightLayer.setScale(0.3f);
-        mSingleLightLayer.setLight(light);
+        mSingleLightLayer.addLight(light);
         mSingleLightLayer.enableRotate();
 
         mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs_cube_map.glsl");
@@ -239,7 +242,7 @@ public class Main {
         mSingleCube.setScale(1.0f);
         mSingleCube.setPosition(new Vector3f(-3, 1f, 0));
         //mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
-        mSingleCube.setLight(light);
+        mSingleCube.addLight(light);
 
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
@@ -277,14 +280,14 @@ public class Main {
         };
         mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
-        mFloor.setLight(light);
+        mFloor.addLight(light);
 
         mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl");
         mWall.setRotateDegree(90);
         mWall.setRotateAxis(new Vector3f(0, 0, 1));
         mWall.setVertices(grassVertices, grassNormals, grassTexCoord);
         mWall.setPosition(new Vector3f(3, 0, 0));
-        mWall.setLight(light);
+        mWall.addLight(light);
 
 
         mUIImage = new UIImage(mCubeFrameBuffer.getFrameBufferId(), "shader/2d_base/fs_depth.glsl");
