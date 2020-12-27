@@ -13,6 +13,8 @@ public class FrameBuffer {
     private int mFrameBufferId;
     private int mFrameBufferTexId;
 
+    private int mBufferType;
+
     public int getFrameBufferId() {
         return mFrameBufferId;
     }
@@ -22,6 +24,11 @@ public class FrameBuffer {
     }
 
     public void init(int width, int height) {
+        init(width, height, GL_RGBA);
+    }
+
+    public void init(int width, int height, int bufferType) {
+        mBufferType = bufferType;
         // framebuffer configuration
         // -------------------------
         mFrameBufferId = glGenFramebuffers();
@@ -29,7 +36,7 @@ public class FrameBuffer {
         // create a color attachment texture
         mFrameBufferTexId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, mFrameBufferTexId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)width, (int)height, 0, GL_RGB, GL_UNSIGNED_BYTE, (ByteBuffer) null);
+        glTexImage2D(GL_TEXTURE_2D, 0, bufferType, (int)width, (int)height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFrameBufferTexId, 0);
@@ -60,5 +67,6 @@ public class FrameBuffer {
     public void end() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
 
 }

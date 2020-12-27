@@ -10,7 +10,7 @@ import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
-import com.sk.tutorial.ui.UIImage;
+import com.sk.tutorial.ui.FrameBufferPreview;
 import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
@@ -133,8 +133,8 @@ public class Main {
 
     private Sprite mFloor;
     private Sprite mWall;
-    private UIImage mUIImage;
-    private UIImage mMainScene;
+    private FrameBufferPreview mFrameBufferPreview;
+    private FrameBufferPreview mMainScene;
 
     private Matrix4f mShadowView;
 
@@ -321,14 +321,14 @@ public class Main {
         mWall.setPosition(new Vector3f(3, 0, 0));
         mWall.addBatchLights(mLights);
 
+//
+//        mFrameBufferPreview = new FrameBufferPreview(mCubeFrameBuffer, "shader/2d_base/fs_depth.glsl");
+//        mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
+//        mFrameBufferPreview.setScale(0.35f);
 
-        mUIImage = new UIImage(mCubeFrameBuffer.getFrameBufferId(), "shader/2d_base/fs_depth.glsl");
-        mUIImage.setTranslate(new Vector3f(0.75f, 0.75f, 0));
-        mUIImage.setScale(0.25f);
-
-        mMainScene = new UIImage(mFrameBuffer.getFrameBufferTexId());
+        mMainScene = new FrameBufferPreview(mFrameBuffer, true);
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
-        mMainScene.setScale(1f);
+        mMainScene.setScale(1.0f);
 
         mModel.setCubeViews(mCubeViews);
         mNanoSuit.setCubeViews(mCubeViews);
@@ -376,7 +376,7 @@ public class Main {
 
         glViewport(0, 0, mShadowMapSize, mShadowMapSize);
         mCubeFrameBuffer.begin();
-        glClear(GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
         mModel.startRenderPointLightShadow();
@@ -395,7 +395,7 @@ public class Main {
         mCubeFrameBuffer.end();
 
         glViewport(0, 0, (int)width, (int)height);
-        //mFrameBuffer.begin();
+        mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -422,12 +422,12 @@ public class Main {
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        //mFrameBuffer.end();
+        mFrameBuffer.end();
 
 
         //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-        mUIImage.render(deltaTime);
-        //mMainScene.render(deltaTime);
+//        mFrameBufferPreview.render(deltaTime);
+        mMainScene.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

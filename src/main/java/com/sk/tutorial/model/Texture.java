@@ -21,7 +21,10 @@ import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL21.GL_SRGB_ALPHA;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengles.GLES20.GL_RGB;
+import static org.lwjgl.opengles.GLES30.GL_SRGB;
 
 public class Texture {
 
@@ -62,7 +65,7 @@ public class Texture {
         STBImage.stbi_set_flip_vertically_on_load(flip);
         ByteBuffer imageData = STBImage.stbi_load(path, x, y, c, 4);
         if (imageData != null) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x[0], y[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA/*GL_RGBA*/, x[0], y[0], 0, GL_RGBA/*GL_RGBA*/, GL_UNSIGNED_BYTE, imageData);
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(imageData);
         }

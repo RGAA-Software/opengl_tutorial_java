@@ -1,5 +1,6 @@
 package com.sk.tutorial.ui;
 
+import com.sk.tutorial.framebuffer.FrameBuffer;
 import com.sk.tutorial.model.Texture;
 import com.sk.tutorial.renderer.IRenderer;
 import org.joml.Matrix4f;
@@ -7,25 +8,15 @@ import org.joml.Vector3f;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_REPEAT;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.opengl.GL30.*;
 
-public class UIImage extends IRenderer {
+public class FrameBufferPreview extends IRenderer {
 
     private Texture mTexture;
     private Vector3f mTranslate;
@@ -33,17 +24,21 @@ public class UIImage extends IRenderer {
 
     private Matrix4f mModel = new Matrix4f();
 
-    public UIImage(int textureId) {
-        this(textureId, "shader/2d_base/fs_image.glsl");
+    private FrameBuffer mFrameBuffer;
+
+    public FrameBufferPreview(FrameBuffer frameBuffer, boolean hdr) {
+        this(frameBuffer, hdr ? "shader/2d_base/fs_image_hdr.glsl" : "shader/2d_base/fs_image.glsl");
     }
 
-    public UIImage(int textureId, String fsPath) {
+
+    public FrameBufferPreview(FrameBuffer frameBuffer, String fsPath) {
         super("shader/2d_base/vs.glsl", fsPath);
-        mTexture = new Texture(textureId);
+        mFrameBuffer = frameBuffer;
+        mTexture = new Texture(frameBuffer.getFrameBufferTexId());
         initVertices();
     }
 
-    public UIImage(int width, int height, int channel) {
+    public FrameBufferPreview(int width, int height, int channel) {
         super("shader/2d_base/vs.glsl", "shader/2d_base/fs_image.glsl");
         mTexture = new Texture(width, height, channel);
         initVertices();
