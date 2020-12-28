@@ -183,7 +183,7 @@ public class Main {
 
         lt = lt.copy();
         lt.position = new Vector3f(-1.4f, MIN_SUN_Y, -1.0f);
-        lt.diffuse = new Vector3f(5.5f, 5.5f, 5.5f);
+        lt.diffuse = new Vector3f(.5f, .5f, .5f);
         lights.add(lt);
 
         light = lights.get(0);
@@ -283,7 +283,7 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        boolean hdr = true;
+        boolean hdr = false;
 
         mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGBA, hdr);
         float[] grassVertices = {

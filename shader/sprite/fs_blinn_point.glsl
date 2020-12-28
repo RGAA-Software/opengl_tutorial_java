@@ -38,7 +38,7 @@ vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
 );
 
 float calculateInShadow() {
-    float shadow;
+    float shadow = 0;
 
     float sampleRadius = 0.005;
     int sampleSize = 20;
@@ -77,8 +77,9 @@ void main()
         float attenuation = 1.0 / (1.0 + light[i].linear * distance + light[i].quadratic * (distance * distance));
 
         vec4 targetColor = vec4(light[i].diffuse, 1.0) * diffuseFactor * texColor + specColor;
-        finalColor = finalColor + vec4(light[i].ambient, 1.0) * texColor + targetColor * (1 - shadow) * attenuation;
+        finalColor = finalColor + targetColor * (1 - shadow) * attenuation;
     }
 
-    gl_FragColor = finalColor;
+    vec3 color = finalColor.rgb + light[0].ambient * texColor.rgb * 5;
+    gl_FragColor = vec4(color, 1.0);
 }
