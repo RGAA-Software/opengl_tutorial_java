@@ -24,17 +24,21 @@ public class FrameBufferPreview extends IRenderer {
 
     private Matrix4f mModel = new Matrix4f();
 
-    private FrameBuffer mFrameBuffer;
-
-    public FrameBufferPreview(FrameBuffer frameBuffer, boolean hdr) {
-        this(frameBuffer, hdr ? "shader/2d_base/fs_image_hdr.glsl" : "shader/2d_base/fs_image.glsl");
+    public FrameBufferPreview(int texId, boolean hdr) {
+        this(texId, -1, hdr ? "shader/2d_base/fs_image_hdr.glsl" : "shader/2d_base/fs_image.glsl");
     }
 
+    public FrameBufferPreview(int texId, String fsPath) {
+        this(texId, -1, fsPath);
+    }
 
-    public FrameBufferPreview(FrameBuffer frameBuffer, String fsPath) {
+    public FrameBufferPreview(int texId, int texId2, String fsPath) {
         super("shader/2d_base/vs.glsl", fsPath);
-        mFrameBuffer = frameBuffer;
-        mTexture = new Texture(frameBuffer.getFrameBufferTexId());
+        if (texId2 != -1) {
+            mTexture = new Texture(texId, texId2);
+        } else {
+            mTexture = new Texture(texId);
+        }
         initVertices();
     }
 
@@ -101,6 +105,11 @@ public class FrameBufferPreview extends IRenderer {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mTexture.id);
 
+        if (mTexture.id2 != -1) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mTexture.id2);
+        }
+
         mModel = mModel.identity();
         if (mTranslate != null) {
             mModel = mModel.translate(mTranslate);
@@ -110,6 +119,7 @@ public class FrameBufferPreview extends IRenderer {
         }
         mShaderProgram.setUniformMatrix4fv("model", mModel);
         mShaderProgram.setUniform1i("image", 0);
+        mShaderProgram.setUniform1i("image2", 1);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

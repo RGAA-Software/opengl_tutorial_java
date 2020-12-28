@@ -28,6 +28,9 @@ uniform int lightSize;
 in vec4 outLightViewPos;
 uniform samplerCube shadowMap;
 
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
 vec3 sampleOffsetDirections[20] = vec3[]
 (
 vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
@@ -81,5 +84,13 @@ void main()
     }
 
     vec3 color = finalColor.rgb + light[0].ambient * texColor.rgb * 5;
-    gl_FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, 1.0);
+
+    float y = 0.299 * FragColor.r + 0.587 * FragColor.g + 0.114 * FragColor.b;
+    if (y > 0.7) {
+        BrightColor = vec4(color, 1.0);
+    } else {
+        BrightColor = vec4(vec3(0), 1.0);
+    }
+
 }

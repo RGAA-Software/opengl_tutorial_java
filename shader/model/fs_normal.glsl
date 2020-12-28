@@ -45,6 +45,9 @@ uniform samplerCube skybox;
 in vec4 outLightViewPos;
 uniform sampler2D shadowMap;
 
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
 float calculateShadow(vec4 fragPosInLightSpace) {
     vec3 projCoord = fragPosInLightSpace.xyz ;/// fragPosInLightSpace.z;
     projCoord = projCoord * 0.5 + 0.5;
@@ -84,5 +87,6 @@ void main()
 
     float shadow = calculateShadow(outLightViewPos);
     vec3 targetColor = (diffuse + specular) * (1 - shadow);
-    gl_FragColor = vec4(targetColor, 1.0) + ambient;
+    FragColor = vec4(targetColor, 1.0) + ambient;
+    BrightColor = vec4(0, 0, 0, 0);
 }

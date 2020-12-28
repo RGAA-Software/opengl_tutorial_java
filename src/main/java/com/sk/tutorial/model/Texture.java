@@ -29,6 +29,7 @@ public class Texture {
     public static final String TYPE_NORMAL = "normal";
 
     public int id;
+    public int id2;
     public String type;
     private String path;
     private int bufferFormat;
@@ -39,6 +40,11 @@ public class Texture {
 
     public Texture(int id) {
         this.id = id;
+    }
+
+    public Texture(int id, int id2) {
+        this.id = id;
+        this.id2 = id2;
     }
 
     public Texture(String path, String type) {
