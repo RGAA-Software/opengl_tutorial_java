@@ -330,7 +330,7 @@ public class Main {
         mBlurPreview.setTranslate(new Vector3f(0.25f, 0.75f, 0));
         mBlurPreview.setScale(0.25f);
 
-        mMainScene = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), mFrameBuffer.getFrameBufferTexId2(), "shader/2d_base/fs_compose.glsl");
+        mMainScene = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), mFrameBuffer.getFrameBufferTexId2(), "shader/2d_base/fs_compose_two_pass.glsl");
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
         mMainScene.setScale(1.0f);
 
