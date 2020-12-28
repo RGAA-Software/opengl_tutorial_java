@@ -35,11 +35,12 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-//    private float width = 800;
-//    private float height = 600;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
+
     private int mShadowMapSize = 2048;
 
     public void run() {
@@ -166,10 +167,10 @@ public class Main {
         lt.quadratic = 0.032f;
         lights.add(lt);
 
-        lt = lt.copy();
-        lt.position = new Vector3f(-1.2f, MIN_SUN_Y, -1.0f);
-        lights.add(lt);
-
+//        lt = lt.copy();
+//        lt.position = new Vector3f(-1.2f, MIN_SUN_Y, -1.0f);
+//        lights.add(lt);
+//
         lt = lt.copy();
         lt.position = new Vector3f(-8.1f, MIN_SUN_Y, -8.0f);
         lt.diffuse = new Vector3f(1.0f, 0, 0);
@@ -182,7 +183,7 @@ public class Main {
 
         lt = lt.copy();
         lt.position = new Vector3f(-1.4f, MIN_SUN_Y, -1.0f);
-        lt.diffuse = new Vector3f(15, 15, 15);
+        lt.diffuse = new Vector3f(5.5f, 5.5f, 5.5f);
         lights.add(lt);
 
         light = lights.get(0);
@@ -282,7 +283,9 @@ public class Main {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl");
+        boolean hdr = true;
+
+        mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGBA, hdr);
         float[] grassVertices = {
             10.0f,  0,  10.0f,
             -10.0f, 0,  10.0f,
@@ -314,7 +317,7 @@ public class Main {
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
         mFloor.addBatchLights(mLights);
 
-        mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl");
+        mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGBA, hdr);
         mWall.setRotateDegree(90);
         mWall.setRotateAxis(new Vector3f(0, 0, 1));
         mWall.setVertices(grassVertices, grassNormals, grassTexCoord);
@@ -326,7 +329,7 @@ public class Main {
 //        mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
 //        mFrameBufferPreview.setScale(0.35f);
 
-        mMainScene = new FrameBufferPreview(mFrameBuffer, true);
+        mMainScene = new FrameBufferPreview(mFrameBuffer, hdr);
         mMainScene.setTranslate(new Vector3f(0, 0, 0));
         mMainScene.setScale(1.0f);
 

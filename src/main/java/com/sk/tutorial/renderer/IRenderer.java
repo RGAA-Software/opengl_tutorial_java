@@ -144,6 +144,7 @@ public abstract class IRenderer {
             bindVAO();
         }
         if (mLights != null && mShaderProgram != null) {
+            mShaderProgram.setUniform1i("lightSize", mLights.size());
             for (int i = 0; i < mLights.size(); i++) {
                 Light light = mLights.get(i);
                 mShaderProgram.setUniform3fv("light[" + i + "].position", light.position);

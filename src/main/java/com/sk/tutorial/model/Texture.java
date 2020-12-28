@@ -1,13 +1,12 @@
 package com.sk.tutorial.model;
 
-import com.sk.tutorial.shader.ShaderProgram;
-
 import org.lwjgl.stb.STBImage;
 
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
+import static org.lwjgl.opengl.GL11.GL_RGB;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
@@ -19,11 +18,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL21.GL_SRGB_ALPHA;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
-import static org.lwjgl.opengles.GLES20.GL_RGB;
 import static org.lwjgl.opengles.GLES30.GL_SRGB;
 
 public class Texture {
@@ -33,8 +29,9 @@ public class Texture {
     public static final String TYPE_NORMAL = "normal";
 
     public int id;
-    String type;
-    String path;
+    public String type;
+    private String path;
+    private int bufferFormat;
 
     private int mWidth;
     private int mHeight;
@@ -45,10 +42,10 @@ public class Texture {
     }
 
     public Texture(String path, String type) {
-        this(path, type, true);
+        this(path, type, true, GL_RGBA, false);
     }
 
-    public Texture(String path, String type, boolean flip) {
+    public Texture(String path, String type, boolean flip, int bufferType, boolean gammaCorrection) {
         this.type = type;
         id = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, id);
@@ -65,11 +62,17 @@ public class Texture {
         STBImage.stbi_set_flip_vertically_on_load(flip);
         ByteBuffer imageData = STBImage.stbi_load(path, x, y, c, 4);
         if (imageData != null) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA/*GL_RGBA*/, x[0], y[0], 0, GL_RGBA/*GL_RGBA*/, GL_UNSIGNED_BYTE, imageData);
+            int bufferFormat = GL_RGB;
+            if (bufferType == GL_RGB) {
+                bufferFormat = gammaCorrection ? GL_SRGB : GL_RGB;
+            } else if (bufferType == GL_RGBA) {
+                bufferFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+            }
+//            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA/*GL_RGBA*/, x[0], y[0], 0, GL_RGBA/*GL_RGBA*/, GL_UNSIGNED_BYTE, imageData);
+            glTexImage2D(GL_TEXTURE_2D, 0, bufferFormat, x[0], y[0], 0, bufferType, GL_UNSIGNED_BYTE, imageData);
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(imageData);
         }
-        //System.out.println("type : " + type + " x : " + x[0] + " y: " + y[0]);
     }
 
     public Texture(int width, int height, int channel) {

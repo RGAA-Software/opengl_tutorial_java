@@ -23,6 +23,7 @@ struct Light {
 
 //uniform Material material;
 uniform Light light[5];
+uniform int lightSize;
 
 in vec4 outLightViewPos;
 uniform samplerCube shadowMap;
@@ -56,8 +57,8 @@ float calculateInShadow() {
 void main()
 {
     vec4 texColor = texture(image, outTex);
-    vec4 finalColor;
-    for (int i = 0; i < 5; i++) {
+    vec4 finalColor = vec4(vec3(0), 1);
+    for (int i = 0; i < lightSize; i++) {
         vec3 toLightDir = light[i].position - outPos;
 
         //    vec3 toLightDir = normalize(light.position - outPos);
@@ -67,7 +68,7 @@ void main()
         vec3 halfWay = normalize(normalize(toLightDir) + toCameraDir);
         float specularFactor = pow( max(dot(normalize(outNormal), halfWay), 0), 32);
 
-        vec3 totalColor = light[i].ambient + light[i].diffuse * diffuseFactor;
+        //vec3 totalColor = light[i].ambient + light[i].diffuse * diffuseFactor;
 
         vec4 specColor = vec4(light[i].specular * specularFactor, 1);
 
@@ -76,7 +77,7 @@ void main()
         float attenuation = 1.0 / (1.0 + light[i].linear * distance + light[i].quadratic * (distance * distance));
 
         vec4 targetColor = vec4(light[i].diffuse, 1.0) * diffuseFactor * texColor + specColor;
-        finalColor += vec4(light[i].ambient, 1.0) * texColor + targetColor * (1 - shadow) * attenuation;
+        finalColor = finalColor + vec4(light[i].ambient, 1.0) * texColor + targetColor * (1 - shadow) * attenuation;
     }
 
     gl_FragColor = finalColor;

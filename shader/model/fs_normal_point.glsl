@@ -89,7 +89,7 @@ void main()
 
     vec3 specular = specularFactor * specularColor * light[0].specular;
 
-    //float shadow = calculateShadow(outLightViewPos);
-    vec3 targetColor = (diffuse + specular);// * (1 - shadow);
+    float shadow = calculateShadow(outLightViewPos);
+    vec3 targetColor = (diffuse + specular) * (1 - shadow);
     gl_FragColor = vec4(targetColor, 1.0) + ambient;
 }

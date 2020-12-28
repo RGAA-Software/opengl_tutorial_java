@@ -33,8 +33,12 @@ public class Sprite extends IRenderer {
     }
 
     public Sprite(String imagePath, boolean flip, String vsPath, String fsPath) {
+        this(imagePath, flip, vsPath, fsPath, GL_RGB, false);
+    }
+
+    public Sprite(String imagePath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
         super(vsPath, fsPath);
-        mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip);
+        mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip, bufferType, gammaCorrection);
     }
 
     public void setVertices(float[] vertices, float[] normals, float[] texCoords) {
