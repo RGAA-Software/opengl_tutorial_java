@@ -6,36 +6,23 @@ uniform sampler2D image;
 
 const float offset = 1.0 / 300.0;
 
+uniform float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);
+
 void main() {
-    //Y = 0.299 R + 0.587 G + 0.114 B
-    vec3 color = texture(image, outTex).rgb;
+    vec2 tex_offset = 1.0 / textureSize(image, 0); // gets size of single texel
+    vec3 result_h = texture(image, outTex).rgb * weight[0];
+    vec3 result_v = texture(image, outTex).rgb * weight[0];
 
-    float kernel[9] = float[](
-    1.0 / 16, 2.0 / 16, 1.0 / 16,
-    2.0 / 16, 4.0 / 16, 2.0 / 16,
-    1.0 / 16, 2.0 / 16, 1.0 / 16
-    );
-
-    vec2 offsets[9] = vec2[](
-    vec2(-offset,  offset), // 左上
-    vec2( 0.0f,    offset), // 正上
-    vec2( offset,  offset), // 右上
-    vec2(-offset,  0.0f),   // 左
-    vec2( 0.0f,    0.0f),   // 中
-    vec2( offset,  0.0f),   // 右
-    vec2(-offset, -offset), // 左下
-    vec2( 0.0f,   -offset), // 正下
-    vec2( offset, -offset)  // 右下
-    );
-
-    vec3 sampleTex[9];
-    for(int i = 0; i < 9; i++)
+    for(int i = 1; i < 5; ++i)
     {
-        sampleTex[i] = vec3(texture(image, outTex.st + offsets[i]));
+        result_h += texture(image, outTex + vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
+        result_h += texture(image, outTex - vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
     }
-    vec3 col = vec3(0.0);
-    for(int i = 0; i < 9; i++)
-        col += sampleTex[i] * kernel[i];
+    for(int i = 1; i < 5; ++i)
+    {
+        result_v += texture(image, outTex + vec2(0.0, tex_offset.y * i)).rgb * weight[i];
+        result_v += texture(image, outTex - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
+    }
 
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(result_h + result_v, 1.0);
 }
