@@ -13,9 +13,11 @@ uniform mat4 view;
 uniform mat4 proj;
 uniform mat4 orthoProj;
 uniform mat4 orthoView;
+uniform mat4 rotateMatrix;
 
 uniform int renderShadowMap;
 out vec4 outLightViewPos;
+out mat4 outModel;
 
 void main()
 {
@@ -28,4 +30,5 @@ void main()
     outPos = vec3(model * vec4(aPos, 1.0));
     outNormal = mat3(transpose(inverse(model))) * aNormal;
     outTex = aTex;
+    outModel = rotateMatrix;
 }

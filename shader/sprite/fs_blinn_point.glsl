@@ -5,6 +5,8 @@ in vec2 outTex;
 in vec3 outNormal;
 
 uniform sampler2D image;
+uniform int hasNormalMap;
+uniform sampler2D normalMap;
 uniform vec3 cameraPos;
 
 struct Light {
@@ -30,6 +32,8 @@ uniform samplerCube shadowMap;
 
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
+
+in mat4 outModel;
 
 vec3 sampleOffsetDirections[20] = vec3[]
 (
@@ -61,26 +65,35 @@ void main()
 {
     vec4 texColor = texture(image, outTex);
     vec4 finalColor = vec4(vec3(0), 1);
+    vec3 normal = outNormal;
+    if (hasNormalMap == 1) {
+        normal = texture(normalMap, outTex).rgb;
+        normal = normal * 2.0 - 1.0;
+        vec4 normal_world = outModel * vec4(normal, 1.0);
+        normal = normalize(normal_world.rgb);
+//        normal = normalize(normal);
+    }
+
     for (int i = 0; i < lightSize; i++) {
         vec3 toLightDir = light[i].position - outPos;
 
         //    vec3 toLightDir = normalize(light.position - outPos);
-        float diffuseFactor = max(dot(normalize(outNormal), normalize(toLightDir)), 0);
+        float diffuseFactor = max(dot(normalize(normal), normalize(toLightDir)), 0);
 
         vec3 toCameraDir = normalize(cameraPos - outPos);
         vec3 halfWay = normalize(normalize(toLightDir) + toCameraDir);
-        float specularFactor = pow( max(dot(normalize(outNormal), halfWay), 0), 32);
+        float specularFactor = pow( max(dot(normalize(normal), halfWay), 0), 32);
 
         //vec3 totalColor = light[i].ambient + light[i].diffuse * diffuseFactor;
 
         vec4 specColor = vec4(light[i].specular * specularFactor, 1);
 
-        float shadow = calculateInShadow();
+        //float shadow = calculateInShadow();
         float distance = length(outPos - light[i].position);
         float attenuation = 1.0 / (1.0 + light[i].linear * distance + light[i].quadratic * (distance * distance));
 
         vec4 targetColor = vec4(light[i].diffuse, 1.0) * diffuseFactor * texColor + specColor;
-        finalColor = finalColor + targetColor * (1 - shadow) * attenuation;
+        finalColor = finalColor + targetColor /** (1 - shadow)*/ * attenuation;
     }
 
     vec3 color = finalColor.rgb + light[0].ambient * texColor.rgb * 5;

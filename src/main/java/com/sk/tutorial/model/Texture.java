@@ -28,8 +28,8 @@ public class Texture {
     public static final String TYPE_SPECULAR = "specular";
     public static final String TYPE_NORMAL = "normal";
 
-    public int id;
-    public int id2;
+    public int id = -1;
+    public int id2 = -1;
     public String type;
     private String path;
     private int bufferFormat;
@@ -66,14 +66,16 @@ public class Texture {
         mHeight = y[0];
         mChannel = c[0];
         STBImage.stbi_set_flip_vertically_on_load(flip);
-        ByteBuffer imageData = STBImage.stbi_load(path, x, y, c, 4);
+        int channel = 4;
+        int bufferFormat = GL_RGB;
+        if (bufferType == GL_RGB) {
+            bufferFormat = gammaCorrection ? GL_SRGB : GL_RGB;
+            channel = 3;
+        } else if (bufferType == GL_RGBA) {
+            bufferFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+        }
+        ByteBuffer imageData = STBImage.stbi_load(path, x, y, c, channel);
         if (imageData != null) {
-            int bufferFormat = GL_RGB;
-            if (bufferType == GL_RGB) {
-                bufferFormat = gammaCorrection ? GL_SRGB : GL_RGB;
-            } else if (bufferType == GL_RGBA) {
-                bufferFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
-            }
 //            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA/*GL_RGBA*/, x[0], y[0], 0, GL_RGBA/*GL_RGBA*/, GL_UNSIGNED_BYTE, imageData);
             glTexImage2D(GL_TEXTURE_2D, 0, bufferFormat, x[0], y[0], 0, bufferType, GL_UNSIGNED_BYTE, imageData);
             glGenerateMipmap(GL_TEXTURE_2D);

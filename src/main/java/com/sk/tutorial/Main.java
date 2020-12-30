@@ -134,6 +134,8 @@ public class Main {
 
     private Sprite mFloor;
     private Sprite mWall;
+    private Sprite mFirstNormalRect;
+    private Sprite mSecondNormalRect;
     private FrameBufferPreview mFrameBufferPreview;
     private FrameBufferPreview mMainScene;
     private FrameBufferPreview mBlurPreview;
@@ -148,7 +150,7 @@ public class Main {
 
     private float mSunY = 1.5f;
     private float MAX_SUN_Y = 8;
-    private float MIN_SUN_Y = 0;
+    private float MIN_SUN_Y = 0.9f;
     private boolean isUping = true;
 
     private Light light;
@@ -159,7 +161,7 @@ public class Main {
 
         Light lt = new Light();
         lt.direction = new Vector3f(0.8f, -1.0f, 1.5f);
-        lt.position = new Vector3f(-1.0f, MIN_SUN_Y, -1.0f);
+        lt.position = new Vector3f(-0.5f, MIN_SUN_Y, -1.0f);
         lt.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         lt.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
         lt.specular = new Vector3f(0.3f, 0.3f, 0.3f);
@@ -218,8 +220,8 @@ public class Main {
         mFrameBuffer = new FrameBuffer();
         mFrameBuffer.init((int)width, (int)height);
 
-        mCubeFrameBuffer = new CubeDepthFrameBuffer();
-        mCubeFrameBuffer.init(mShadowMapSize, mShadowMapSize);
+//        mCubeFrameBuffer = new CubeDepthFrameBuffer();
+//        mCubeFrameBuffer.init(mShadowMapSize, mShadowMapSize);
 
         mPointDepthShaderProgram = new ShaderProgram();
         mPointDepthShaderProgram.initWithShaderPath("shader/cube_map/vs.glsl", "shader/cube_map/fs.glsl", "shader/cube_map/gs.glsl");
@@ -233,12 +235,13 @@ public class Main {
                 .lookAt(light.position, light.direction, new Vector3f(0, 1, 0));
 
 
-        mModel = ModelLoader.loadModel("resources/model/planet/planet.obj", modelShaderProgram);
+        mModel = ModelLoader.loadModel("resources/model/cyborg/cyborg.obj", modelShaderProgram);
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
-        mModel.setScale(0.13f);
-        mModel.setPosition(new Vector3f(0, 2, 0));
+        mModel.setScale(0.4f);
+        mModel.setPosition(new Vector3f(0, 1, 0));
         mModel.addLight(light);
+        mModel.enableDebugRotate();
 
 //        ShaderProgram wolfShaderProgram = new ShaderProgram();
 //        wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
@@ -267,9 +270,9 @@ public class Main {
         mSingleLightLayer.addLight(light);
         mSingleLightLayer.enableRotate();
 
-        mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs_cube_map.glsl");
-        mSingleCube.setCubeMap(mCubeFrameBuffer.getFrameBufferTexId());
-        mSingleCube.setScale(1.0f);
+        mSingleCube = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
+//        mSingleCube.setCubeMap(mCubeFrameBuffer.getFrameBufferTexId());
+        mSingleCube.setScale(0.5f);
         mSingleCube.setPosition(new Vector3f(-3, 1f, 0));
         //mSingleCube.setColor(new Vector3f(0.5f, 0.5f, 0.5f));
         mSingleCube.addLight(light);
@@ -279,6 +282,8 @@ public class Main {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+//        glEnable(GL_CULL_FACE);
+//        glCullFace(GL_FRONT);
 
         boolean hdr = false;
 
@@ -314,14 +319,54 @@ public class Main {
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
         mFloor.addBatchLights(mLights);
 
-        mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGBA, hdr);
+        mWall = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGBA, false);
         mWall.setRotateDegree(90);
         mWall.setRotateAxis(new Vector3f(0, 0, 1));
         mWall.setVertices(grassVertices, grassNormals, grassTexCoord);
         mWall.setPosition(new Vector3f(3, 0, 0));
         mWall.addBatchLights(mLights);
 
-//
+        mFirstNormalRect = new Sprite("resources/images/brickwall.jpg", "resources/images/brickwall_normal.jpg",false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
+        float[] rectVertices = {
+                // 第一个三角形
+                1f, 1f, 0.0f,   // 右上角
+                1f, -1f, 0.0f,  // 右下角
+                -1f, 1f, 0.0f,  // 左上角
+                // 第二个三角形
+                1f, -1f, 0.0f,  // 右下角
+                -1f, -1f, 0.0f, // 左下角
+                -1f, 1f, 0.0f   // 左上角
+        };
+
+        float[] rectNormals = {
+                0, 0, 1.0f,
+                0, 0, 1.0f,
+                0, 0, 1.0f,
+                0, 0, 1.0f,
+                0, 0, 1.0f,
+                0, 0, 1.0f,
+        };
+
+        float[] rectTexCoords = {
+                1, 1,
+                1, 0,
+                0, 1,
+                1, 0,
+                0, 0,
+                0, 1
+        };
+        mFirstNormalRect.setVertices(rectVertices, rectNormals, rectTexCoords);
+        mFirstNormalRect.setPosition(new Vector3f(-3, 1, -3));
+        mFirstNormalRect.addBatchLights(mLights);
+
+        mSecondNormalRect = new Sprite("resources/images/brickwall.jpg", "resources/images/brickwall_normal.jpg",false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
+        mSecondNormalRect.setRotateDegree(-90);
+        mSecondNormalRect.setRotateAxis(new Vector3f(1, 0, 0));
+        mSecondNormalRect.setVertices(rectVertices, rectNormals, rectTexCoords);
+        mSecondNormalRect.setPosition(new Vector3f(-2, 0.02f, -2));
+        mSecondNormalRect.addBatchLights(mLights);
+
+
         mFrameBufferPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_luma.glsl");
         mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
         mFrameBufferPreview.setScale(0.25f);
@@ -341,7 +386,7 @@ public class Main {
     }
 
     private FrameBuffer mFrameBuffer;
-    private CubeDepthFrameBuffer mCubeFrameBuffer;
+//    private CubeDepthFrameBuffer mCubeFrameBuffer;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
@@ -349,57 +394,53 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
-        if (isUping) {
-            if (light.position.y <= MAX_SUN_Y) {
-                light.position.y += deltaTime/2;
-            } else {
-                isUping = false;
-            }
-        }else {
-            if (light.position.y >= MIN_SUN_Y) {
-                light.position.y -= deltaTime/2;
-            } else {
-                isUping = true;
-            }
-        }
+//        if (isUping) {
+//            if (light.position.y <= MAX_SUN_Y) {
+//                light.position.y += deltaTime/2;
+//            } else {
+//                isUping = false;
+//            }
+//        }else {
+//            if (light.position.y >= MIN_SUN_Y) {
+//                light.position.y -= deltaTime/2;
+//            } else {
+//                isUping = true;
+//            }
+//        }
 
-        mCubeViews[0].identity();
-        mCubeViews[1].identity();
-        mCubeViews[2].identity();
-        mCubeViews[3].identity();
-        mCubeViews[4].identity();
-        mCubeViews[5].identity();
+//        mCubeViews[0].identity();
+//        mCubeViews[1].identity();
+//        mCubeViews[2].identity();
+//        mCubeViews[3].identity();
+//        mCubeViews[4].identity();
+//        mCubeViews[5].identity();
+//
+//        mCubeViews[0].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(1.0f, 0.0f, 0.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+//        mCubeViews[1].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(-1.0f, 0.0f, 0.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+//        mCubeViews[2].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 1.0f, 0.0f)), new Vector3f(0.0f, 0.0f, 1.0f));
+//        mCubeViews[3].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, -1.0f, 0.0f)), new Vector3f(0.0f, 0.0f, -1.0f));
+//        mCubeViews[4].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 0.0f, 1.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
+//        mCubeViews[5].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 0.0f, -1.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
 
-        mCubeViews[0].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(1.0f, 0.0f, 0.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
-        mCubeViews[1].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(-1.0f, 0.0f, 0.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
-        mCubeViews[2].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 1.0f, 0.0f)), new Vector3f(0.0f, 0.0f, 1.0f));
-        mCubeViews[3].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, -1.0f, 0.0f)), new Vector3f(0.0f, 0.0f, -1.0f));
-        mCubeViews[4].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 0.0f, 1.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
-        mCubeViews[5].lookAt(light.position, new Vector3f(light.position).add(new Vector3f(0.0f, 0.0f, -1.0f)), new Vector3f(0.0f, -1.0f, 0.0f));
 
+//        glViewport(0, 0, mShadowMapSize, mShadowMapSize);
+//        mCubeFrameBuffer.begin();
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+//
+//        mModel.startRenderPointLightShadow();
+//        mModel.setShaderProgram(mPointDepthShaderProgram);
+//        mNanoSuit.startRenderPointLightShadow();
+//        mNanoSuit.setShaderProgram(mPointDepthShaderProgram);
+//
+//        mModel.render(deltaTime);
+//        mNanoSuit.render(deltaTime);
+//        mWall.render(deltaTime);
+//
+//        mCubeFrameBuffer.end();
 
-        glViewport(0, 0, mShadowMapSize, mShadowMapSize);
-        mCubeFrameBuffer.begin();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-
-        mModel.startRenderPointLightShadow();
-        mModel.setShaderProgram(mPointDepthShaderProgram);
-        mNanoSuit.startRenderPointLightShadow();
-        mNanoSuit.setShaderProgram(mPointDepthShaderProgram);
-        mWall.startRenderPointLightShadow();
-
-//        mSingleCube.render(deltaTime);
-//        mSingleLightLayer.render(deltaTime);
-//        mFloor.render(deltaTime);
-        mModel.render(deltaTime);
-        mNanoSuit.render(deltaTime);
-        mWall.render(deltaTime);
-
-        mCubeFrameBuffer.end();
-
-        glViewport(0, 0, (int)width, (int)height);
-        mFrameBuffer.begin();
+//        glViewport(0, 0, (int)width, (int)height);
+//        mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -410,29 +451,30 @@ public class Main {
         mWall.stopRenderPointLightShadow();
         //mWall.setShaderProgram();
 
-        mModel.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
-        //mWolf.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
-        mNanoSuit.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
-        mFloor.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
-        mSingleLightLayer.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
-        mSingleCube.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
-        mWall.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mModel.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mWolf.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mNanoSuit.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mFloor.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mWall.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mSingleLightLayer.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
+//        mSingleCube.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
 
         mSingleCube.render(deltaTime);
         mSingleLightLayer.render(deltaTime);
-
         mFloor.render(deltaTime);
         mWall.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
         mNanoSuit.render(deltaTime);
-        mFrameBuffer.end();
-
-
-        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-        mFrameBufferPreview.render(deltaTime);
-        mBlurPreview.render(deltaTime);
-        mMainScene.render(deltaTime);
+        mFirstNormalRect.render(deltaTime);
+        mSecondNormalRect.render(deltaTime);
+//        mFrameBuffer.end();
+//
+//
+//        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+//        mFrameBufferPreview.render(deltaTime);
+//        mBlurPreview.render(deltaTime);
+//        mMainScene.render(deltaTime);
 
         mLastTime = glfwGetTime();
     }

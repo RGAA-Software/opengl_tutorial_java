@@ -16,6 +16,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 public class Sprite extends IRenderer {
 
     private Texture mTexture;
+    private Texture mNormalTexture;
     private int mVerticleSize;
     private Vector3f mPosition;
 
@@ -37,8 +38,15 @@ public class Sprite extends IRenderer {
     }
 
     public Sprite(String imagePath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
+        this(imagePath, null,  flip, vsPath, fsPath, bufferType, gammaCorrection);
+    }
+
+    public Sprite(String imagePath, String normalMapPath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
         super(vsPath, fsPath);
         mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip, bufferType, gammaCorrection);
+        if (normalMapPath != null) {
+            mNormalTexture = new Texture(normalMapPath, Texture.TYPE_NORMAL, flip, bufferType, gammaCorrection);
+        }
     }
 
     public void setVertices(float[] vertices, float[] normals, float[] texCoords) {
@@ -82,6 +90,7 @@ public class Sprite extends IRenderer {
     }
 
     private Matrix4f model = new Matrix4f();
+    private Matrix4f rotateMatrix = new Matrix4f();
 
     @Override
     public void render(double deltaTime) {
@@ -89,6 +98,15 @@ public class Sprite extends IRenderer {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mTexture.id);
         mShaderProgram.setUniform1i("image", 0);
+
+        model = model.identity();
+        if (mPosition != null) {
+            model = model.translate(mPosition);
+        }
+
+        if (mRotateAxis != null) {
+            model = model.rotate((float)Math.toRadians(mRotateDegree), mRotateAxis);
+        }
 
         if (mShadowMap != -1) {
             glActiveTexture(GL_TEXTURE1);
@@ -102,13 +120,17 @@ public class Sprite extends IRenderer {
             mShaderProgram.setUniform1i("shadowMap", 2);
         }
 
-        model = model.identity();
-        if (mPosition != null) {
-            model = model.translate(mPosition);
-        }
-
-        if (mRotateAxis != null) {
-            model = model.rotate((float)Math.toRadians(mRotateDegree), mRotateAxis);
+        if (mNormalTexture != null && mNormalTexture.id != -1) {
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, mNormalTexture.id);
+            mShaderProgram.setUniform1i("hasNormalMap", 1);
+            mShaderProgram.setUniform1i("normalMap", 3);
+            if (mRotateAxis != null) {
+                rotateMatrix.identity().rotate((float) Math.toRadians(mRotateDegree), mRotateAxis);
+                mShaderProgram.setUniformMatrix4fv("rotateMatrix", rotateMatrix);
+            } else {
+                mShaderProgram.setUniformMatrix4fv("rotateMatrix", rotateMatrix.identity());
+            }
         }
 
         mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
