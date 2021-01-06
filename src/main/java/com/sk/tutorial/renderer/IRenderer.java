@@ -23,6 +23,7 @@ public abstract class IRenderer {
     protected float mRotateDegree;
     protected Vector3f mRotateAxis;
     protected float mScale;
+    protected Vector3f mScaleAxis;
     protected List<Light> mLights = new ArrayList<>();
     protected Matrix4f mShadowView;
 
@@ -82,6 +83,10 @@ public abstract class IRenderer {
 
     public void setScale(float scale) {
         mScale = scale;
+    }
+
+    public void setScaleAxis(Vector3f axis) {
+        mScaleAxis = axis;
     }
 
     public void prepare() {

@@ -108,6 +108,10 @@ public class Sprite extends IRenderer {
             model = model.rotate((float)Math.toRadians(mRotateDegree), mRotateAxis);
         }
 
+        if (mScaleAxis != null) {
+            model = model.scale(mScaleAxis);
+        }
+
         if (mShadowMap != -1) {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, mShadowMap);
