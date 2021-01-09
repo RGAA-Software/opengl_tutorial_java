@@ -35,10 +35,10 @@ public class Main {
     // The window handle
     private long window;
 
-//    private float width = 1920;
-//    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
+//    private float width = 800;
+//    private float height = 600;
 //    private int vao;
 
     private int mShadowMapSize = 2048;
@@ -163,7 +163,7 @@ public class Main {
         lt.direction = new Vector3f(0.8f, -1.0f, 1.5f);
         lt.position = new Vector3f(-0.5f, MIN_SUN_Y, -1.0f);
         lt.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
-        lt.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
+        lt.diffuse = new Vector3f(0.8f, 0.8f, 0.8f);
         lt.specular = new Vector3f(0.3f, 0.3f, 0.3f);
         lt.constant = 1.0f;
         lt.linear = 0.09f;
