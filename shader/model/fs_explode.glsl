@@ -49,32 +49,23 @@ uniform samplerCube skybox;
 void main()
 {
     vec3 diffuseColor1 = vec3(texture(material.diffuse_1, outTex));
-    vec3 diffuseColor2 = vec3(texture(material.diffuse_2, outTex));
-    vec3 diffuseColor3 = vec3(texture(material.diffuse_3, outTex));
 
     vec3 specularColor1 = vec3(texture(material.specular_1, outTex));
-    vec3 specularColor2 = vec3(texture(material.specular_2, outTex));
-    vec3 specularColor3 = vec3(texture(material.specular_3, outTex));
 
 
-    float cosTheta = dot(normalize(light.direction), normalize((outPos - light.position)));
-    vec3 diffuseColorCompose = diffuseColor1 + diffuseColor2 + diffuseColor3;
-    vec3 ambient = vec3(0.1, 0.1, 0.1);
-    if (diffuseColorCompose.r <= 0 && diffuseColorCompose.g <= 0 && diffuseColorCompose.b <= 0) {
-        diffuseColorCompose = ambient;
-    }
 
-    vec3 specularColorCompose = specularColor1 + specularColor2 + specularColor3;
+    vec3 diffuseColorCompose = diffuseColor1;
+    vec3 ambient = vec3(0.1, 0.1, 0.1) * diffuseColorCompose;
+
+
+    vec3 specularColorCompose = specularColor1;
 
     float diffuseFactor = max( dot( normalize(-light.direction), normalize(outNormal) ), 0);
-    vec3 diffuse = diffuseFactor * diffuseColorCompose * light.diffuse;
+    vec3 diffuse = diffuseFactor * diffuseColorCompose * vec3(0.8);//light.diffuse;
 
-    float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(light.position - outPos)) , 0);
+    float specularFactor = max( dot( reflect(normalize(light.direction), normalize(outNormal)), normalize(cameraPos - outPos)) , 0);
     specularFactor = pow(specularFactor, 64);
-    vec3 specular = specularFactor * specularColorCompose * light.specular;
-
-    float e = light.cosCutoff - light.outerCutoff;
-    float intensity = clamp((cosTheta - light.outerCutoff)/e , 0, 1);
+    vec3 specular = specularFactor * specularColorCompose * vec3(0.6);//light.specular;
 
     gl_FragColor = vec4(ambient + (diffuse + specular), 1.0);
 //    vec3 I = normalize(outPos - cameraPos);

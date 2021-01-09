@@ -3,6 +3,7 @@ package com.sk.tutorial.model;
 import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.renderer.IRenderer;
 import com.sk.tutorial.shader.ShaderProgram;
+import com.sk.tutorial.world.Director;
 
 import org.joml.Math;
 import org.joml.Matrix4f;
@@ -85,6 +86,7 @@ public class Model extends IRenderer {
         mShaderProgram.setUniform3fv("singleColor", mOutlineColor);
         mShaderProgram.setUniform1f("scale", 10.2f);
         mShaderProgram.setUniform1f("time", (float) GLFW.glfwGetTime());
+        mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
         for (Mesh mesh : meshes) {
             mesh.render(deltaTime);
         }

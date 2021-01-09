@@ -169,18 +169,18 @@ public class Main {
         mModelShader.initWithShaderPath("shader/model/vs_explode.glsl",
                 "shader/model/fs_explode.glsl");
 
-        mModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", mModelShader);
+        mModel = ModelLoader.loadModel("resources/model/cyborg/cyborg.obj", mModelShader);
 
 //        mModel = ModelLoader.loadModel("resources/model/satellite/10477_Satellite_v1_L3.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/deer/deer.obj", modelShader);
 //        mModel = ModelLoader.loadModel("resources/model/wolf/wolf.obj", modelShader);
-        mModel.setScale(0.1f);
+        mModel.setScale(0.3f);
         mModel.setPosition(new Vector3f(0, 0, 0));
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
 
         mDebugModel = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", mNormalVisShader);
-        mDebugModel.setScale(0.1f);
+        mDebugModel.setScale(0.3f);
         mDebugModel.setPosition(new Vector3f(0, 0, 0));
         mDebugModel.setCamera(mCamera);
         mDebugModel.setProjection(mProjMat);
