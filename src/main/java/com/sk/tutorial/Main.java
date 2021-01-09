@@ -136,6 +136,7 @@ public class Main {
     private Sprite mWall;
     private Sprite mFirstNormalRect;
     private Sprite mSecondNormalRect;
+    private Sprite mTestImage;
     private FrameBufferPreview mFrameBufferPreview;
     private FrameBufferPreview mMainScene;
     private FrameBufferPreview mBlurPreview;
@@ -366,6 +367,12 @@ public class Main {
         mSecondNormalRect.setPosition(new Vector3f(-2, 0.02f, -2));
         mSecondNormalRect.addBatchLights(mLights);
 
+        mTestImage = new Sprite("resources/images/test.jpg",true, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
+        mTestImage.setVertices(rectVertices, rectNormals, rectTexCoords);
+        mTestImage.setScaleAxis(new Vector3f(9000.0f / 800 * 1.5f, 1.5f, 1));
+        mTestImage.setPosition(new Vector3f(-3, 4, -5));
+        mTestImage.addBatchLights(mLights);
+
 
         mFrameBufferPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_luma.glsl");
         mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
@@ -468,6 +475,7 @@ public class Main {
         mNanoSuit.render(deltaTime);
         mFirstNormalRect.render(deltaTime);
         mSecondNormalRect.render(deltaTime);
+        mTestImage.render(deltaTime);
 //        mFrameBuffer.end();
 //
 //
