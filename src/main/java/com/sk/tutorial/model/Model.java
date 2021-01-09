@@ -123,7 +123,7 @@ public class Model extends IRenderer {
         getShaderProgram().setUniformMatrix4fv("model", model);
         getShaderProgram().setUniformMatrix4fv("view", Director.getInstance().getCamera().lookAt());
         getShaderProgram().setUniformMatrix4fv("proj", Director.getInstance().getProjection());
-
+        getShaderProgram().setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
 
         for (Mesh mesh : meshes) {
             mesh.render(deltaTime);

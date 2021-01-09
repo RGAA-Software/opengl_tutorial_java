@@ -43,19 +43,28 @@ public class Mesh extends IRenderer {
         glBindVertexArray(mRenderVAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-        float[] verticles = new float[vertices.size() * (3 + 3 + 2)];
+        int verticleSize = 3 + 3 + 2 + 3 + 3;
+        float[] verticles = new float[vertices.size() * verticleSize];
         for (int i = 0; i < vertices.size(); i++) {
             Vertex vertex = vertices.get(i);
-            verticles[i * 8 + 0] = vertex.position.x;
-            verticles[i * 8 + 1] = vertex.position.y;
-            verticles[i * 8 + 2] = vertex.position.z;
+            verticles[i * verticleSize + 0] = vertex.position.x;
+            verticles[i * verticleSize + 1] = vertex.position.y;
+            verticles[i * verticleSize + 2] = vertex.position.z;
 
-            verticles[i * 8 + 3] = vertex.normal.x;
-            verticles[i * 8 + 4] = vertex.normal.y;
-            verticles[i * 8 + 5] = vertex.normal.z;
+            verticles[i * verticleSize + 3] = vertex.normal.x;
+            verticles[i * verticleSize + 4] = vertex.normal.y;
+            verticles[i * verticleSize + 5] = vertex.normal.z;
 
-            verticles[i * 8 + 6] = vertex.texCoords.x;
-            verticles[i * 8 + 7] = vertex.texCoords.y;
+            verticles[i * verticleSize + 6] = vertex.texCoords.x;
+            verticles[i * verticleSize + 7] = vertex.texCoords.y;
+
+            verticles[i * verticleSize + 8] = vertex.tangent.x;
+            verticles[i * verticleSize + 9] = vertex.tangent.y;
+            verticles[i * verticleSize + 10] = vertex.tangent.z;
+
+            verticles[i * verticleSize + 11] = vertex.bitangent.x;
+            verticles[i * verticleSize + 12] = vertex.bitangent.y;
+            verticles[i * verticleSize + 13] = vertex.bitangent.z;
         }
         glBufferData(GL_ARRAY_BUFFER, verticles, GL_STATIC_DRAW);
 
@@ -70,16 +79,24 @@ public class Mesh extends IRenderer {
         int posLoc = glGetAttribLocation(mShaderProgram.getProgram(), "aPos");
         int normalLoc = glGetAttribLocation(mShaderProgram.getProgram(), "aNormal");
         int texLoc = glGetAttribLocation(mShaderProgram.getProgram(), "aTex");
+        int tangentLoc = mShaderProgram.getAttribLocation("aTangent");
+        int bitangentLoc = mShaderProgram.getAttribLocation("aBiTangent");
 
         // 顶点位置
         glEnableVertexAttribArray(posLoc);
-        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, 8 * 4, 0);
+        glVertexAttribPointer(posLoc, 3, GL_FLOAT, false, verticleSize * 4, 0);
         // 顶点法线
         glEnableVertexAttribArray(normalLoc);
-        glVertexAttribPointer(normalLoc, 3, GL_FLOAT, false, 8*4, 3*4);
+        glVertexAttribPointer(normalLoc, 3, GL_FLOAT, false, verticleSize*4, 3*4);
         // 顶点纹理坐标
         glEnableVertexAttribArray(texLoc);
-        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 8*4, 6*4);
+        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, verticleSize*4, 6*4);
+
+        glEnableVertexAttribArray(tangentLoc);
+        glVertexAttribPointer(tangentLoc, 3, GL_FLOAT, false, verticleSize * 4, 8 * 4);
+
+        glEnableVertexAttribArray(bitangentLoc);
+        glVertexAttribPointer(bitangentLoc, 3, GL_FLOAT, false, verticleSize * 4, 11 * 4);
 
         glBindVertexArray(0);
     }
@@ -100,8 +117,9 @@ public class Mesh extends IRenderer {
                     mShaderProgram.setUniform1i("material[" + i + "].type", 1);
                 } else if (TextUtils.equals(type, Texture.TYPE_SPECULAR)) {
                     mShaderProgram.setUniform1i("material[" + i + "].type", 2);
+                } else if (TextUtils.equals(type, Texture.TYPE_NORMAL)) {
+                    mShaderProgram.setUniform1i("material[" + i + "].type", 3);
                 }
-
                 mShaderProgram.setUniform1i(("material[" + i + "].image"), i);
                 glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
             }

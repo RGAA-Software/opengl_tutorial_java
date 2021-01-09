@@ -148,7 +148,7 @@ public abstract class IRenderer {
         if (mRenderVAO != -1) {
             bindVAO();
         }
-        if (mLights != null && mShaderProgram != null) {
+        if (mLights != null && mLights.size() > 0 && mShaderProgram != null) {
             mShaderProgram.setUniform1i("lightSize", mLights.size());
             for (int i = 0; i < mLights.size(); i++) {
                 Light light = mLights.get(i);
@@ -162,6 +162,7 @@ public abstract class IRenderer {
                 mShaderProgram.setUniform1f("light[" + i + "].linear", light.linear);
                 mShaderProgram.setUniform1f("light[" + i + "].quadratic", light.quadratic);
             }
+            mShaderProgram.setUniform3fv("lightPos", mLights.get(0).position);
         }
 
         mShaderProgram.setUniform1i("renderShadowMap", 0);

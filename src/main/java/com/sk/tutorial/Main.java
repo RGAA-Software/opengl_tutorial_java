@@ -162,9 +162,9 @@ public class Main {
 
         Light lt = new Light();
         lt.direction = new Vector3f(0.8f, -1.0f, 1.5f);
-        lt.position = new Vector3f(0.5f, 2.1f, -1.0f);
+        lt.position = new Vector3f(0.3f, 2.1f, -1.0f);
         lt.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
-        lt.diffuse = new Vector3f(0.8f, 0.8f, 0.8f);
+        lt.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
         lt.specular = new Vector3f(0.3f, 0.3f, 0.3f);
         lt.constant = 1.0f;
         lt.linear = 0.09f;
@@ -254,20 +254,20 @@ public class Main {
 //        mWolf.setLight(sun);
 
 
-        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShaderProgram);
-        mNanoSuit.setCamera(mCamera);
-        mNanoSuit.setProjection(mProjMat);
-        mNanoSuit.setScale(0.1f);
-        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
-        mNanoSuit.addLight(light);
-        mNanoSuit.enableDebugRotate();
+//        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShaderProgram);
+//        mNanoSuit.setCamera(mCamera);
+//        mNanoSuit.setProjection(mProjMat);
+//        mNanoSuit.setScale(0.1f);
+//        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
+//        mNanoSuit.addLight(light);
+//        mNanoSuit.enableDebugRotate();
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
         //Vector3f lightDirection = new Vector3f(sun.direction);
         //lightDirection = lightDirection.sub(-1, 0, 0);
         mSingleLightLayer.setPosition(light.position);
-        mSingleLightLayer.setScale(0.3f);
+        mSingleLightLayer.setScale(0.12f);
         mSingleLightLayer.addLight(light);
         mSingleLightLayer.enableRotate();
 
@@ -387,7 +387,7 @@ public class Main {
         mMainScene.setScale(1.0f);
 
         mModel.setCubeViews(mCubeViews);
-        mNanoSuit.setCubeViews(mCubeViews);
+//        mNanoSuit.setCubeViews(mCubeViews);
         mWall.setCubeViews(mCubeViews);
 
     }
@@ -472,7 +472,7 @@ public class Main {
         mWall.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
-        mNanoSuit.render(deltaTime);
+//        mNanoSuit.render(deltaTime);
         mFirstNormalRect.render(deltaTime);
         mSecondNormalRect.render(deltaTime);
         mTestImage.render(deltaTime);
