@@ -105,6 +105,7 @@ public class Mesh extends IRenderer {
                 mShaderProgram.setUniform1i(("material[" + i + "].image"), i);
                 glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
             }
+            mShaderProgram.setUniform1i("materialSize", textures.size());
         }
 
         if (mShadowMap != -1) {

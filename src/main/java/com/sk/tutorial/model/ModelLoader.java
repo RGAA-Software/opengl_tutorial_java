@@ -22,7 +22,7 @@ public class ModelLoader {
 
     public static Model loadModel(String path, ShaderProgram shaderProgram) {
         String basePath = path.substring(0, path.lastIndexOf("/"));
-        AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate|Assimp.aiProcess_GenNormals/*|Assimp.aiProcess_FlipUVs*/);
+        AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate|Assimp.aiProcess_GenNormals/*|Assimp.aiProcess_FlipUVs*/ | Assimp.aiProcess_CalcTangentSpace);
 
         System.out.println("materials : " + aiScene.mNumMaterials());
         System.out.println("meshs : " + aiScene.mNumMeshes());
@@ -92,6 +92,7 @@ public class ModelLoader {
                 AIVector3D aiTangent = aiTangents.get();
                 tangents.add(new Vector3f(aiTangent.x(),aiTangent.y(),aiTangent.z()));
             }
+            System.out.println("tangents size : " + tangents.size());
         }
 
         AIVector3D.Buffer aiBitangents = aiMesh.mBitangents();
@@ -100,6 +101,7 @@ public class ModelLoader {
                 AIVector3D aiBitangent = aiBitangents.get();
                 bitangents.add(new Vector3f(aiBitangent.x(),aiBitangent.y(),aiBitangent.z()));
             }
+            System.out.println("bitangents size : " + bitangents.size());
         }
 
         AIFace.Buffer aifaces = aiMesh.mFaces();
@@ -173,7 +175,7 @@ public class ModelLoader {
 
         // normal Texture
         AIString normalPath = AIString.calloc();
-        Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_NORMALS, 0, normalPath, (IntBuffer) null, null, null, null, null, null);
+        Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_HEIGHT, 0, normalPath, (IntBuffer) null, null, null, null, null, null);
         String normalTexPath = normalPath.dataString();
         System.out.println("normalTex path : " + normalTexPath);
 

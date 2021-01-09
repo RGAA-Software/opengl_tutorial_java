@@ -45,23 +45,17 @@ uniform samplerCube skybox;
 in vec4 outLightViewPos;
 uniform sampler2D shadowMap;
 
+uniform int materialSize;
+
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
-
-float calculateShadow(vec4 fragPosInLightSpace) {
-    vec3 projCoord = fragPosInLightSpace.xyz ;/// fragPosInLightSpace.z;
-    projCoord = projCoord * 0.5 + 0.5;
-    float currentDepth = projCoord.z;
-    float shadowMapDepth = texture(shadowMap, projCoord.xy).r;
-    return currentDepth - 0.05 > shadowMapDepth ? 1.0 : 0.0;
-}
 
 void main()
 {
     vec3 diffuseColor = vec3(0, 0, 0);
     vec3 specularColor = vec3(0, 0, 0);
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < materialSize; i++) {
         int type = material[i].type;
         if (type == 1) {
             // diffuse
@@ -76,7 +70,8 @@ void main()
     }
 
 
-    vec4 ambient = vec4(light[0].ambient, 1) * vec4(diffuseColor, 1);
+    //vec4 ambient = vec4(light[0].ambient, 1) * vec4(diffuseColor, 1);
+    vec4 ambient = vec4(vec3(0.5, 0.5, 0.5), 1) * vec4(diffuseColor, 1);
 
     vec3 toLightDir = light[0].position - outPos;
 
@@ -88,12 +83,12 @@ void main()
 
     vec3 toCameraDir = normalize(cameraPos - outPos);
     vec3 halfWay = normalize(normalize(toLightDir) + toCameraDir);
-    float specularFactor = pow( max(dot(normalize(outNormal), halfWay), 0), 32);
+    float specularFactor = pow( max(dot(normalize(outNormal), halfWay), 0), 128);
 
-    vec3 specular = specularFactor * specularColor * light[0].specular;
+    vec3 specular = specularFactor * specularColor * vec3(0.5, 0.5, 0.5);//light[0].specular;
 
     float shadow = 0;//calculateShadow(outLightViewPos);
-    vec3 targetColor = (diffuse + specular) * (1 - shadow);
+    vec3 targetColor = (diffuse + specular) ;// * (1 - shadow);
     FragColor = vec4(targetColor, 1.0) + ambient;
     BrightColor = vec4(0, 0, 0, 1);
 }

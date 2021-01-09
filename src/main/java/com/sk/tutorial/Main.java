@@ -162,7 +162,7 @@ public class Main {
 
         Light lt = new Light();
         lt.direction = new Vector3f(0.8f, -1.0f, 1.5f);
-        lt.position = new Vector3f(-0.5f, MIN_SUN_Y, -1.0f);
+        lt.position = new Vector3f(0.5f, 2.1f, -1.0f);
         lt.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         lt.diffuse = new Vector3f(0.8f, 0.8f, 0.8f);
         lt.specular = new Vector3f(0.3f, 0.3f, 0.3f);
@@ -181,10 +181,10 @@ public class Main {
         lt.diffuse = new Vector3f(0, 1.0f, 0);
         lights.add(lt);
 
-        lt = lt.copy();
-        lt.position = new Vector3f(-1.4f, MIN_SUN_Y, -1.0f);
-        lt.diffuse = new Vector3f(.5f, .5f, .5f);
-        lights.add(lt);
+//        lt = lt.copy();
+//        lt.position = new Vector3f(-1.4f, MIN_SUN_Y, -1.0f);
+//        lt.diffuse = new Vector3f(.5f, .5f, .5f);
+//        lights.add(lt);
 
         light = lights.get(0);
         return lights;
@@ -329,14 +329,14 @@ public class Main {
 
         mFirstNormalRect = new Sprite("resources/images/brickwall.jpg", "resources/images/brickwall_normal.jpg",false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
         float[] rectVertices = {
-                // 第一个三角形
-                1f, 1f, 0.0f,   // 右上角
-                1f, -1f, 0.0f,  // 右下角
-                -1f, 1f, 0.0f,  // 左上角
-                // 第二个三角形
-                1f, -1f, 0.0f,  // 右下角
-                -1f, -1f, 0.0f, // 左下角
-                -1f, 1f, 0.0f   // 左上角
+
+                1f, 1f, 0.0f,
+                1f, -1f, 0.0f,
+                -1f, 1f, 0.0f,
+
+                1f, -1f, 0.0f,
+                -1f, -1f, 0.0f,
+                -1f, 1f, 0.0f
         };
 
         float[] rectNormals = {
@@ -367,9 +367,9 @@ public class Main {
         mSecondNormalRect.setPosition(new Vector3f(-2, 0.02f, -2));
         mSecondNormalRect.addBatchLights(mLights);
 
-        mTestImage = new Sprite("resources/images/test.jpg",true, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
+        mTestImage = new Sprite("resources/images/pic1.jpg",true, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
         mTestImage.setVertices(rectVertices, rectNormals, rectTexCoords);
-        mTestImage.setScaleAxis(new Vector3f(9000.0f / 800 * 1.5f, 1.5f, 1));
+        mTestImage.setScaleAxis(new Vector3f(1f, 1801.0f/1024, 1));
         mTestImage.setPosition(new Vector3f(-3, 4, -5));
         mTestImage.addBatchLights(mLights);
 
@@ -451,11 +451,11 @@ public class Main {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
-        mModel.stopRenderPointLightShadow();
-        mModel.setShaderProgram(modelShaderProgram);
-        mNanoSuit.stopRenderPointLightShadow();
-        mNanoSuit.setShaderProgram(modelShaderProgram);
-        mWall.stopRenderPointLightShadow();
+//        mModel.stopRenderPointLightShadow();
+//        mModel.setShaderProgram(modelShaderProgram);
+//        mNanoSuit.stopRenderPointLightShadow();
+//        mNanoSuit.setShaderProgram(modelShaderProgram);
+//        mWall.stopRenderPointLightShadow();
         //mWall.setShaderProgram();
 
 //        mModel.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
