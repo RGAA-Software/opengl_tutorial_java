@@ -254,13 +254,13 @@ public class Main {
 //        mWolf.setLight(sun);
 
 
-//        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShaderProgram);
-//        mNanoSuit.setCamera(mCamera);
-//        mNanoSuit.setProjection(mProjMat);
-//        mNanoSuit.setScale(0.1f);
-//        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
-//        mNanoSuit.addLight(light);
-//        mNanoSuit.enableDebugRotate();
+        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShaderProgram);
+        mNanoSuit.setCamera(mCamera);
+        mNanoSuit.setProjection(mProjMat);
+        mNanoSuit.setScale(0.1f);
+        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
+        mNanoSuit.addLight(light);
+        mNanoSuit.enableDebugRotate();
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
@@ -472,7 +472,7 @@ public class Main {
         mWall.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
-//        mNanoSuit.render(deltaTime);
+        mNanoSuit.render(deltaTime);
         mFirstNormalRect.render(deltaTime);
         mSecondNormalRect.render(deltaTime);
         mTestImage.render(deltaTime);
