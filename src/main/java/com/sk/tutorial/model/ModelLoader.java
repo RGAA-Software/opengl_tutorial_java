@@ -22,7 +22,7 @@ public class ModelLoader {
 
     public static Model loadModel(String path, ShaderProgram shaderProgram) {
         String basePath = path.substring(0, path.lastIndexOf("/"));
-        AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate|Assimp.aiProcess_GenNormals/*|Assimp.aiProcess_FlipUVs*/ | Assimp.aiProcess_CalcTangentSpace);
+        AIScene aiScene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate/*|Assimp.aiProcess_GenNormals|Assimp.aiProcess_FlipUVs*/ | Assimp.aiProcess_CalcTangentSpace);
 
         System.out.println("materials : " + aiScene.mNumMaterials());
         System.out.println("meshs : " + aiScene.mNumMeshes());

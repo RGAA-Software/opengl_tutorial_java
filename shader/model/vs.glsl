@@ -32,7 +32,11 @@ void main()
     gl_Position = proj * view * model * vec4(aPos, 1.0);
     outTex = aTex;
 
+    outPos = vec3(model * vec4(aPos, 1.0));
+
     mat3 normalMatrix = transpose(inverse(mat3(model)));
+    outNormal = normalMatrix * aNormal;
+
     vec3 T = normalize(normalMatrix * aTangent);
     vec3 N = normalize(normalMatrix * aNormal);
     T = normalize(T - dot(T, N) * N);
@@ -41,5 +45,5 @@ void main()
     mat3 TBN = transpose(mat3(T, B, N));
     cameraPosInTBN = TBN * cameraPos;
     lightPosInTBN  = TBN * lightPos;
-    posInTBN  = TBN * (normalMatrix * aPos);
+    posInTBN  = TBN * outPos;
 }

@@ -66,6 +66,8 @@ public class Mesh extends IRenderer {
             verticles[i * verticleSize + 12] = vertex.bitangent.y;
             verticles[i * verticleSize + 13] = vertex.bitangent.z;
         }
+
+
         glBufferData(GL_ARRAY_BUFFER, verticles, GL_STATIC_DRAW);
 
         int[] idxArray = new int[indices.size()];
@@ -111,17 +113,22 @@ public class Mesh extends IRenderer {
         List<Texture> textures = material.textures;
         if (textures != null) {
             for (int i = 0; i < textures.size(); i++) {
+                int textureId = textures.get(i).id;
                 glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, textureId);
                 String type = textures.get(i).type;
                 if ( TextUtils.equals(type, Texture.TYPE_DIFFUSE)) {
-                    mShaderProgram.setUniform1i("material[" + i + "].type", 1);
+                    //mShaderProgram.setUniform1i("material[" + i + "].type", 1);
+                    mShaderProgram.setUniform1i("diffuseImage", i);
                 } else if (TextUtils.equals(type, Texture.TYPE_SPECULAR)) {
-                    mShaderProgram.setUniform1i("material[" + i + "].type", 2);
+                    //mShaderProgram.setUniform1i("material[" + i + "].type", 2);
+                    mShaderProgram.setUniform1i("specularImage", i);
                 } else if (TextUtils.equals(type, Texture.TYPE_NORMAL)) {
-                    mShaderProgram.setUniform1i("material[" + i + "].type", 3);
+                    //mShaderProgram.setUniform1i("material[" + i + "].type", 3);
+                    mShaderProgram.setUniform1i("normalImage", i);
                 }
-                mShaderProgram.setUniform1i(("material[" + i + "].image"), i);
-                glBindTexture(GL_TEXTURE_2D, textures.get(i).id);
+                //mShaderProgram.setUniform1i(("material[" + i + "].image"), i);
+
             }
             mShaderProgram.setUniform1i("materialSize", textures.size());
         }

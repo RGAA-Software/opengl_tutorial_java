@@ -49,6 +49,7 @@ public class Texture {
 
     public Texture(String path, String type) {
         this(path, type, true, GL_RGBA, false);
+        //System.out.println("Texture path : " + path);
     }
 
     public Texture(String path, String type, boolean flip, int bufferType, boolean gammaCorrection) {
@@ -81,6 +82,7 @@ public class Texture {
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(imageData);
         }
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public Texture(int width, int height, int channel) {
@@ -100,6 +102,7 @@ public class Texture {
         }
         buffer.position(0);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     @Override
