@@ -1,13 +1,16 @@
 package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
-import com.sk.tutorial.framebuffer.CubeDepthFrameBuffer;
 import com.sk.tutorial.framebuffer.FrameBuffer;
+import com.sk.tutorial.geometry.Square;
+import com.sk.tutorial.geometry.TriangleGen;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.light.Light;
 import com.sk.tutorial.model.Model;
 import com.sk.tutorial.model.ModelLoader;
+import com.sk.tutorial.model.Vertex;
+import com.sk.tutorial.renderer.MixColorSprite;
 import com.sk.tutorial.renderer.Sprite;
 import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.ui.FrameBufferPreview;
@@ -35,10 +38,10 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-//    private float width = 800;
-//    private float height = 600;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
 
     private int mShadowMapSize = 2048;
@@ -137,6 +140,7 @@ public class Main {
     private Sprite mFirstNormalRect;
     private Sprite mSecondNormalRect;
     private Sprite mTestImage;
+    private MixColorSprite mTempImage;
     private FrameBufferPreview mFrameBufferPreview;
     private FrameBufferPreview mMainScene;
     private FrameBufferPreview mBlurPreview;
@@ -254,13 +258,13 @@ public class Main {
 //        mWolf.setLight(sun);
 
 
-        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShaderProgram);
-        mNanoSuit.setCamera(mCamera);
-        mNanoSuit.setProjection(mProjMat);
-        mNanoSuit.setScale(0.1f);
-        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
-        mNanoSuit.addLight(light);
-        mNanoSuit.enableDebugRotate();
+//        mNanoSuit = ModelLoader.loadModel("resources/model/nanosuit/nanosuit.obj", modelShaderProgram);
+//        mNanoSuit.setCamera(mCamera);
+//        mNanoSuit.setProjection(mProjMat);
+//        mNanoSuit.setScale(0.1f);
+//        mNanoSuit.setPosition(new Vector3f(1, 1, -1));
+//        mNanoSuit.addLight(light);
+//        mNanoSuit.enableDebugRotate();
 
 //        mBoxLayer = new MultiBoxLayer(mCamera, mProjMat, "shader/base/vs.glsl", "shader/base/fs.glsl");
         mSingleLightLayer = new SingleLightCubeLayer(mCamera, mProjMat, "shader/light_cube/vs.glsl", "shader/light_cube/fs.glsl");
@@ -339,6 +343,15 @@ public class Main {
                 -1f, 1f, 0.0f
         };
 
+        List<Vertex> mMixAttribs = new ArrayList<>();
+        mMixAttribs.add(new Vertex(new Vector3f(1f, 1f, 0.0f), new Vector3f(1, 0, 0)));
+        mMixAttribs.add(new Vertex(new Vector3f(1f, -1f, 0.0f), new Vector3f(0, 1, 0)));
+        mMixAttribs.add(new Vertex(new Vector3f( -1f, 1f, 0.0f), new Vector3f(0, 0, 1)));
+
+        mMixAttribs.add(new Vertex(new Vector3f(1f, -1f, 0.0f), new Vector3f(0, 1, 0)));
+        mMixAttribs.add(new Vertex(new Vector3f(-1f, -1f, 0.0f), new Vector3f(1, 1, 0)));
+        mMixAttribs.add(new Vertex(new Vector3f( -1f, 1f, 0.0f), new Vector3f(0, 0, 1)));
+
         float[] rectNormals = {
                 0, 0, 1.0f,
                 0, 0, 1.0f,
@@ -367,12 +380,31 @@ public class Main {
         mSecondNormalRect.setPosition(new Vector3f(-2, 0.02f, -2));
         mSecondNormalRect.addBatchLights(mLights);
 
+        mTempImage = new MixColorSprite("resources/images/test.png", "resources/images/test_split.png",true, "shader/sprite/vs_mix_color.glsl", "shader/sprite/fs_blinn_point_mix_color.glsl", GL_RGB);
+        float[] colors = new float[] {
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1,
+            0, 1, 0,
+            1, 1, 0,
+            0, 0, 1,
+        };
+
+        Square square = TriangleGen.genTrianglesForImage(100, false);
+        square = TriangleGen.modifyVertexColor(square);
+        square = TriangleGen.modifyVertexColor1(square);
+        float[] genTriangleBuffer = TriangleGen.transferToBuffer(square.vertices);
+        mTempImage.setPosColorAttribs(genTriangleBuffer);
+        mTempImage.setScaleAxis(new Vector3f(1920f/1080, 1.0f, 1));
+        mTempImage.setPosition(new Vector3f(-2.5f, 2, -1));
+
+        mTempImage.addBatchLights(mLights);
+
         mTestImage = new Sprite("resources/images/pic1.jpg",true, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn_point.glsl", GL_RGB, false);
         mTestImage.setVertices(rectVertices, rectNormals, rectTexCoords);
         mTestImage.setScaleAxis(new Vector3f(1f, 1801.0f/1024, 1));
         mTestImage.setPosition(new Vector3f(-3, 4, -5));
         mTestImage.addBatchLights(mLights);
-
 
         mFrameBufferPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_luma.glsl");
         mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
@@ -389,6 +421,8 @@ public class Main {
         mModel.setCubeViews(mCubeViews);
 //        mNanoSuit.setCubeViews(mCubeViews);
         mWall.setCubeViews(mCubeViews);
+
+        //glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
 
     }
 
@@ -472,10 +506,11 @@ public class Main {
         mWall.render(deltaTime);
         mModel.render(deltaTime);
         //mWolf.render(deltaTime);
-        mNanoSuit.render(deltaTime);
+//        mNanoSuit.render(deltaTime);
         mFirstNormalRect.render(deltaTime);
         mSecondNormalRect.render(deltaTime);
         mTestImage.render(deltaTime);
+        mTempImage.render(deltaTime);
 //        mFrameBuffer.end();
 //
 //

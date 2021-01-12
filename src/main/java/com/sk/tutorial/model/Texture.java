@@ -20,6 +20,8 @@ import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL21.GL_SRGB_ALPHA;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengles.GLES20.GL_LUMINANCE;
+import static org.lwjgl.opengles.GLES30.GL_RED;
 import static org.lwjgl.opengles.GLES30.GL_SRGB;
 
 public class Texture {
@@ -27,6 +29,7 @@ public class Texture {
     public static final String TYPE_DIFFUSE = "diffuse";
     public static final String TYPE_SPECULAR = "specular";
     public static final String TYPE_NORMAL = "normal";
+    public static final String TYPE_SINGLE_CHANNEL = "single_channel";
 
     public int id = -1;
     public int id2 = -1;
@@ -63,9 +66,6 @@ public class Texture {
         int[] x = new int[1];
         int[] y = new int[1];
         int[] c = new int[1];
-        mWidth = x[0];
-        mHeight = y[0];
-        mChannel = c[0];
         STBImage.stbi_set_flip_vertically_on_load(flip);
         int channel = 4;
         int bufferFormat = GL_RGB;
@@ -74,8 +74,16 @@ public class Texture {
             channel = 3;
         } else if (bufferType == GL_RGBA) {
             bufferFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+        } else if (bufferType == GL_LUMINANCE) {
+            bufferFormat = GL_LUMINANCE;
+            channel = 1;
         }
+
         ByteBuffer imageData = STBImage.stbi_load(path, x, y, c, channel);
+        mWidth = x[0];
+        mHeight = y[0];
+        mChannel = c[0];
+        System.out.println("path : " + path + "c : " + c[0]);
         if (imageData != null) {
 //            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA/*GL_RGBA*/, x[0], y[0], 0, GL_RGBA/*GL_RGBA*/, GL_UNSIGNED_BYTE, imageData);
             glTexImage2D(GL_TEXTURE_2D, 0, bufferFormat, x[0], y[0], 0, bufferType, GL_UNSIGNED_BYTE, imageData);

@@ -1,13 +1,13 @@
 package com.sk.tutorial.renderer;
 
 import com.sk.tutorial.model.Texture;
+import com.sk.tutorial.model.Vertex;
 import com.sk.tutorial.world.Director;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.nio.IntBuffer;
-
+import java.util.List;
 import static org.lwjgl.opengl.GL30.*;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -15,43 +15,61 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
-public class Sprite extends IRenderer {
+public class MixColorSprite extends Sprite {
 
-    protected Texture mTexture;
-    protected Texture mNormalTexture;
-    protected int mVerticleSize;
-    protected Vector3f mPosition;
+    private Texture mMixTexture;
 
-    public Sprite(int textureId) {
-        super("shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
-        mTexture = new Texture(textureId);
+    public MixColorSprite(int textureId) {
+        super(textureId);
     }
 
-    public Sprite(String imagePath, boolean flip) {
-        this(imagePath, flip, "shader/sprite/vs.glsl", "shader/sprite/fs.glsl");
+    public MixColorSprite(String imagePath, boolean flip) {
+        super(imagePath, flip);
     }
 
-    public Sprite(String imagePath) {
-        this(imagePath, true);
+    public MixColorSprite(String imagePath) {
+        super(imagePath);
     }
 
-    public Sprite(String imagePath, boolean flip, String vsPath, String fsPath) {
-        this(imagePath, flip, vsPath, fsPath, GL_RGB, false);
+    public MixColorSprite(String imagePath, boolean flip, String vsPath, String fsPath) {
+        super(imagePath, flip, vsPath, fsPath);
     }
 
-    public Sprite(String imagePath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
-        this(imagePath, null,  flip, vsPath, fsPath, bufferType, gammaCorrection);
+    public MixColorSprite(String imagePath, String mixTexPath, boolean flip, String vsPath, String fsPath, int bufferType) {
+        super(imagePath, flip, vsPath, fsPath, bufferType, false);
+        mMixTexture = new Texture(mixTexPath, Texture.TYPE_SINGLE_CHANNEL, flip, GL_RGB, false);
     }
 
-    public Sprite(String imagePath, String normalMapPath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
-        super(vsPath, fsPath);
-        mTexture = new Texture(imagePath, Texture.TYPE_DIFFUSE, flip, bufferType, gammaCorrection);
-        if (normalMapPath != null) {
-            mNormalTexture = new Texture(normalMapPath, Texture.TYPE_NORMAL, flip, bufferType, gammaCorrection);
-        }
+    public MixColorSprite(String imagePath, String normalMapPath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
+        super(imagePath, normalMapPath, flip, vsPath, fsPath, bufferType, gammaCorrection);
     }
 
-    public void setVertices(float[] vertices, float[] normals, float[] texCoords) {
+    public void setPosColorAttribs(float[] attribs) {
+        mRenderVAO = glGenVertexArrays();
+
+        int strip = 8;
+
+        glBindVertexArray(mRenderVAO);
+        mVerticleSize =  attribs.length/strip;
+
+        int vertexBuffer = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, attribs, GL_STATIC_DRAW);
+        int vertexLoc = mShaderProgram.getAttribLocation("aPos");
+        glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, false, strip * 4, 0);
+        glEnableVertexAttribArray(vertexLoc);
+
+        int mixColorLoc = mShaderProgram.getAttribLocation("aMixColor");
+        glVertexAttribPointer(mixColorLoc, 3, GL_FLOAT, false, strip * 4, 4 * 3);
+        glEnableVertexAttribArray(mixColorLoc);
+
+        int texLoc = mShaderProgram.getAttribLocation("aTex");
+        glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, strip * 4, 4 * 6);
+        glEnableVertexAttribArray(texLoc);
+
+    }
+
+    public void setVertices(float[] vertices, float[] normals, float[] texCoords, float[] colors) {
         mRenderVAO = glGenVertexArrays();
         glBindVertexArray(mRenderVAO);
 
@@ -84,22 +102,31 @@ public class Sprite extends IRenderer {
             glEnableVertexAttribArray(texLoc);
         }
 
+        int vbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, colors, GL_STATIC_DRAW);
+        int mixColorLoc = mShaderProgram.getAttribLocation("aMixColor");
+        glVertexAttribPointer(mixColorLoc, 3, GL_FLOAT, false, 0,0);
+        glEnableVertexAttribArray(mixColorLoc);
+
         glBindVertexArray(0);
     }
 
-    public void setPosition(Vector3f position) {
-        mPosition = position;
-    }
 
     private Matrix4f model = new Matrix4f();
-    private Matrix4f rotateMatrix = new Matrix4f();
 
     @Override
     public void render(double deltaTime) {
-        super.render(deltaTime);
+        mShaderProgram.use();
+        glBindVertexArray(mRenderVAO);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mTexture.id);
         mShaderProgram.setUniform1i("image", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, mMixTexture.id);
+        mShaderProgram.setUniform1i("imageMix", 1);
 
         model = model.identity();
         if (mPosition != null) {
@@ -114,30 +141,6 @@ public class Sprite extends IRenderer {
             model = model.scale(mScaleAxis);
         }
 
-        if (mShadowMap != -1) {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mShadowMap);
-            mShaderProgram.setUniform1i("shadowMap", 1);
-        }
-
-        if (mCubeShadowMap != -1) {
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, mCubeShadowMap);
-            mShaderProgram.setUniform1i("shadowMap", 2);
-        }
-
-        if (mNormalTexture != null && mNormalTexture.id != -1) {
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_2D, mNormalTexture.id);
-            mShaderProgram.setUniform1i("hasNormalMap", 1);
-            mShaderProgram.setUniform1i("normalMap", 3);
-            if (mRotateAxis != null) {
-                rotateMatrix.identity().rotate((float) Math.toRadians(mRotateDegree), mRotateAxis);
-                mShaderProgram.setUniformMatrix4fv("rotateMatrix", rotateMatrix);
-            } else {
-                mShaderProgram.setUniformMatrix4fv("rotateMatrix", rotateMatrix.identity());
-            }
-        }
 
         mShaderProgram.setUniform3fv("cameraPos", Director.getInstance().getCamera().getCameraPos());
 
@@ -146,6 +149,5 @@ public class Sprite extends IRenderer {
 
         glDrawArrays(GL_TRIANGLES, 0, mVerticleSize);
         glBindVertexArray(0);
-
     }
 }

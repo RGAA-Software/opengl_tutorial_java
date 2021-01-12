@@ -16,6 +16,9 @@ public class ShaderProgram {
 
     private int program;
 
+    private String mVSShader;
+    private String mFSShader;
+
     public ShaderProgram() {
     }
 
@@ -38,6 +41,8 @@ public class ShaderProgram {
         String vs = readFileAsString(vsPath);
         String fs = readFileAsString(fsPath);
         String gs = null;
+        mVSShader = vs;
+        mFSShader = fs;
         if (geometryPath != null) {
             gs = readFileAsString(geometryPath);
         }
@@ -168,6 +173,14 @@ public class ShaderProgram {
             }
         }
         return data;
+    }
+
+    public String getVSShader() {
+        return mVSShader;
+    }
+
+    public String getFSShader() {
+        return mFSShader;
     }
 
 }
