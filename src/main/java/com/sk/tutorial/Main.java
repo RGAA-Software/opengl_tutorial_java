@@ -380,7 +380,11 @@ public class Main {
         mSecondNormalRect.setPosition(new Vector3f(-2, 0.02f, -2));
         mSecondNormalRect.addBatchLights(mLights);
 
-        mTempImage = new MixColorSprite("resources/images/test.png", "resources/images/test_split.png",true, "shader/sprite/vs_mix_color.glsl", "shader/sprite/fs_blinn_point_mix_color.glsl", GL_RGB);
+        mTempImage = new MixColorSprite("resources/images/test.png",
+                "resources/images/test_split.png",
+                "resources/images/height.png",
+                "resources/images/sampler.png",
+                true, "shader/sprite/vs_mix_color.glsl", "shader/sprite/fs_blinn_point_mix_color.glsl", GL_RGB);
         float[] colors = new float[] {
             1, 0, 0,
             0, 1, 0,
@@ -390,7 +394,7 @@ public class Main {
             0, 0, 1,
         };
 
-        Square square = TriangleGen.genTrianglesForImage(100, false);
+        Square square = TriangleGen.genTrianglesForImage(10, false);
         square = TriangleGen.modifyVertexColor(square);
         square = TriangleGen.modifyVertexColor1(square);
         float[] genTriangleBuffer = TriangleGen.transferToBuffer(square.vertices);

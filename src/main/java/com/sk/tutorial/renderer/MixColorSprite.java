@@ -18,6 +18,8 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 public class MixColorSprite extends Sprite {
 
     private Texture mMixTexture;
+    private Texture mHeightTexture;
+    private Texture mSamplerTexture;
 
     public MixColorSprite(int textureId) {
         super(textureId);
@@ -35,9 +37,11 @@ public class MixColorSprite extends Sprite {
         super(imagePath, flip, vsPath, fsPath);
     }
 
-    public MixColorSprite(String imagePath, String mixTexPath, boolean flip, String vsPath, String fsPath, int bufferType) {
+    public MixColorSprite(String imagePath, String mixTexPath, String heightTexPath, String samplerTexPath, boolean flip, String vsPath, String fsPath, int bufferType) {
         super(imagePath, flip, vsPath, fsPath, bufferType, false);
         mMixTexture = new Texture(mixTexPath, Texture.TYPE_SINGLE_CHANNEL, flip, GL_RGB, false);
+        mHeightTexture = new Texture(heightTexPath, Texture.TYPE_SINGLE_CHANNEL, flip, GL_RGB, false);
+        mSamplerTexture = new Texture(samplerTexPath, Texture.TYPE_SINGLE_CHANNEL, flip, GL_RGB, false);
     }
 
     public MixColorSprite(String imagePath, String normalMapPath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
@@ -120,6 +124,8 @@ public class MixColorSprite extends Sprite {
         mShaderProgram.use();
         glBindVertexArray(mRenderVAO);
 
+        glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mTexture.id);
         mShaderProgram.setUniform1i("image", 0);
@@ -127,6 +133,14 @@ public class MixColorSprite extends Sprite {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, mMixTexture.id);
         mShaderProgram.setUniform1i("imageMix", 1);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, mHeightTexture.id);
+        mShaderProgram.setUniform1i("imageHeight", 2);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, mSamplerTexture.id);
+        mShaderProgram.setUniform1i("imageSampler", 3);
 
         model = model.identity();
         if (mPosition != null) {
@@ -149,5 +163,6 @@ public class MixColorSprite extends Sprite {
 
         glDrawArrays(GL_TRIANGLES, 0, mVerticleSize);
         glBindVertexArray(0);
+        glPixelStorei(GL_UNPACK_ALIGNMENT,4);
     }
 }
