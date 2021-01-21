@@ -17,7 +17,11 @@ public class Vertex {
     public int xMeshIndex;
     public int yMeshIndex;
 
-    public Vertex() {}
+    public Vertex() {
+        position = new Vector3f();
+        color = new Vector3f();
+        texCoords = new Vector2f();
+    }
 
     public Vertex(float x, float y, float z) {
         position = new Vector3f(x, y, z);

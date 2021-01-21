@@ -20,6 +20,8 @@ public class MixColorSprite extends Sprite {
     private Texture mMixTexture;
     private Texture mSamplerTexture;
 
+    private int mIndicesSize = 0;
+
     public MixColorSprite(int textureId) {
         super(textureId);
     }
@@ -69,6 +71,49 @@ public class MixColorSprite extends Sprite {
         glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, strip * 4, 4 * 6);
         glEnableVertexAttribArray(texLoc);
 
+    }
+
+
+    public void setVerticesIndexBuffer(float[] vertices, float[] texCoords, float[] colors, int[] indices) {
+        mRenderVAO = glGenVertexArrays();
+        glBindVertexArray(mRenderVAO);
+
+        assert (vertices != null);
+
+        mVerticleSize = vertices.length / 3;
+        mIndicesSize = indices.length;
+
+        int vertexBuffer = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        int vertexLoc = mShaderProgram.getAttribLocation("aPos");
+        glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(vertexLoc);
+
+
+        int elementBuffer = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+
+        if (texCoords != null) {
+            int texBuffer = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+            glBufferData(GL_ARRAY_BUFFER, texCoords, GL_STATIC_DRAW);
+            int texLoc = mShaderProgram.getAttribLocation("aTex");
+            glVertexAttribPointer(texLoc, 2, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(texLoc);
+        }
+
+        if (colors != null) {
+            int vbo = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, colors, GL_STATIC_DRAW);
+            int mixColorLoc = mShaderProgram.getAttribLocation("aMixColor");
+            glVertexAttribPointer(mixColorLoc, 3, GL_FLOAT, false, 0, 0);
+            glEnableVertexAttribArray(mixColorLoc);
+        }
+
+        glBindVertexArray(0);
     }
 
     public void setVertices(float[] vertices, float[] normals, float[] texCoords, float[] colors) {
@@ -154,7 +199,11 @@ public class MixColorSprite extends Sprite {
         getShaderProgram().setUniformMatrix4fv("model", model);
         Director.getInstance().updateProjectionCamera(this);
 
-        glDrawArrays(GL_TRIANGLES, 0, mVerticleSize);
+        //glDrawArrays(GL_TRIANGLES, 0, mVerticleSize);
+
+        glDrawElements(GL_TRIANGLES, mIndicesSize, GL_UNSIGNED_INT, 0);
+        //glDrawArrays(GL_POINTS, 0, mVerticleSize);
+
         glBindVertexArray(0);
     }
 }

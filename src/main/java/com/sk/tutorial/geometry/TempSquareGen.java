@@ -6,6 +6,217 @@ import java.util.List;
 
 public class TempSquareGen {
 
+
+    public static IndexTempSquare generateIndexTempSquare(int width, int height) {
+        IndexTempSquare indexTempSquare = new IndexTempSquare(width, height);
+        float pieceSize = 2.0f / width;
+        float startX = -1.0f;
+        float startY = -1.0f;
+        float uvPieceSize = 1.0f / width;
+
+        for (int y = 0; y <= height; y++) {
+            for (int x = 0; x <= width; x++) {
+                Vertex vertex = new Vertex();
+                vertex.position.x = startX + x * pieceSize;
+                vertex.position.y = startY + y * pieceSize;
+                vertex.texCoords.x = x * uvPieceSize;
+                vertex.texCoords.y = y * uvPieceSize;
+                vertex.xMeshIndex = x;
+                vertex.yMeshIndex = y;
+                indexTempSquare.vertices[x][y] = vertex;
+
+                if (x < width && y < height) {
+                    Vertex center = new Vertex();
+                    center.position.x = startX + (x + 0.5f) * pieceSize;
+                    center.position.y = startY + (y + 0.5f) * pieceSize;
+                    center.texCoords.x = (x + 0.5f) * uvPieceSize;
+                    center.texCoords.y = (y + 0.5f) * uvPieceSize;
+                    center.xMeshIndex = x;
+                    center.yMeshIndex = y;
+                    indexTempSquare.centerVertices[x][y] = center;
+                }
+            }
+        }
+
+        fillIndexColor(indexTempSquare, width, height);
+
+        return indexTempSquare;
+    }
+
+
+    public static void fillIndexColor(IndexTempSquare indexTempSquare, int width, int height) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float centerColor = (float)Temperature.tempMatrix[x][height - 1 - y] / 37.0f;
+                indexTempSquare.centerVertices[x][y].color.x = centerColor;
+            }
+        }
+    }
+
+    public static float[] transferToColorBuffer(IndexTempSquare indexTempSquare) {
+        int width = indexTempSquare.width;
+        int height = indexTempSquare.height;
+        float[] buffer = new float[width * height * 3 * 5];
+        Vertex[][] vertices = indexTempSquare.vertices;
+        Vertex[][] centerVertices = indexTempSquare.centerVertices;
+
+        int index = 0;
+        for (int y = 0; y <= height; y++) {
+            for (int x = 0; x <= width; x++) {
+                Vertex vertex = vertices[x][y];
+                buffer[index++] = vertex.color.x;
+                buffer[index++] = vertex.color.x;
+                buffer[index++] = vertex.color.x;
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Vertex center = centerVertices[x][y];
+                buffer[index++] = center.color.x;
+                buffer[index++] = center.color.x;
+                buffer[index++] = center.color.x;
+            }
+        }
+        return buffer;
+    }
+
+    public static float[] transferToUVBuffer(IndexTempSquare indexTempSquare) {
+        int width = indexTempSquare.width;
+        int height = indexTempSquare.height;
+        float[] buffer = new float[width * height * 3 * 5];
+        Vertex[][] vertices = indexTempSquare.vertices;
+        Vertex[][] centerVertices = indexTempSquare.centerVertices;
+
+        int index = 0;
+        for (int y = 0; y <= height; y++) {
+            for (int x = 0; x <= width; x++) {
+                Vertex vertex = vertices[x][y];
+                buffer[index++] = vertex.texCoords.x;
+                buffer[index++] = vertex.texCoords.y;
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Vertex center = centerVertices[x][y];
+                buffer[index++] = center.texCoords.x;
+                buffer[index++] = center.texCoords.y;
+            }
+        }
+        return buffer;
+    }
+
+    static float[] vBuffer ;
+
+    public static float[] transferToVerticesBuffer(IndexTempSquare indexTempSquare) {
+        int width = indexTempSquare.width;
+        int height = indexTempSquare.height;
+        float[] buffer = new float[width * height * 3 * 5];
+        Vertex[][] vertices = indexTempSquare.vertices;
+        Vertex[][] centerVertices = indexTempSquare.centerVertices;
+
+        int index = 0;
+        for (int y = 0; y <= height; y++) {
+            for (int x = 0; x <= width; x++) {
+                Vertex vertex = vertices[x][y];
+                buffer[index++] = vertex.position.x;
+                buffer[index++] = vertex.position.y;
+                buffer[index++] = vertex.position.z;
+            }
+        }
+
+        System.out.println("verticle size : " + index);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Vertex center = centerVertices[x][y];
+                buffer[index++] = center.position.x;
+                buffer[index++] = center.position.y;
+                buffer[index++] = center.position.z;
+            }
+        }
+        System.out.println("total size : " + index);
+
+        vBuffer = buffer;
+        return buffer;
+    }
+
+    public static int[] transferToIndexBuffer(IndexTempSquare indexTempSquare) {
+        int triangleCount = 4;
+        int[] buffer = new int[indexTempSquare.width * indexTempSquare.height * triangleCount * 3];
+        int width = indexTempSquare.width;
+        int height = indexTempSquare.height;
+        int centerOffset = (width + 1) * (height + 1);
+        System.out.println("center offset : " + centerOffset);
+        int index = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // left-top         (x, y)
+                // left-bottom      (x, y+1)
+                // right-top        (x+1, y)
+                // right-bottom     (x+1, y+1)
+                // center           (x, y) + OFFSET
+                int leftTopIndex = (y * (width + 1) + x);
+                int leftBottomIndex = ((y+1) * (width + 1) + x);
+                int rightTopIndex = (y * (width + 1) + x + 1);
+                int rightBottomIndex = ((y + 1) * (width + 1) + x + 1);
+                int centerIndex = (y * (width) + x) + centerOffset;
+
+                buffer[index++] = leftTopIndex;
+                buffer[index++] = rightTopIndex;
+                buffer[index++] = centerIndex;
+
+//                System.out.println("left top : " + leftTopIndex + " right top : " + rightTopIndex + " center : " + centerIndex);
+//                System.out.println("(" + vBuffer[leftTopIndex] + ", " + vBuffer[leftTopIndex + 1] + "," + vBuffer[leftTopIndex+2]+ ")");
+//                System.out.println("(" + vBuffer[rightTopIndex] + ", " + vBuffer[rightTopIndex + 1] + "," + vBuffer[rightTopIndex+2]+ ")");
+//                System.out.println("(" + vBuffer[centerIndex] + ", " + vBuffer[centerIndex + 1] + "," + vBuffer[centerIndex+2]+ ")");
+
+
+                buffer[index++] = leftTopIndex;
+                buffer[index++] = centerIndex;
+                buffer[index++] = leftBottomIndex;
+
+                buffer[index++] = leftBottomIndex;
+                buffer[index++] = rightBottomIndex;
+                buffer[index++] = centerIndex;
+
+                buffer[index++] = rightBottomIndex;
+                buffer[index++] = rightTopIndex;
+                buffer[index++] = centerIndex;
+            }
+        }
+        return buffer;
+    }
+
+    public static void calculateColor(IndexTempSquare indexTempSquare) {
+        int index = 0;
+        int width = indexTempSquare.width;
+        int height = indexTempSquare.height;
+        for (int y = 0; y <= height; y++) {
+            for (int x = 0; x <= width; x++) {
+
+                int left = Math.max(x - 1, 0);
+                int top = Math.max(y - 1, 0);
+                int right = Math.min(x + 1, width - 1);
+                int bottom = Math.min(y + 1, height - 1);
+
+                float leftTopColor = indexTempSquare.centerVertices[left][top].color.x;
+                float leftBottomColor = indexTempSquare.centerVertices[left][bottom].color.x;
+                float rightTopColor = indexTempSquare.centerVertices[right][top].color.x;
+                float rightBottomColor = indexTempSquare.centerVertices[right][bottom].color.x;
+
+                float color = (leftBottomColor + leftTopColor + rightBottomColor + rightTopColor) /4;
+                indexTempSquare.vertices[x][y].color.x = color;
+                indexTempSquare.vertices[x][y].color.y = color;
+                indexTempSquare.vertices[x][y].color.z = color;
+            }
+        }
+    }
+
+
+    ///////// TEMP SQUARE
+
     public static TempSquare generate(int width, int height) {
         TempSquare square = new TempSquare(width, height);
 
@@ -157,7 +368,7 @@ public class TempSquareGen {
 
                 if (leftTopSquare != null) {
                     currentSquare.left.v3.color.x = getColor(centerColor, leftTopSquare.centerColor);
-                    System.out.println("left center color : " + centerColor);
+//                    System.out.println("left center color : " + centerColor);
                 } else {
                     currentSquare.left.v3.color.x = getColor(centerColor, centerColor);
                 }

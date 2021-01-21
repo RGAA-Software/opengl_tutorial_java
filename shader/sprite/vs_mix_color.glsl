@@ -34,4 +34,6 @@ void main()
     outNormal = mat3(transpose(inverse(model))) * aNormal;
     outTex = aTex;
     outModel = rotateMatrix;
+
+
 }

@@ -2,10 +2,7 @@ package com.sk.tutorial;
 
 import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.framebuffer.FrameBuffer;
-import com.sk.tutorial.geometry.Square;
-import com.sk.tutorial.geometry.TempSquare;
-import com.sk.tutorial.geometry.TempSquareGen;
-import com.sk.tutorial.geometry.TriangleGen;
+import com.sk.tutorial.geometry.*;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
 import com.sk.tutorial.light.Light;
@@ -40,10 +37,10 @@ public class Main {
     // The window handle
     private long window;
 
-//    private float width = 1920;
-//    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
+//    private float width = 800;
+//    private float height = 600;
 //    private int vao;
 
     private int mShadowMapSize = 2048;
@@ -289,6 +286,7 @@ public class Main {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+        glPointSize(8);
 //        glEnable(GL_CULL_FACE);
 //        glCullFace(GL_FRONT);
 
@@ -392,9 +390,18 @@ public class Main {
         TempSquare tempSquare = TempSquareGen.generate(32, 32);
         float[] triangleBuffer = TempSquareGen.transferToBuffer(tempSquare);
 
-        mTempImage.setPosColorAttribs(triangleBuffer);
+        IndexTempSquare indexTempSquare = TempSquareGen.generateIndexTempSquare(32, 32);
+        float[] verticleBuffer = TempSquareGen.transferToVerticesBuffer(indexTempSquare);
+        int[] indexBuffer = TempSquareGen.transferToIndexBuffer(indexTempSquare);
+        TempSquareGen.calculateColor(indexTempSquare);
+        float[] indexColorBuffer = TempSquareGen.transferToColorBuffer(indexTempSquare);
+        float[] indexUVBuffer = TempSquareGen.transferToUVBuffer(indexTempSquare);
+
+
+        //mTempImage.setPosColorAttribs(triangleBuffer);
+        mTempImage.setVerticesIndexBuffer(verticleBuffer, indexUVBuffer, indexColorBuffer, indexBuffer);
         mTempImage.setScaleAxis(new Vector3f(1920f/1080, 1.0f, 1));
-        mTempImage.setPosition(new Vector3f(-2.5f, 2, -1));
+        mTempImage.setPosition(new Vector3f(0, 0, -1));
 
         mTempImage.addBatchLights(mLights);
 
