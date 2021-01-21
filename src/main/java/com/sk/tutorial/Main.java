@@ -3,6 +3,8 @@ package com.sk.tutorial;
 import com.sk.tutorial.camera.Camera;
 import com.sk.tutorial.framebuffer.FrameBuffer;
 import com.sk.tutorial.geometry.Square;
+import com.sk.tutorial.geometry.TempSquare;
+import com.sk.tutorial.geometry.TempSquareGen;
 import com.sk.tutorial.geometry.TriangleGen;
 import com.sk.tutorial.input.InputProcessor;
 import com.sk.tutorial.layer.SingleLightCubeLayer;
@@ -381,20 +383,16 @@ public class Main {
         mSecondNormalRect.addBatchLights(mLights);
 
         mTempImage = new MixColorSprite("resources/images/test.png", "resources/images/test_split.png",true, "shader/sprite/vs_mix_color.glsl", "shader/sprite/fs_blinn_point_mix_color.glsl", GL_RGB);
-        float[] colors = new float[] {
-            1, 0, 0,
-            0, 1, 0,
-            0, 0, 1,
-            0, 1, 0,
-            1, 1, 0,
-            0, 0, 1,
-        };
 
-        Square square = TriangleGen.genTrianglesForImage(100, false);
+        Square square = TriangleGen.genTrianglesForImage(20, false);
         square = TriangleGen.modifyVertexColor(square);
         square = TriangleGen.modifyVertexColor1(square);
         float[] genTriangleBuffer = TriangleGen.transferToBuffer(square.vertices);
-        mTempImage.setPosColorAttribs(genTriangleBuffer);
+
+        TempSquare tempSquare = TempSquareGen.generate(32, 32);
+        float[] triangleBuffer = TempSquareGen.transferToBuffer(tempSquare);
+
+        mTempImage.setPosColorAttribs(triangleBuffer);
         mTempImage.setScaleAxis(new Vector3f(1920f/1080, 1.0f, 1));
         mTempImage.setPosition(new Vector3f(-2.5f, 2, -1));
 
@@ -422,7 +420,7 @@ public class Main {
 //        mNanoSuit.setCubeViews(mCubeViews);
         mWall.setCubeViews(mCubeViews);
 
-        //glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
+//        glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
 
     }
 
@@ -500,16 +498,16 @@ public class Main {
 //        mSingleLightLayer.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
 //        mSingleCube.bindShadowMap(mCubeFrameBuffer.getFrameBufferTexId());
 
-        mSingleCube.render(deltaTime);
-        mSingleLightLayer.render(deltaTime);
-        mFloor.render(deltaTime);
-        mWall.render(deltaTime);
-        mModel.render(deltaTime);
+        //mSingleCube.render(deltaTime);
+        //mSingleLightLayer.render(deltaTime);
+        //mFloor.render(deltaTime);
+        //mWall.render(deltaTime);
+        //mModel.render(deltaTime);
         //mWolf.render(deltaTime);
 //        mNanoSuit.render(deltaTime);
-        mFirstNormalRect.render(deltaTime);
-        mSecondNormalRect.render(deltaTime);
-        mTestImage.render(deltaTime);
+        //mFirstNormalRect.render(deltaTime);
+        //mSecondNormalRect.render(deltaTime);
+        //mTestImage.render(deltaTime);
         mTempImage.render(deltaTime);
 //        mFrameBuffer.end();
 //

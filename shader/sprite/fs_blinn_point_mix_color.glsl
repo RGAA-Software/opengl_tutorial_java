@@ -7,6 +7,7 @@ in vec3 outMixColor;
 
 uniform sampler2D image;
 uniform sampler2D imageMix;
+uniform sampler2D imageSampler;
 uniform vec3 cameraPos;
 
 layout (location = 0) out vec4 FragColor;
@@ -15,9 +16,11 @@ void main()
 {
     vec4 texColor = texture(image, outTex);
     vec4 mixColor = texture(imageMix, outTex);
-    if (mixColor.r < 0.0001 && mixColor.g < 0.0001 && mixColor.b < 0.0001) {
-        FragColor = texColor;
-    } else {
-        FragColor = vec4(mix(texColor.xyz, vec3(outMixColor), 0.9), 1.0);
-    }
+//    if (mixColor.r < 0.0001 && mixColor.g < 0.0001 && mixColor.b < 0.0001) {
+//        FragColor = texColor;
+//    } else {
+//    }
+    vec4 samplerColor = texture(imageSampler, vec2(pow(1 -outMixColor.r, 2) * 2, 0.2));
+    FragColor = vec4(mix(texColor.xyz, vec3(samplerColor.rgb), 0.9), 1.0);
+    FragColor = vec4(samplerColor.rgb, 1.0);
 }

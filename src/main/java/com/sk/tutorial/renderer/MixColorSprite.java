@@ -18,6 +18,7 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 public class MixColorSprite extends Sprite {
 
     private Texture mMixTexture;
+    private Texture mSamplerTexture;
 
     public MixColorSprite(int textureId) {
         super(textureId);
@@ -38,6 +39,7 @@ public class MixColorSprite extends Sprite {
     public MixColorSprite(String imagePath, String mixTexPath, boolean flip, String vsPath, String fsPath, int bufferType) {
         super(imagePath, flip, vsPath, fsPath, bufferType, false);
         mMixTexture = new Texture(mixTexPath, Texture.TYPE_SINGLE_CHANNEL, flip, GL_RGB, false);
+        mSamplerTexture = new Texture("resources/images/sampler.png", Texture.TYPE_DIFFUSE, flip, GL_RGB, false);
     }
 
     public MixColorSprite(String imagePath, String normalMapPath, boolean flip, String vsPath, String fsPath, int bufferType, boolean gammaCorrection) {
@@ -127,6 +129,11 @@ public class MixColorSprite extends Sprite {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, mMixTexture.id);
         mShaderProgram.setUniform1i("imageMix", 1);
+
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, mSamplerTexture.id);
+        mShaderProgram.setUniform1i("imageSampler", 2);
 
         model = model.identity();
         if (mPosition != null) {

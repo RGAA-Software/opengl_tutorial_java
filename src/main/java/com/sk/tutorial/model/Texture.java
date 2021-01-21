@@ -83,7 +83,7 @@ public class Texture {
         mWidth = x[0];
         mHeight = y[0];
         mChannel = c[0];
-        System.out.println("path : " + path + "c : " + c[0]);
+        System.out.println("path : " + path + " c : " + c[0]);
         if (imageData != null) {
 //            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA/*GL_RGBA*/, x[0], y[0], 0, GL_RGBA/*GL_RGBA*/, GL_UNSIGNED_BYTE, imageData);
             glTexImage2D(GL_TEXTURE_2D, 0, bufferFormat, x[0], y[0], 0, bufferType, GL_UNSIGNED_BYTE, imageData);

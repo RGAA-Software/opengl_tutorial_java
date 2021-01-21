@@ -19,6 +19,12 @@ public class Vertex {
 
     public Vertex() {}
 
+    public Vertex(float x, float y, float z) {
+        position = new Vector3f(x, y, z);
+        color = new Vector3f(0f, 0f, 0f);
+        texCoords = new Vector2f();
+    }
+
     public Vertex(Vector3f pos, Vector3f c) {
         position = pos;
         color = c;
