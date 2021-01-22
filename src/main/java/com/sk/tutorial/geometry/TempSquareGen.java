@@ -211,6 +211,9 @@ public class TempSquareGen {
                 indexTempSquare.vertices[x][y].color.y = color;
                 indexTempSquare.vertices[x][y].color.z = color;
             }
+
+//            if (y >= 2)
+//                break;
         }
     }
 

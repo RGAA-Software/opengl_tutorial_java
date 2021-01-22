@@ -287,7 +287,7 @@ public class Main {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-        glPointSize(8);
+        glPointSize(5);
 //        glEnable(GL_CULL_FACE);
 //        glCullFace(GL_FRONT);
 
@@ -431,7 +431,7 @@ public class Main {
 //        mNanoSuit.setCubeViews(mCubeViews);
         mWall.setCubeViews(mCubeViews);
 
-//        glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
+        glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
 
     }
 
@@ -490,7 +490,7 @@ public class Main {
 //        mCubeFrameBuffer.end();
 
 //        glViewport(0, 0, (int)width, (int)height);
-        mFrameBuffer.begin();
+//        mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -520,14 +520,12 @@ public class Main {
         //mSecondNormalRect.render(deltaTime);
         //mTestImage.render(deltaTime);
         mTempImage.render(deltaTime);
-        mFrameBuffer.end();
-//
-//
-//        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
-//        mFrameBufferPreview.render(deltaTime);
-        mOriginPreview.render(deltaTime);
-        mBlurPreview.render(deltaTime);
-//        mMainScene.render(deltaTime);
+
+//        mFrameBuffer.end();
+
+//        mOriginPreview.render(deltaTime);
+//        mBlurPreview.render(deltaTime);
+
 
         mLastTime = glfwGetTime();
     }
