@@ -20,9 +20,9 @@ void main()
 //        FragColor = texColor;
 //    } else {
 //    }
-    //vec4 samplerColor = texture(imageSampler, vec2(pow(1 -outMixColor.r, 2) * 2, 0.2));
-    vec4 samplerColor = texture(imageSampler, vec2(1 - outMixColor.r - 0.1, 0.2));
-//    FragColor = vec4(mix(texColor.xyz, vec3(samplerColor.rgb), 0.9), 1.0);
+    vec4 samplerColor = texture(imageSampler, vec2(pow(1 - outMixColor.r, 3) * 7, 0.2));
+//    vec4 samplerColor = texture(imageSampler, vec2(1 - outMixColor.r - 0.1, 0.2));
+//    FragColor = vec4(mix(texColor.xyz, vec3(samplerColor.rgb), 0.95), 1.0);
     FragColor = vec4(samplerColor.rgb, 1.0);
 //    FragColor = vec4(mixColor.rgb, 1);
 
