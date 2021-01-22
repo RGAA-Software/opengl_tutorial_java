@@ -40,10 +40,10 @@ public class Main {
     // The window handle
     private long window;
 
-//    private float width = 1920;
-//    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 1920;
+    private float height = 1080;
+//    private float width = 800;
+//    private float height = 600;
 //    private int vao;
 
     private int mShadowMapSize = 2048;
@@ -143,9 +143,10 @@ public class Main {
     private Sprite mSecondNormalRect;
     private Sprite mTestImage;
     private MixColorSprite mTempImage;
-    private FrameBufferPreview mFrameBufferPreview;
-    private FrameBufferPreview mMainScene;
-    private FrameBufferPreview mBlurPreview;
+//    private FrameBufferPreview mFrameBufferPreview;
+//    private FrameBufferPreview mMainScene;
+    private FrameBufferPreview mOriginPreview;
+    private FrameBufferPreview mProcessPreview;
 
     private Matrix4f mShadowView;
 
@@ -242,13 +243,13 @@ public class Main {
                 .lookAt(light.position, light.direction, new Vector3f(0, 1, 0));
 
 
-        mModel = ModelLoader.loadModel("resources/model/cyborg/cyborg.obj", modelShaderProgram);
-        mModel.setCamera(mCamera);
-        mModel.setProjection(mProjMat);
-        mModel.setScale(0.4f);
-        mModel.setPosition(new Vector3f(0, 1, 0));
-        mModel.addLight(light);
-        mModel.enableDebugRotate();
+//        mModel = ModelLoader.loadModel("resources/model/cyborg/cyborg.obj", modelShaderProgram);
+//        mModel.setCamera(mCamera);
+//        mModel.setProjection(mProjMat);
+//        mModel.setScale(0.4f);
+//        mModel.setPosition(new Vector3f(0, 1, 0));
+//        mModel.addLight(light);
+//        mModel.enableDebugRotate();
 
 //        ShaderProgram wolfShaderProgram = new ShaderProgram();
 //        wolfShaderProgram.initWithShaderPath("shader/model/vs.glsl", "shader/model/fs_normal.glsl");
@@ -394,7 +395,7 @@ public class Main {
 
         mTempImage.setPosColorAttribs(triangleBuffer);
         mTempImage.setScaleAxis(new Vector3f(1920f/1080, 1.0f, 1));
-        mTempImage.setPosition(new Vector3f(-2.5f, 2, -1));
+        mTempImage.setPosition(new Vector3f(0, 0, -1));
 
         mTempImage.addBatchLights(mLights);
 
@@ -404,21 +405,27 @@ public class Main {
         mTestImage.setPosition(new Vector3f(-3, 4, -5));
         mTestImage.addBatchLights(mLights);
 
-        mFrameBufferPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_luma.glsl");
-        mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
-        mFrameBufferPreview.setScale(0.25f);
+//        mFrameBufferPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_luma.glsl");
+//        mFrameBufferPreview.setTranslate(new Vector3f(0.75f, 0.75f, 0));
+//        mFrameBufferPreview.setScale(0.25f);
 
-        mBlurPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId2(), "shader/2d_base/fs_blur.glsl");
-        mBlurPreview.setTranslate(new Vector3f(0.25f, 0.75f, 0));
-        mBlurPreview.setScale(0.25f);
+        mOriginPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_image.glsl");
+        mOriginPreview.setTranslate(new Vector3f(0.25f, 0.75f, 0));
+        mOriginPreview.setScale(0.25f);
 
-        mMainScene = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), mFrameBuffer.getFrameBufferTexId2(), "shader/2d_base/fs_compose_two_pass.glsl");
-        mMainScene.setTranslate(new Vector3f(0, 0, 0));
-        mMainScene.setScale(1.0f);
+        mProcessPreview = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), "shader/2d_base/fs_blur.glsl");
+        mProcessPreview.setTranslate(new Vector3f(0, 0, 0));
+        //mProcessPreview.setScale(0.75f);
 
-        mModel.setCubeViews(mCubeViews);
+
+
+//        mMainScene = new FrameBufferPreview(mFrameBuffer.getFrameBufferTexId(), mFrameBuffer.getFrameBufferTexId2(), "shader/2d_base/fs_compose_two_pass.glsl");
+//        mMainScene.setTranslate(new Vector3f(0, 0, 0));
+//        mMainScene.setScale(1.0f);
+
+//        mModel.setCubeViews(mCubeViews);
 //        mNanoSuit.setCubeViews(mCubeViews);
-        mWall.setCubeViews(mCubeViews);
+//        mWall.setCubeViews(mCubeViews);
 
 //        glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
 
@@ -479,7 +486,7 @@ public class Main {
 //        mCubeFrameBuffer.end();
 
 //        glViewport(0, 0, (int)width, (int)height);
-//        mFrameBuffer.begin();
+        mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -509,12 +516,14 @@ public class Main {
         //mSecondNormalRect.render(deltaTime);
         //mTestImage.render(deltaTime);
         mTempImage.render(deltaTime);
-//        mFrameBuffer.end();
+        mFrameBuffer.end();
 //
 //
-//        //glClearColor(.2f, 0.2f, 0.2f, 1.0f);
+//        glClearColor(0.5f, 0.1f, 0.1f, 1.0f);
+//        glClear(GL_COLOR_BUFFER_BIT);
 //        mFrameBufferPreview.render(deltaTime);
-//        mBlurPreview.render(deltaTime);
+        mOriginPreview.render(deltaTime);
+        mProcessPreview.render(deltaTime);
 //        mMainScene.render(deltaTime);
 
         mLastTime = glfwGetTime();
