@@ -16,7 +16,7 @@ float normpdf(in float x, in float sigma) {
 }
 vec3 gaussianblur(int size, sampler2D texture, vec2 resolution) {
     //declare stuff
-    const int mSize =25;
+    const int mSize = 25;
     const int kSize = (mSize-1)/2;
     float kernel[mSize];
     vec3 final_colour = vec3(0.0);
@@ -51,7 +51,7 @@ vec3 gaussianblur(int size, sampler2D texture, vec2 resolution) {
 vec4 blur(vec2 _uv, sampler2D texture) {
     float disp = 0.;
     float intensity = .2;
-    const int passes = 8;
+    const int passes = 5;
     vec4 c1 = vec4(0.0);
     disp = intensity*(0.5-distance(0.5, .1));
 
