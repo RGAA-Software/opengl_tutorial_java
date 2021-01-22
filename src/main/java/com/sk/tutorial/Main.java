@@ -22,6 +22,10 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -401,7 +405,7 @@ public class Main {
 
         //mTempImage.setPosColorAttribs(triangleBuffer);
         mTempImage.setVerticesIndexBuffer(verticleBuffer, indexUVBuffer, indexColorBuffer, indexBuffer);
-        mTempImage.setScaleAxis(new Vector3f(1920f/1080, 1.0f, 1));
+        mTempImage.setScaleAxis(new Vector3f(720/720, 1.0f, 1));
         mTempImage.setPosition(new Vector3f(0, 0, -1));
 
         mTempImage.addBatchLights(mLights);
@@ -431,12 +435,26 @@ public class Main {
 //        mNanoSuit.setCubeViews(mCubeViews);
         mWall.setCubeViews(mCubeViews);
 
-        glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
+        //glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
+
+
+
+        try {
+            fos = new FileOutputStream(new File("image.rgba"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     private FrameBuffer mFrameBuffer;
 //    private CubeDepthFrameBuffer mCubeFrameBuffer;
+
+    ByteBuffer pixels = ByteBuffer.allocateDirect((int)width * (int)height * 4);
+
+
+    FileOutputStream fos;
+    static boolean save = true;
 
     private void render(double deltaTime) {
         if (mLastTime <= 0) {
@@ -490,7 +508,7 @@ public class Main {
 //        mCubeFrameBuffer.end();
 
 //        glViewport(0, 0, (int)width, (int)height);
-//        mFrameBuffer.begin();
+        mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -521,11 +539,33 @@ public class Main {
         //mTestImage.render(deltaTime);
         mTempImage.render(deltaTime);
 
-//        mFrameBuffer.end();
+        mFrameBuffer.end();
+//
+        mOriginPreview.render(deltaTime);
+        mBlurPreview.render(deltaTime);
 
-//        mOriginPreview.render(deltaTime);
-//        mBlurPreview.render(deltaTime);
+        if (fos != null) {
+            try {
 
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                pixels.position(0);
+                glReadPixels(0, 0, 1920, 1080, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+                int p = pixels.position();
+                System.out.println("pixel position : " + p);
+
+                fos.getChannel().write(pixels);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            fos = null;
+        }
 
         mLastTime = glfwGetTime();
     }

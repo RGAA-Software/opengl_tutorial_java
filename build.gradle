@@ -27,10 +27,13 @@ if(isWindows()) {
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+    implementation 'com.quickbirdstudios:opencv:3.4.1'
 
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"

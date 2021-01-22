@@ -47,7 +47,7 @@ public class TempSquareGen {
     public static void fillIndexColor(IndexTempSquare indexTempSquare, int width, int height) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                float centerColor = (float)Temperature.tempMatrix[x][height - 1 - y] / 37.0f;
+                float centerColor = (float)Temperature.tempMatrix[height - 1 - y][x] / 55.0f;
                 indexTempSquare.centerVertices[x][y].color.x = centerColor;
             }
         }
@@ -196,10 +196,10 @@ public class TempSquareGen {
         for (int y = 0; y <= height; y++) {
             for (int x = 0; x <= width; x++) {
 
-                int left = Math.max(x - 1, 0);
-                int top = Math.max(y - 1, 0);
-                int right = Math.min(x + 1, width - 1);
-                int bottom = Math.min(y + 1, height - 1);
+                int left = Math.min(Math.max(x - 1, 0), width - 1);
+                int top = Math.min(Math.max(y - 1, 0), height - 1);
+                int right = Math.min(x, width - 1);
+                int bottom = Math.min(y , height - 1);
 
                 float leftTopColor = indexTempSquare.centerVertices[left][top].color.x;
                 float leftBottomColor = indexTempSquare.centerVertices[left][bottom].color.x;
@@ -210,10 +210,10 @@ public class TempSquareGen {
                 indexTempSquare.vertices[x][y].color.x = color;
                 indexTempSquare.vertices[x][y].color.y = color;
                 indexTempSquare.vertices[x][y].color.z = color;
-            }
 
-//            if (y >= 2)
-//                break;
+//                System.out.println("left : " + left + " right : " + right + " top : " + top + " bottom : " + bottom);
+//                System.out.println("left top : " + leftTopColor + " left bottom : " + leftBottomColor + " right top : " + rightTopColor + " right bottom : " + rightBottomColor + " center : " + color);
+            }
         }
     }
 

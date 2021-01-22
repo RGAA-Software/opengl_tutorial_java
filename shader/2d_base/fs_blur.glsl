@@ -16,7 +16,7 @@ float normpdf(in float x, in float sigma) {
 }
 vec3 gaussianblur(int size, sampler2D texture, vec2 resolution) {
     //declare stuff
-    const int mSize = 9;
+    const int mSize = 7;
     const int kSize = (mSize-1)/2;
     float kernel[mSize];
     vec3 final_colour = vec3(0.0);
@@ -96,7 +96,7 @@ void main() {
 
 
         vec3 color = gaussianblur(10, image, textureSize(image, 0));
-        gl_FragColor = vec4(color, 0.50);
+        gl_FragColor = vec4(color, 1.0);
 
 //        gl_FragColor = blur(outTex, image);
 
