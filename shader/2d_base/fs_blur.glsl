@@ -16,7 +16,7 @@ float normpdf(in float x, in float sigma) {
 }
 vec3 gaussianblur(int size, sampler2D texture, vec2 resolution) {
     //declare stuff
-    const int mSize = 25;
+    const int mSize = 9;
     const int kSize = (mSize-1)/2;
     float kernel[mSize];
     vec3 final_colour = vec3(0.0);
@@ -69,13 +69,36 @@ vec4 blur(vec2 _uv, sampler2D texture) {
 }
 
 
+
+// 7x7
+vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+    vec4 color = vec4(0.0);
+    vec2 off1 = vec2(1.411764705882353) * direction;
+    vec2 off2 = vec2(3.2941176470588234) * direction;
+    vec2 off3 = vec2(5.176470588235294) * direction;
+    color += texture2D(image, uv) * 0.1964825501511404;
+    color += texture2D(image, uv + (off1 / resolution)) * 0.2969069646728344;
+    color += texture2D(image, uv - (off1 / resolution)) * 0.2969069646728344;
+    color += texture2D(image, uv + (off2 / resolution)) * 0.09447039785044732;
+    color += texture2D(image, uv - (off2 / resolution)) * 0.09447039785044732;
+    color += texture2D(image, uv + (off3 / resolution)) * 0.010381362401148057;
+    color += texture2D(image, uv - (off3 / resolution)) * 0.010381362401148057;
+    return color;
+}
+
+
 void main() {
+
+
+    vec4 colorH = blur13(image, outTex, textureSize(image, 0), vec2(1, 0));
+    vec4 colorV = blur13(image, outTex, textureSize(image, 0), vec2(0, 1));
+    gl_FragColor = mix(colorH, colorV, 0.5);
 
 
 //    vec3 color = gaussianblur(10, image, textureSize(image, 0));
 //    gl_FragColor = vec4(color, 1.0);
 
-    gl_FragColor = blur(outTex, image);
+//    gl_FragColor = blur(outTex, image);
 
 //    vec2 tex_offset = 1.0 / textureSize(image, 0); // gets size of single texel
 //    vec3 result_h = texture(image, outTex).rgb * weight[0];
@@ -92,7 +115,7 @@ void main() {
 //        result_v += texture(image, outTex - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
 //    }
 //
-//    gl_FragColor = vec4(result_h + result_v, 1.0);
+//    gl_FragColor = vec4(mix(result_h, result_v, 0.5), 1.0);
 
 
 //    vec2 offsets[9] = vec2[](
