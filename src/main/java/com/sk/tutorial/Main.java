@@ -435,7 +435,7 @@ public class Main {
 //        mNanoSuit.setCubeViews(mCubeViews);
         mWall.setCubeViews(mCubeViews);
 
-        //glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
+        glPolygonMode(GL_FRONT_AND_BACK ,GL_LINE );
 
 
 
@@ -508,7 +508,7 @@ public class Main {
 //        mCubeFrameBuffer.end();
 
 //        glViewport(0, 0, (int)width, (int)height);
-        mFrameBuffer.begin();
+        //mFrameBuffer.begin();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(.2f, 0.2f, 0.2f, 1.0f);
 
@@ -539,7 +539,7 @@ public class Main {
         //mTestImage.render(deltaTime);
         mTempImage.render(deltaTime);
 
-        mFrameBuffer.end();
+        //mFrameBuffer.end();
 //
         mOriginPreview.render(deltaTime);
         mBlurPreview.render(deltaTime);
