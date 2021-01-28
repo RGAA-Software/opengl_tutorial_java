@@ -244,7 +244,7 @@ public class Main {
                 .lookAt(light.position, light.direction, new Vector3f(0, 1, 0));
 
 
-        mModel = ModelLoader.loadModel("resources/model/cyborg/cyborg.obj", modelShaderProgram);
+        mModel = ModelLoader.loadModel("resources/model/untitled/untitled.obj", modelShaderProgram);
         mModel.setCamera(mCamera);
         mModel.setProjection(mProjMat);
         mModel.setScale(0.4f);
@@ -533,7 +533,7 @@ public class Main {
         //mSingleLightLayer.render(deltaTime);
         //mFloor.render(deltaTime);
         //mWall.render(deltaTime);
-        //mModel.render(deltaTime);
+        mModel.render(deltaTime);
         //mWolf.render(deltaTime);
 //        mNanoSuit.render(deltaTime);
         //mFirstNormalRect.render(deltaTime);

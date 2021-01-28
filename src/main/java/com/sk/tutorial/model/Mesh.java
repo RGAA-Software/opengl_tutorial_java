@@ -58,13 +58,13 @@ public class Mesh extends IRenderer {
             verticles[i * verticleSize + 6] = vertex.texCoords.x;
             verticles[i * verticleSize + 7] = vertex.texCoords.y;
 
-            verticles[i * verticleSize + 8] = vertex.tangent.x;
-            verticles[i * verticleSize + 9] = vertex.tangent.y;
-            verticles[i * verticleSize + 10] = vertex.tangent.z;
+            verticles[i * verticleSize + 8] = vertex.tangent != null ? vertex.tangent.x : 0;
+            verticles[i * verticleSize + 9] = vertex.tangent != null ? vertex.tangent.y : 0;
+            verticles[i * verticleSize + 10] = vertex.tangent != null ? vertex.tangent.z : 0;
 
-            verticles[i * verticleSize + 11] = vertex.bitangent.x;
-            verticles[i * verticleSize + 12] = vertex.bitangent.y;
-            verticles[i * verticleSize + 13] = vertex.bitangent.z;
+            verticles[i * verticleSize + 11] = vertex.bitangent != null ? vertex.bitangent.x : 0;
+            verticles[i * verticleSize + 12] = vertex.bitangent != null ? vertex.bitangent.y : 0;
+            verticles[i * verticleSize + 13] = vertex.bitangent != null ? vertex.bitangent.z : 0;
         }
 
 

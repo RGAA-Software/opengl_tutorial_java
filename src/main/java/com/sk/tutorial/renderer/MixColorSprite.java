@@ -202,7 +202,7 @@ public class MixColorSprite extends Sprite {
         //glDrawArrays(GL_TRIANGLES, 0, mVerticleSize);
 
         glDrawElements(GL_TRIANGLES, mIndicesSize, GL_UNSIGNED_INT, 0);
-        //glDrawArrays(GL_POINTS, 0, mVerticleSize);
+        glDrawArrays(GL_POINTS, 0, mVerticleSize);
 
         glBindVertexArray(0);
     }
