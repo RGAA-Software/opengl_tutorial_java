@@ -41,10 +41,10 @@ public class Main {
     // The window handle
     private long window;
 
-    private float width = 1920;
-    private float height = 1080;
-//    private float width = 800;
-//    private float height = 600;
+//    private float width = 1920;
+//    private float height = 1080;
+    private float width = 800;
+    private float height = 600;
 //    private int vao;
 
     private int mShadowMapSize = 2048;
@@ -462,6 +462,8 @@ public class Main {
         }
         mDeltaTime = glfwGetTime() - mLastTime;
 
+        //System.out.println(mDeltaTime);
+
 //        if (isUping) {
 //            if (light.position.y <= MAX_SUN_Y) {
 //                light.position.y += deltaTime/2;
@@ -549,7 +551,7 @@ public class Main {
 
                 glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
                 pixels.position(0);
-                glReadPixels(0, 0, 1920, 1080, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+                glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
                 int p = pixels.position();
                 System.out.println("pixel position : " + p);
