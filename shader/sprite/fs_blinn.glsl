@@ -30,6 +30,7 @@ uniform sampler2D shadowMap;
 float calculateShadow(vec4 fragPosInLightSpace) {
     vec3 projCoord = fragPosInLightSpace.xyz / fragPosInLightSpace.w;
     projCoord = projCoord * 0.5 + 0.5;
+
     float currentDepth = projCoord.z;
     float shadowMapDepth = texture(shadowMap, projCoord.xy).r;
     return currentDepth - 0.0005 > shadowMapDepth ? 1.0 : 0.0;
@@ -41,6 +42,9 @@ float calculateShadowPCF(vec4 fragPosInLightSpace) {
     vec3 projCoord = fragPosInLightSpace.xyz / fragPosInLightSpace.w;
     projCoord = projCoord * 0.5 + 0.5;
 
+    if (projCoord.z > 1.0) {
+        return 0.0;
+    }
     for (int x = -1; x <= 1; x++) {
         for (int y = -1; y <= 1; y++) {
             float pcfDepth = texture(shadowMap, projCoord.xy + vec2(x, y) * texelSize).r;

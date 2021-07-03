@@ -38,7 +38,7 @@ public class Main {
     private float width = 800;
     private float height = 600;
 //    private int vao;
-    private int mShadowMapSize = 2048;
+    private int mShadowMapSize = 1024*2;
 
     public void run() {
         init();
@@ -150,7 +150,9 @@ public class Main {
                 .setCamera(mCamera);
 
         Sun sun = new Sun();
-        sun.direction = new Vector3f(0, -1.0f, 1.5f);
+        sun.direction = new Vector3f(0, -0.3f, 1.5f); // 调成(0, -0.3, 1.5)为啥有成片的黑影出现？跟上面的ortho project mat有关系
+        //Matrix4f mOrthoProjMat = new Matrix4f()
+        //                .ortho(-5, 5, -10, 10, -10, 10); 如果将zNear 设置为-5，则不行。
         sun.position = new Vector3f(0.0f, 0.0f, 0.0f);
         sun.ambient = new Vector3f(0.1f, 0.1f, 0.1f);
         sun.diffuse = new Vector3f(0.6f, 0.6f, 0.6f);
@@ -211,13 +213,14 @@ public class Main {
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
         mFloor = new Sprite("resources/images/wood.png", false, "shader/sprite/vs.glsl", "shader/sprite/fs_blinn.glsl");
+        float scale = 30.0f;
         float[] grassVertices = {
-            10.0f,  0,  10.0f,
-            -10.0f, 0,  10.0f,
-            -10.0f, 0, -10.0f,
-            10.0f,  0,  10.0f,
-            -10.0f, 0, -10.0f,
-            10.0f,  0, -10.0f,
+            scale,  0,  scale,
+            -scale, 0,  scale,
+            -scale, 0, -scale,
+            scale,  0,  scale,
+            -scale, 0, -scale,
+            scale,  0, -scale,
         };
 
         float[] grassNormals = {
@@ -231,12 +234,12 @@ public class Main {
         };
 
         float[] grassTexCoord = {
-                10.0f,  0.0f,
+                scale,  0.0f,
                 0.0f,  0.0f,
-                0.0f, 10.0f,
-                10.0f,  0.0f,
-                0.0f, 10.0f,
-                10.0f, 10.0f
+                0.0f, scale,
+                scale,  0.0f,
+                0.0f, scale,
+                scale, scale
         };
         mFloor.setVertices(grassVertices, grassNormals, grassTexCoord);
         mFloor.setPosition(new Vector3f(0, -0.5f, 0));
