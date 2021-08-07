@@ -238,6 +238,9 @@ public class Main {
 
     private Random random = new Random();
 
+    private boolean shot = true;
+    private ByteBuffer shotBuffer = ByteBuffer.allocateDirect((int) (width*height*4)).order(ByteOrder.nativeOrder());
+
     private void render() {
         program.use();
 
@@ -274,6 +277,24 @@ public class Main {
 
             i++;
         }
+
+        if (false) {
+            shot = false;
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            shotBuffer.position(0);
+            glReadPixels(0, 0, (int)width, (int)height, GL_RGBA, GL_UNSIGNED_BYTE, shotBuffer);
+
+            shotBuffer.position(0);
+            try {
+                FileOutputStream fos = new FileOutputStream("shot.rgba");
+                byte[] buffer = new byte[(int) (width*height*4)];
+                shotBuffer.get(buffer);
+                fos.write(buffer);
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void loop() {
@@ -285,7 +306,7 @@ public class Main {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(.2f, 0.26f, 0.2f, 1.0f);
+        glClearColor(.0f, 0.0f, 0.0f, 0.0f);
 
         prepare();
 

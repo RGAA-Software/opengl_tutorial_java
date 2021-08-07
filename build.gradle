@@ -21,7 +21,7 @@ project.ext.lwjglNatives = "natives-windows"
 //} else {
 //    project.ext.lwjglNatives = "natives-linux"
 //}
-
+//
 //switch (OperatingSystem.current()) {
 //    case OperatingSystem.LINUX:
 //        project.ext.lwjglNatives = "natives-linux"
