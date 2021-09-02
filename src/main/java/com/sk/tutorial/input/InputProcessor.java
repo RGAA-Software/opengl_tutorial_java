@@ -28,7 +28,7 @@ public class InputProcessor {
             @Override
             public void invoke(long window, double xpos, double ypos) {
 
-                System.out.println("x pos : " + xpos + " y pos : " + ypos);
+                //System.out.println("x pos : " + xpos + " y pos : " + ypos);
 
                 double pitch = camera.getPitch() , yaw = camera.getYaw();
 

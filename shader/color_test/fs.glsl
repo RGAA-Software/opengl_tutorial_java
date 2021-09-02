@@ -5,5 +5,9 @@ uniform vec3 bgrColor;
 
 void main()
 {
-    gl_FragColor = vec4(0.2, 0.1, 0.1, 1.0);
+    if (gl_FragCoord.x > 150.0) {
+        gl_FragColor = vec4(bgrColor/255.0, 1.0);
+    } else {
+        gl_FragColor = vec4(rgbColor/255.0, 1.0);
+    }
 }

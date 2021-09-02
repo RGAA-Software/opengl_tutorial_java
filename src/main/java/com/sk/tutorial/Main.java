@@ -15,9 +15,13 @@ import com.sk.tutorial.shader.ShaderProgram;
 import com.sk.tutorial.ui.FrameBufferPreview;
 import com.sk.tutorial.world.Director;
 
+import org.ice1000.jimgui.JImGui;
+import org.ice1000.jimgui.JImVec4;
+import org.ice1000.jimgui.util.JniLoader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
@@ -43,8 +47,8 @@ public class Main {
 
 //    private float width = 1920;
 //    private float height = 1080;
-    private float width = 800;
-    private float height = 600;
+    private float width = 300;
+    private float height = 300;
 //    private int vao;
 
 
@@ -59,6 +63,9 @@ public class Main {
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
+
+    private Vector3f rgbColor = new Vector3f(128, 120, 15);
+    private Vector3f bgrColor = new Vector3f(15, 120, 128);
 
     private void init() {
 
@@ -114,7 +121,7 @@ public class Main {
                     (vidmode.height() - pHeight.get(0)) / 2
             );
         } // the stack frame is popped automatically
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
         // Enable v-sync
@@ -124,6 +131,39 @@ public class Main {
         glfwShowWindow(window);
 
         InputProcessor.getInstance().processCursorCallback(window, width, height, mCamera);
+
+        glfwSetKeyCallback(window, new GLFWKeyCallbackI() {
+            @Override
+            public void invoke(long window, int key, int scancode, int action, int mods) {
+                if (key == GLFW_KEY_R) {
+                    rgbColor.x++;
+                    if (rgbColor.x > 255) {
+                        rgbColor.x = 0;
+                    }
+                    bgrColor.z = rgbColor.x;
+
+                } else if (key == GLFW_KEY_B) {
+                    bgrColor.z++;
+                    if (bgrColor.z > 255) {
+                        bgrColor.z = 0;
+                    }
+                    rgbColor.x = bgrColor.z;
+
+                } else if (key == GLFW_KEY_G) {
+                    rgbColor.y++;
+                    bgrColor.y++;
+                    if (rgbColor.y > 255) {
+                        rgbColor.y = 0;
+                    }
+                    if (bgrColor.y > 255) {
+                        bgrColor.y = 0;
+                    }
+                }
+
+                System.out.println("RGB : " + rgbColor.x + " " + rgbColor.y + " " + rgbColor.z);
+                System.out.println("BGR : " + bgrColor.x + " " + bgrColor.y + " " + bgrColor.z);
+            }
+        });
 
     }
 
@@ -135,9 +175,12 @@ public class Main {
     private ShaderProgram mShader;
     private int mRenderVAO;
 
+    private JImGui jImGui;
+
     private void prepare() {
+
         mShader = new ShaderProgram();
-        mShader.initWithShaderPath("resources/shader/color_test/vs.glsl", "resources/shader/color_test/fs.glsl");
+        mShader.initWithShaderPath("shader/color_test/vs.glsl", "shader/color_test/fs.glsl");
 
         float[] rectVertices = {
             1f, 1f, 0.0f,
@@ -170,6 +213,9 @@ public class Main {
 
         mShader.use();
         glBindVertexArray(mRenderVAO);
+
+        mShader.setUniform3fv("rgbColor", rgbColor);
+        mShader.setUniform3fv("bgrColor", bgrColor);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
