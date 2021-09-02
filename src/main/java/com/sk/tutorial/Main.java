@@ -143,35 +143,44 @@ public class Main {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        int[] x = new int[1];
-        int[] y = new int[1];
-        int[] c = new int[1];
-        STBImage.stbi_set_flip_vertically_on_load(true);
-        ByteBuffer imageData = STBImage.stbi_load("resources/images/image1.jpg", x, y, c, 3);
-        if (imageData != null) {
-            System.out.println("x : " + x[0] + " y : " + y[0] + " c : " + c[0]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            STBImage.stbi_image_free(imageData);
-        }
+//        int[] x = new int[1];
+//        int[] y = new int[1];
+//        int[] c = new int[1];
+        //STBImage.stbi_set_flip_vertically_on_load(true);
+        //ByteBuffer imageData = STBImage.stbi_load("resources/images/image1.jpg", x, y, c, 3);
+
+        int x = 32;
+        int y = 32;
+        int c = 4;
+        ByteBuffer imageData;
+        byte[] buffer = FileUtil.readFileAsByteArray("resources/images/cursor_192.rgba");
+//        byte[] buffer = FileUtil.readFileAsByteArray("image.rgba");
+        imageData = ByteBuffer.allocateDirect(buffer.length).order(ByteOrder.nativeOrder()).put(buffer);
+        imageData.position(0);
+        System.out.println("x : " + x + " y : " + y + " c : " + c);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        STBImage.stbi_image_free(imageData);
 
 
-        texture2 = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        x = new int[1];
-        y = new int[1];
-        c = new int[1];
-        STBImage.stbi_set_flip_vertically_on_load(true);
-        imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
-        if (imageData != null) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            STBImage.stbi_image_free(imageData);
-        }
+        glEnable(GL_BLEND);
+
+//        texture2 = glGenTextures();
+//        glBindTexture(GL_TEXTURE_2D, texture2);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//        x = new int[1];
+//        y = new int[1];
+//        c = new int[1];
+//        STBImage.stbi_set_flip_vertically_on_load(true);
+//        imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
+//        if (imageData != null) {
+//            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+//            glGenerateMipmap(GL_TEXTURE_2D);
+//            STBImage.stbi_image_free(imageData);
+//        }
     }
 
 
@@ -180,11 +189,11 @@ public class Main {
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+//        glActiveTexture(GL_TEXTURE1);
+//        glBindTexture(GL_TEXTURE_2D, texture2);
 
         glUniform1i(glGetUniformLocation(program.getProgram(), "image1"), 0);
-        glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
+//        glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
 
         // Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

@@ -8,5 +8,9 @@ uniform sampler2D image2;
 
 void main()
 {
-    gl_FragColor = mix(texture(image1, outTex), texture(image2, outTex), 0.95);
+    vec4 color = texture(image1, outTex);
+    if (color.a < 0.1) {
+        discard;
+    }
+    gl_FragColor = color.rgba;
 }
