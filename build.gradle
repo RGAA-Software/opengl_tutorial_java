@@ -33,8 +33,9 @@ repositories {
 dependencies {
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
-    implementation 'com.quickbirdstudios:opencv:3.4.1'
-
+    //implementation 'com.quickbirdstudios:opencv:3.4.1'
+    implementation "org.ice1000.jimgui:core:v0.20.3"
+    implementation "org.ice1000.jimgui:kotlin-dsl:v0.20.3"
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
     implementation "org.lwjgl:lwjgl-bgfx"
