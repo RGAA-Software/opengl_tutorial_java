@@ -56,7 +56,7 @@ public class Main {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         // Create the window
-        window = glfwCreateWindow(600, 600, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -208,7 +208,7 @@ public class Main {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(.2f, 0.26f, 0.2f, 1.0f);
+        glClearColor(1f, 1f, 1f, 1.0f);
 
         prepare();
 

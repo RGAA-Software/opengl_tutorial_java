@@ -9,8 +9,8 @@ uniform sampler2D image2;
 void main()
 {
     vec4 color = texture(image1, outTex);
-    if (color.a < 0.1) {
+    if (color.a < 0.2) {
         discard;
     }
-    gl_FragColor = color.rgba;
+    gl_FragColor = color.bgra;
 }
