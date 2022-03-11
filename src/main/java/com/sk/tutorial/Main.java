@@ -54,9 +54,9 @@ public class Main {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
-
+        glfwWindowHint(GLFW_SAMPLES, 4);
         // Create the window
-        window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(1462, 794, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -103,10 +103,10 @@ public class Main {
         program.initWithShaderPath("shader/base/vs.glsl", "shader/base/fs.glsl");
 
         float vertices[] = {
-                -0.5f, -0.5f, 0.0f, 1.0f, 0, 0,  0, 0,
-                0.5f, -0.5f, 0.0f, 0, 1.0f, 0,  1, 0,
-                0.5f,  0.5f, 0.0f, 0, 0, 1.0f,  1, 1,
-                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0, 0, 1
+                -1f, -1f, 0.0f, 1.0f, 0, 0,  0, 0,
+                1f, -1f, 0.0f, 0, 1.0f, 0,  1, 0,
+                1f,  1f, 0.0f, 0, 0, 1.0f,  1, 1,
+                -1f, 1f, 0.0f, 1.0f, 1.0f, 0, 0, 1
         };
 
 
@@ -141,24 +141,26 @@ public class Main {
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 //        int[] x = new int[1];
 //        int[] y = new int[1];
 //        int[] c = new int[1];
-        //STBImage.stbi_set_flip_vertically_on_load(true);
-        //ByteBuffer imageData = STBImage.stbi_load("resources/images/image1.jpg", x, y, c, 3);
+//        STBImage.stbi_set_flip_vertically_on_load(true);
+//        ByteBuffer imageData = STBImage.stbi_load("resources/images/origin.png", x, y, c, 4);
 
-        int x = 32;
-        int y = 32;
-        int c = 4;
+        int x = 1920;
+        int y = 1080;
+        int c = 3;
         ByteBuffer imageData;
-        byte[] buffer = FileUtil.readFileAsByteArray("resources/images/cursor_192.rgba");
-//        byte[] buffer = FileUtil.readFileAsByteArray("image.rgba");
+        byte[] buffer = FileUtil.readFileAsByteArray("resources/images/frame_12.rgb");
+        //byte[] buffer = FileUtil.readFileAsByteArray("image.rgba");
         imageData = ByteBuffer.allocateDirect(buffer.length).order(ByteOrder.nativeOrder()).put(buffer);
+
         imageData.position(0);
-        System.out.println("x : " + x + " y : " + y + " c : " + c);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+        //System.out.println("x : " + x[0] + " y : " + y[0] + " c : " + c[0]);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x[0], y[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
         glGenerateMipmap(GL_TEXTURE_2D);
         STBImage.stbi_image_free(imageData);
 
