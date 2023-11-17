@@ -56,7 +56,7 @@ public class Main {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
         glfwWindowHint(GLFW_SAMPLES, 4);
         // Create the window
-        window = glfwCreateWindow(1462, 794, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -136,66 +136,32 @@ public class Main {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-
-        texture = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture);
+        texture2 = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture2);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//        int[] x = new int[1];
-//        int[] y = new int[1];
-//        int[] c = new int[1];
-//        STBImage.stbi_set_flip_vertically_on_load(true);
-//        ByteBuffer imageData = STBImage.stbi_load("resources/images/origin.png", x, y, c, 4);
-
-        int x = 1920;
-        int y = 1080;
-        int c = 3;
-        ByteBuffer imageData;
-        byte[] buffer = FileUtil.readFileAsByteArray("resources/images/frame_12.rgb");
-        //byte[] buffer = FileUtil.readFileAsByteArray("image.rgba");
-        imageData = ByteBuffer.allocateDirect(buffer.length).order(ByteOrder.nativeOrder()).put(buffer);
-
-        imageData.position(0);
-        //System.out.println("x : " + x[0] + " y : " + y[0] + " c : " + c[0]);
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x[0], y[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        STBImage.stbi_image_free(imageData);
-
-
-        glEnable(GL_BLEND);
-
-//        texture2 = glGenTextures();
-//        glBindTexture(GL_TEXTURE_2D, texture2);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        x = new int[1];
-//        y = new int[1];
-//        c = new int[1];
-//        STBImage.stbi_set_flip_vertically_on_load(true);
-//        imageData = STBImage.stbi_load("resources/images/image2.jpg", x, y, c, 3);
-//        if (imageData != null) {
-//            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x[0], y[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-//            glGenerateMipmap(GL_TEXTURE_2D);
-//            STBImage.stbi_image_free(imageData);
-//        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        int[] x2 = new int[1];
+        int[] y2 = new int[1];
+        int[] c2 = new int[1];
+        STBImage.stbi_set_flip_vertically_on_load(true);
+        ByteBuffer imageData = STBImage.stbi_load("resources/images/image2.jpg", x2, y2, c2, 3);
+        if (imageData != null) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x2[0], y2[0], 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            STBImage.stbi_image_free(imageData);
+        }
     }
 
 
     private void render() {
         program.use();
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-//        glActiveTexture(GL_TEXTURE1);
-//        glBindTexture(GL_TEXTURE_2D, texture2);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
 
-        glUniform1i(glGetUniformLocation(program.getProgram(), "image1"), 0);
-//        glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
+        glUniform1i(glGetUniformLocation(program.getProgram(), "image2"), 1);
 
         // Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
