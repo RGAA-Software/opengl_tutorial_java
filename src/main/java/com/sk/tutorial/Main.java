@@ -148,13 +148,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        try {
-            FileOutputStream fos = new FileOutputStream("shader/a.txt");
-            fos.write("xxxx".getBytes());
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         new Main().run();
     }
 

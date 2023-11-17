@@ -1,5 +1,6 @@
 package com.sk.tutorial.shader;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -68,7 +69,20 @@ public class ShaderProgram {
         String data = null;
         try {
             fis = new FileInputStream(path);
-            data = new String(fis.readAllBytes());
+            byte[] buffer = new byte[1024];
+            int readSize = fis.read(buffer);
+            ByteArrayOutputStream bios = new ByteArrayOutputStream();
+            if (readSize > 0) {
+                bios.write(buffer, 0, readSize);
+            }
+            while (readSize > 0) {
+                readSize = fis.read(buffer);
+                if (readSize > 0) {
+                    bios.write(buffer, 0, readSize);
+                }
+            }
+            //data = new String(fis.readAllBytes());
+            data = bios.toString();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

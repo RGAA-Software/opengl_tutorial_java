@@ -9,11 +9,16 @@ sourceCompatibility = 1.9
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.9.25"
-project.ext.lwjglNatives = "natives-linux"
+project.ext.lwjglNatives = "natives-windows"
 
 repositories {
     mavenCentral()
 }
+
+//compileJava {
+//    sourceCompatibility = 8
+//    targetCompatibility = 8
+//}
 
 dependencies {
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
